@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { salvarPontuacao, buscarPlacar, pontuacaoParaPercentual } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -22,6 +23,8 @@ interface LeaderEntry {
   percentage: number;
   result: string;
   date: string;
+  // Adicionar campos do banco de dados para melhor tipagem, se necessário
+  tempo_segundos?: number;
 }
 
 const QUESTIONS_POOL: Question[] = [
@@ -421,13 +424,44 @@ export default function Home() {
   const [leaderboard, setLeaderboard] = useState<LeaderEntry[]>([]);
   const [playerName, setPlayerName] = useState("");
   const [showNameInput, setShowNameInput] = useState(false);
+  const [startTime, setStartTime] = useState<number>(0); // NOVO: Rastrear tempo de início
 
-  // Carregar leaderboard
-  useEffect(() => {
-    const saved = localStorage.getItem("gayQuizLeaderboard");
-    if (saved) {
-      setLeaderboard(JSON.parse(saved));
+  // Função auxiliar para obter o resultado baseado na porcentagem
+  const getResultByPercentage = (percentage: number): Result => {
+    let result = RESULTS[0];
+    for (let i = RESULTS.length - 1; i >= 0; i--) {
+      if (percentage >= RESULTS[i].percentage) {
+        result = RESULTS[i];
+        break;
+      }
     }
+    return result;
+  };
+
+  // Função para carregar o placar do banco de dados
+  const loadLeaderboard = async () => {
+    const placar = await buscarPlacar(50); // Top 50
+    
+    // Converter formato do banco para formato do frontend
+    const entries: LeaderEntry[] = placar.map(score => {
+      // Usar 15 como total de perguntas padrão para cálculo de porcentagem, 
+      // pois o número real de perguntas pode variar
+      const percentage = pontuacaoParaPercentual(score.pontuacao, 15); 
+      return {
+        name: score.apelido,
+        percentage,
+        result: getResultByPercentage(percentage).title,
+        date: new Date(score.data_registro).toLocaleDateString("pt-BR"),
+        tempo_segundos: score.tempo_segundos,
+      };
+    });
+    
+    setLeaderboard(entries);
+  };
+
+  // Carregar leaderboard ao montar o componente
+  useEffect(() => {
+    loadLeaderboard();
   }, []);
 
   // Embaralhar perguntas ao iniciar
@@ -481,6 +515,11 @@ export default function Home() {
     }, 300);
   };
 
+  const startQuiz = () => {
+    setQuizStarted(true);
+    setStartTime(Date.now()); // NOVO: Registra tempo de início
+  };
+
   const getResult = (): Result => {
     const maxPoints = questions.length * 3;
     const percentage = Math.round((totalPoints / maxPoints) * 100);
@@ -495,21 +534,37 @@ export default function Home() {
     return result;
   };
 
-  const saveToLeaderboard = (name: string) => {
-    const result = getResult();
-    const maxPoints = questions.length * 3;
-    const percentage = Math.round((totalPoints / maxPoints) * 100);
+  const saveToLeaderboard = async (name: string) => {
+    const tempoSegundos = (Date.now() - startTime) / 1000; // Calcula tempo em segundos
+    const apelido = name || "Anônimo";
 
-    const entry: LeaderEntry = {
-      name: name || "Anônimo",
-      percentage,
-      result: result.title,
-      date: new Date().toLocaleDateString("pt-BR"),
-    };
+    // Salvar no banco de dados PostgreSQL
+    const saved = await salvarPontuacao(apelido, totalPoints, tempoSegundos);
 
-    const updated = [entry, ...leaderboard].slice(0, 50);
-    setLeaderboard(updated);
-    localStorage.setItem("gayQuizLeaderboard", JSON.stringify(updated));
+    if (saved) {
+      console.log("✅ Pontuação salva no banco de dados:", saved);
+      
+      // Atualizar placar local
+      await loadLeaderboard();
+    } else {
+      console.error("❌ Erro ao salvar pontuação");
+      // Fallback: manter lógica antiga de localStorage (opcional, mas bom para robustez)
+      const result = getResult();
+      const maxPoints = questions.length * 3;
+      const percentage = Math.round((totalPoints / maxPoints) * 100);
+      
+      const entry: LeaderEntry = {
+        name: apelido,
+        percentage,
+        result: result.title,
+        date: new Date().toLocaleDateString("pt-BR"),
+      };
+      
+      const updated = [entry, ...leaderboard].slice(0, 50);
+      setLeaderboard(updated);
+      localStorage.setItem("gayQuizLeaderboard", JSON.stringify(updated));
+    }
+
     setShowNameInput(false);
     setShowResult(true);
   };
@@ -559,9 +614,9 @@ export default function Home() {
               {leaderboard.map((entry, index) => (
                 <div key={index} className="flex justify-between items-center p-3 bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg">
                   <div>
-                    <p className="font-bold text-gray-800">#{index + 1} {entry.name}</p>
-                    <p className="text-sm text-gray-600">{entry.result} ({entry.percentage}%)</p>
-                    <p className="text-xs text-gray-500">{entry.date}</p>
+	                    <p className="font-bold text-gray-800">#{index + 1} {entry.name}</p>
+	                    <p className="text-sm text-gray-600">{entry.result} ({entry.percentage}%)</p>
+	                    <p className="text-xs text-gray-500">{entry.date} {entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}</p>
                   </div>
                   <p className="text-2xl">{entry.percentage >= 85 ? "👑" : entry.percentage >= 65 ? "🌟" : "💜"}</p>
                 </div>
@@ -619,12 +674,12 @@ export default function Home() {
             Um teste 100% científico (não é) para descobrir seu nível de gayness! 
             Responda com honestidade e divirta-se! 😄
           </p>
-          <Button
-            onClick={() => setQuizStarted(true)}
-            className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-3 text-lg mb-3"
-          >
-            Começar Quiz! 🚀
-          </Button>
+	          <Button
+	            onClick={startQuiz} // NOVO: Chama a função startQuiz que registra o tempo
+	            className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-3 text-lg mb-3"
+	          >
+	            Começar Quiz! 🚀
+	          </Button>
           <Button
             onClick={() => setNsfw(!nsfw)}
             variant="outline"
@@ -736,12 +791,12 @@ export default function Home() {
             ) : (
               <div className="space-y-3 max-h-80 overflow-y-auto">
                 {leaderboard.slice(0, 20).map((entry, index) => (
-                  <div key={index} className="flex justify-between items-center p-4 bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg hover:shadow-md transition-shadow">
-                    <div className="flex-1">
-                      <p className="font-bold text-gray-800 text-lg">#{index + 1} {entry.name}</p>
-                      <p className="text-sm text-gray-600">{entry.result}</p>
-                      <p className="text-xs text-gray-500">{entry.date}</p>
-                    </div>
+	                  <div key={index} className="flex justify-between items-center p-4 bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg hover:shadow-md transition-shadow">
+	                    <div className="flex-1">
+	                      <p className="font-bold text-gray-800 text-lg">#{index + 1} {entry.name}</p>
+	                      <p className="text-sm text-gray-600">{entry.result}</p>
+	                      <p className="text-xs text-gray-500">{entry.date} {entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}</p>
+	                    </div>
                     <div className="text-right">
                       <p className="text-3xl">{entry.percentage >= 85 ? "👑" : entry.percentage >= 65 ? "🌟" : "💜"}</p>
                       <p className="font-bold text-purple-600 text-lg">{entry.percentage}%</p>
