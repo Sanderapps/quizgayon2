@@ -6,10 +6,11 @@ const { Pool } = pg;
 // O Railway injeta automaticamente as variáveis de ambiente
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl:
-    process.env.NODE_ENV === "production"
-      ? { rejectUnauthorized: false }
-      : false,
+  // Adicionar a configuração de SSL para o Railway
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+  // Adicionar timeout para evitar que o servidor fique preso na inicialização
+  connectionTimeoutMillis: 5000,
+  idleTimeoutMillis: 30000,
 });
 
 // Função para inicializar o banco de dados e criar a tabela se não existir
