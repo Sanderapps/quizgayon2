@@ -928,6 +928,7 @@ export default function Home() {
     }
   }, [quizStarted, questions.length, nsfw]);
 
+  // Função para gerar um som de clique/resposta 8-bit
   const playSound = () => {
     if (!audioEnabled) return;
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -937,14 +938,40 @@ export default function Home() {
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
 
-    oscillator.frequency.value = 800;
-    oscillator.type = "sine";
+    oscillator.frequency.value = 1000; // Frequência mais alta
+    oscillator.type = "square"; // Onda quadrada para som 8-bit
 
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05); // Mais curto e rápido
 
     oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.1);
+    oscillator.stop(audioContext.currentTime + 0.05);
+  };
+
+  // Função para gerar um som de sucesso (fim do quiz)
+  const playSuccessSound = () => {
+    if (!audioEnabled) return;
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const now = audioContext.currentTime;
+    const noteLength = 0.1;
+    const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6 (Acorde de C maior)
+
+    notes.forEach((freq, index) => {
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+
+      osc.connect(gain);
+      gain.connect(audioContext.destination);
+
+      osc.frequency.value = freq;
+      osc.type = "square";
+
+      gain.gain.setValueAtTime(0.2, now + index * 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.05 + noteLength);
+
+      osc.start(now + index * 0.05);
+      osc.stop(now + index * 0.05 + noteLength);
+    });
   };
 
   const handleAnswer = (points: number) => {
@@ -959,6 +986,7 @@ export default function Home() {
         setCurrentQuestion(currentQuestion + 1);
         setFadeOut(false);
       } else {
+        playSuccessSound(); // NOVO: Toca som de sucesso
         setShowConfetti(true);
         setShowNameInput(true);
       }
