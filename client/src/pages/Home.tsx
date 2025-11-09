@@ -1174,7 +1174,7 @@ export default function Home() {
             </h1>
             {result.badge && (
               <div className="mb-6 inline-block bg-white px-6 py-3 rounded-full font-bold text-purple-600 shadow-lg">
-                🏅 {result.badge}
+                {result.badge}
               </div>
             )}
             <div className="mb-8">
