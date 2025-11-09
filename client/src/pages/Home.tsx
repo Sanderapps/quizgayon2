@@ -102,111 +102,644 @@ const QUESTIONS_POOL: Question[] = [
   },
   {
     id: 9,
-    text: "Qual é seu tipo de humor favorito?",
+    text: "Qual é sua reação ao ver um homem de biquíni na praia?",
     answers: [
-      { text: "Humor sarcástico e irônico", points: 3 },
-      { text: "Humor variado", points: 1 },
-      { text: "Humor mais simples", points: 0 },
+      { text: "Não consigo desviar o olhar!", points: 3 },
+      { text: "Acho normal", points: 1 },
+      { text: "Não ligo", points: 0 },
     ],
   },
   {
     id: 10,
-    text: "Como você se sente com a comunidade LGBTQ+?",
+    text: "Como você se sente com piercings e tatuagens?",
     answers: [
-      { text: "Sou parte dela! 🏳️‍🌈", points: 3 },
-      { text: "Apoio totalmente", points: 1 },
-      { text: "Respeito, mas não tenho conexão", points: 0 },
+      { text: "Adorei! Quero fazer mais!", points: 3 },
+      { text: "Alguns ficam legais", points: 1 },
+      { text: "Não é meu estilo", points: 0 },
     ],
   },
   {
     id: 11,
-    text: "Você já chorou assistindo um filme?",
+    text: "Qual é sua reação ao ver um casal do mesmo sexo se beijando?",
     answers: [
-      { text: "Sim! Chorei muito! 😭", points: 3 },
-      { text: "Às vezes", points: 1 },
-      { text: "Nunca", points: 0 },
+      { text: "Que fofo! ❤️", points: 3 },
+      { text: "Normal, sem problemas", points: 1 },
+      { text: "Fico desconfortável", points: 0 },
     ],
   },
   {
     id: 12,
-    text: "Como você se sente com skincare e cuidados pessoais?",
+    text: "Como você se sente com moda alternativa?",
     answers: [
-      { text: "Tenho uma rotina completa! 💅", points: 3 },
-      { text: "Cuido o básico", points: 1 },
-      { text: "Não ligo muito", points: 0 },
+      { text: "Adoro! Quero experimentar", points: 3 },
+      { text: "Acho interessante", points: 1 },
+      { text: "Não é meu estilo", points: 0 },
     ],
   },
   {
     id: 13,
-    text: "Qual é sua reação ao ver um homem com unhas pintadas?",
+    text: "Qual é sua reação ao ouvir 'Britney Spears'?",
     answers: [
-      { text: "Que legal! Eu também quero!", points: 3 },
-      { text: "Acho interessante", points: 1 },
-      { text: "Não é meu estilo", points: 0 },
+      { text: "PRINCESA DO POP! 👑", points: 3 },
+      { text: "Algumas músicas são boas", points: 1 },
+      { text: "Não curto", points: 0 },
     ],
   },
   {
     id: 14,
-    text: "Como você se sente dançando?",
+    text: "Como você se sente em relação a skincare?",
     answers: [
-      { text: "Adoro! Sou uma diva! 💃", points: 3 },
-      { text: "Gosto, mas sou tímido", points: 1 },
-      { text: "Prefiro não dançar", points: 0 },
+      { text: "Tenho uma rotina completa!", points: 3 },
+      { text: "Faço o básico", points: 1 },
+      { text: "Não me importo muito", points: 0 },
     ],
   },
   {
     id: 15,
-    text: "Qual é sua reação ao ouvir 'Britney Spears'?",
+    text: "Qual é sua reação ao ver um homem com maquiagem?",
     answers: [
-      { text: "PRINCESA! 👑", points: 3 },
-      { text: "Gosto de algumas músicas", points: 1 },
-      { text: "Não é meu estilo", points: 0 },
+      { text: "Que legal! Quer dizer que ele é confiante!", points: 3 },
+      { text: "Acho interessante", points: 1 },
+      { text: "Acho estranho", points: 0 },
     ],
   },
   {
     id: 16,
-    text: "Como você se sente com moda e tendências?",
+    text: "Como você se sente com a comunidade LGBTQ+?",
     answers: [
-      { text: "Sou sempre atualizado com as trends!", points: 3 },
-      { text: "Sigo algumas tendências", points: 1 },
-      { text: "Não me importo com moda", points: 0 },
+      { text: "Sou parte dela! 🌈", points: 3 },
+      { text: "Apoio totalmente", points: 1 },
+      { text: "Não tenho opinião", points: 0 },
     ],
   },
   {
     id: 17,
-    text: "Qual é sua reação ao ver um homem com maquiagem?",
+    text: "Qual é sua reação ao ouvir 'Ariana Grande'?",
     answers: [
-      { text: "Que lindo! Inspiração!", points: 3 },
-      { text: "Acho interessante", points: 1 },
+      { text: "Meu Deus, que voz! 😍", points: 3 },
+      { text: "Gosto de algumas músicas", points: 1 },
       { text: "Não é meu estilo", points: 0 },
     ],
   },
   {
     id: 18,
-    text: "Como você se sente com relacionamentos?",
+    text: "Como você se sente com cabelo comprido em homens?",
     answers: [
-      { text: "Aberto para qualquer pessoa especial!", points: 3 },
-      { text: "Depende da pessoa", points: 1 },
-      { text: "Tenho preferências bem definidas", points: 0 },
+      { text: "Adorei! Fica muito bonito!", points: 3 },
+      { text: "Pode ficar legal", points: 1 },
+      { text: "Não gosto", points: 0 },
     ],
   },
   {
     id: 19,
+    text: "Qual é sua reação ao ver um homem com unhas pintadas?",
+    answers: [
+      { text: "Que estilo! Quero fazer igual!", points: 3 },
+      { text: "Acho interessante", points: 1 },
+      { text: "Acho estranho", points: 0 },
+    ],
+  },
+  {
+    id: 20,
+    text: "Como você se sente com a série 'Queer Eye'?",
+    answers: [
+      { text: "Adoro! Choro em todo episódio!", points: 3 },
+      { text: "É uma boa série", points: 1 },
+      { text: "Não é meu tipo", points: 0 },
+    ],
+  },
+  {
+    id: 21,
     text: "Qual é sua reação ao ouvir 'Madonna'?",
     answers: [
-      { text: "RAINHA DAS RAINHAS! 👑✨", points: 3 },
+      { text: "RAINHA ABSOLUTA! 👑", points: 3 },
       { text: "Gosto de algumas músicas", points: 1 },
       { text: "Não é meu estilo", points: 0 },
     ],
   },
   {
-    id: 20,
-    text: "Como você se sente com sua sexualidade?",
+    id: 22,
+    text: "Como você se sente com sapatos de salto?",
     answers: [
-      { text: "Totalmente confortável e orgulhoso!", points: 3 },
-      { text: "Estou explorando", points: 1 },
-      { text: "Ainda estou descobrindo", points: 0 },
+      { text: "Adoro! Tenho vários!", points: 3 },
+      { text: "Às vezes uso", points: 1 },
+      { text: "Não uso", points: 0 },
     ],
+  },
+  {
+    id: 23,
+    text: "Qual é sua reação ao ver um homem com bolsa?",
+    answers: [
+      { text: "Que prático e estiloso!", points: 3 },
+      { text: "Acho normal", points: 1 },
+      { text: "Acho estranho", points: 0 },
+    ],
+  },
+  {
+    id: 24,
+    text: "Como você se sente com a série 'Heartstopper'?",
+    answers: [
+      { text: "Que fofo! Amei demais!", points: 3 },
+      { text: "É uma boa série", points: 1 },
+      { text: "Não é meu tipo", points: 0 },
+    ],
+  },
+  {
+    id: 25,
+    text: "Qual é sua reação ao ouvir 'Beyoncé'?",
+    answers: [
+      { text: "RAINHA! Sem discussão!", points: 3 },
+      { text: "Gosto de algumas músicas", points: 1 },
+      { text: "Não é meu estilo", points: 0 },
+    ],
+  },
+  {
+    id: 26,
+    text: "Como você se sente com a moda de celebridades gays?",
+    answers: [
+      { text: "Adoro! Muito inspirador!", points: 3 },
+      { text: "Acho interessante", points: 1 },
+      { text: "Não me importa", points: 0 },
+    ],
+  },
+  {
+    id: 27,
+    text: "Qual é sua reação ao ver um homem com esmalte preto?",
+    answers: [
+      { text: "Que gótico e legal!", points: 3 },
+      { text: "Acho interessante", points: 1 },
+      { text: "Acho estranho", points: 0 },
+    ],
+  },
+  {
+    id: 28,
+    text: "Como você se sente com a série 'Sex Education'?",
+    answers: [
+      { text: "Adorei! Muito bom!", points: 3 },
+      { text: "É uma boa série", points: 1 },
+      { text: "Não é meu tipo", points: 0 },
+    ],
+  },
+  {
+    id: 29,
+    text: "Qual é sua reação ao ouvir 'Cher'?",
+    answers: [
+      { text: "LENDA! Sempre foi icônica!", points: 3 },
+      { text: "Gosto de algumas músicas", points: 1 },
+      { text: "Não é meu estilo", points: 0 },
+    ],
+  },
+  {
+    id: 30,
+    text: "Como você se sente com homens que usam brinco?",
+    answers: [
+      { text: "Muito sexy! Amo!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Não gosto", points: 0 },
+    ],
+  },
+  {
+    id: 31,
+    text: "Qual é sua reação ao ver um homem com sobrancelha feita?",
+    answers: [
+      { text: "Que cuidado! Muito bonito!", points: 3 },
+      { text: "Acho normal", points: 1 },
+      { text: "Acho estranho", points: 0 },
+    ],
+  },
+  {
+    id: 32,
+    text: "Como você se sente com a série 'The L Word'?",
+    answers: [
+      { text: "Clássico! Adorei!", points: 3 },
+      { text: "É uma boa série", points: 1 },
+      { text: "Não é meu tipo", points: 0 },
+    ],
+  },
+  {
+    id: 33,
+    text: "Qual é sua reação ao ouvir 'Whitney Houston'?",
+    answers: [
+      { text: "DIVA SUPREMA! 👑", points: 3 },
+      { text: "Gosto de algumas músicas", points: 1 },
+      { text: "Não é meu estilo", points: 0 },
+    ],
+  },
+  {
+    id: 34,
+    text: "Como você se sente com homens que usam corrente/colar?",
+    answers: [
+      { text: "Muito estiloso! Amo!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Não gosto", points: 0 },
+    ],
+  },
+  {
+    id: 35,
+    text: "Qual é sua reação ao ver um homem com cabelo rosa/colorido?",
+    answers: [
+      { text: "Que coragem e estilo!", points: 3 },
+      { text: "Acho interessante", points: 1 },
+      { text: "Acho estranho", points: 0 },
+    ],
+  },
+  {
+    id: 36,
+    text: "Como você se sente com a série 'Pose'?",
+    answers: [
+      { text: "Obra de arte! Amei!", points: 3 },
+      { text: "É uma boa série", points: 1 },
+      { text: "Não é meu tipo", points: 0 },
+    ],
+  },
+  {
+    id: 37,
+    text: "Qual é sua reação ao ouvir 'Mariah Carey'?",
+    answers: [
+      { text: "RAINHA DO WHISTLE NOTE! 👑", points: 3 },
+      { text: "Gosto de algumas músicas", points: 1 },
+      { text: "Não é meu estilo", points: 0 },
+    ],
+  },
+  {
+    id: 38,
+    text: "Como você se sente com homens que usam chapéu?",
+    answers: [
+      { text: "Muito estiloso! Amo!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Não gosto", points: 0 },
+    ],
+  },
+  {
+    id: 39,
+    text: "Qual é sua reação ao ver um homem com barba bem feita?",
+    answers: [
+      { text: "Que sexy! Muito bonito!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Não me importa", points: 0 },
+    ],
+  },
+  {
+    id: 40,
+    text: "Como você se sente com a série 'Orange Is the New Black'?",
+    answers: [
+      { text: "Adorei! Muito bom!", points: 3 },
+      { text: "É uma boa série", points: 1 },
+      { text: "Não é meu tipo", points: 0 },
+    ],
+  },
+  {
+    id: 41,
+    text: "Qual é sua reação ao ouvir 'Lady Gaga'?",
+    answers: [
+      { text: "RAINHA! *grita*", points: 3 },
+      { text: "Gosto de algumas músicas", points: 1 },
+      { text: "Não é meu estilo", points: 0 },
+    ],
+  },
+  {
+    id: 42,
+    text: "Como você se sente com homens que usam óculos de grau?",
+    answers: [
+      { text: "Muito charmoso! Amo!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Não me importa", points: 0 },
+    ],
+  },
+  {
+    id: 43,
+    text: "Qual é sua reação ao ver um homem com piercing no nariz?",
+    answers: [
+      { text: "Que estiloso! Muito bonito!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Acho estranho", points: 0 },
+    ],
+  },
+  {
+    id: 44,
+    text: "Como você se sente com a série 'Sense8'?",
+    answers: [
+      { text: "Obra prima! Adorei!", points: 3 },
+      { text: "É uma boa série", points: 1 },
+      { text: "Não é meu tipo", points: 0 },
+    ],
+  },
+  {
+    id: 45,
+    text: "Qual é sua reação ao ouvir 'Rihanna'?",
+    answers: [
+      { text: "RAINHA! Sem discussão!", points: 3 },
+      { text: "Gosto de algumas músicas", points: 1 },
+      { text: "Não é meu estilo", points: 0 },
+    ],
+  },
+  {
+    id: 46,
+    text: "Como você se sente com homens que usam pulseira?",
+    answers: [
+      { text: "Muito estiloso! Amo!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Não gosto", points: 0 },
+    ],
+  },
+  {
+    id: 47,
+    text: "Qual é sua reação ao ver um homem com cabelo platinado?",
+    answers: [
+      { text: "Que estiloso! Muito bonito!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Acho estranho", points: 0 },
+    ],
+  },
+  {
+    id: 48,
+    text: "Como você se sente com a série 'Euphoria'?",
+    answers: [
+      { text: "Intenso e bom! Adorei!", points: 3 },
+      { text: "É uma boa série", points: 1 },
+      { text: "Não é meu tipo", points: 0 },
+    ],
+  },
+  {
+    id: 49,
+    text: "Qual é sua reação ao ouvir 'Katy Perry'?",
+    answers: [
+      { text: "RAINHA DO POP! Incomparável!", points: 3 },
+      { text: "Gosto de algumas músicas", points: 1 },
+      { text: "Não é meu estilo", points: 0 },
+    ],
+  },
+  {
+    id: 50,
+    text: "Como você se sente com homens que usam cachecol?",
+    answers: [
+      { text: "Muito estiloso! Amo!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Não gosto", points: 0 },
+    ],
+  },
+  {
+    id: 51,
+    text: "Qual é sua reação ao ver um homem com cabelo moicano?",
+    answers: [
+      { text: "Que estiloso! Muito bonito!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Não gosto", points: 0 },
+    ],
+  },
+  {
+    id: 52,
+    text: "Como você se sente com a série 'Orange Is the New Black'?",
+    answers: [
+      { text: "Adorei! Muito bom!", points: 3 },
+      { text: "É uma boa série", points: 1 },
+      { text: "Não é meu tipo", points: 0 },
+    ],
+  },
+  {
+    id: 53,
+    text: "Qual é sua reação ao ouvir 'Demi Lovato'?",
+    answers: [
+      { text: "DIVA! Incomparável!", points: 3 },
+      { text: "Gosto de algumas músicas", points: 1 },
+      { text: "Não é meu estilo", points: 0 },
+    ],
+  },
+  {
+    id: 54,
+    text: "Como você se sente com homens que usam relógio de marca?",
+    answers: [
+      { text: "Muito sofisticado! Amo!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Não me importa", points: 0 },
+    ],
+  },
+  {
+    id: 55,
+    text: "Qual é sua reação ao ver um homem com tatuagem grande?",
+    answers: [
+      { text: "Que sexy! Muito bonito!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Não gosto", points: 0 },
+    ],
+  },
+  {
+    id: 56,
+    text: "Como você se sente com a série 'Heartstopper' Season 2?",
+    answers: [
+      { text: "Ainda mais fofo! Amei!", points: 3 },
+      { text: "É uma boa série", points: 1 },
+      { text: "Não é meu tipo", points: 0 },
+    ],
+  },
+  {
+    id: 57,
+    text: "Qual é sua reação ao ouvir 'Freddie Mercury'?",
+    answers: [
+      { text: "LENDA ABSOLUTA! Incomparável!", points: 3 },
+      { text: "Gosto de algumas músicas", points: 1 },
+      { text: "Não é meu estilo", points: 0 },
+    ],
+  },
+  {
+    id: 58,
+    text: "Como você se sente com homens que usam óculos escuro?",
+    answers: [
+      { text: "Muito misterioso! Amo!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Não gosto", points: 0 },
+    ],
+  },
+  {
+    id: 59,
+    text: "Qual é sua reação ao ver um homem com músculos definidos?",
+    answers: [
+      { text: "Que gato! Muito atraente!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Não me importa", points: 0 },
+    ],
+  },
+  {
+    id: 60,
+    text: "Como você se sente com a série 'Nós'?",
+    answers: [
+      { text: "Adorei! Muito bom!", points: 3 },
+      { text: "É uma boa série", points: 1 },
+      { text: "Não é meu tipo", points: 0 },
+    ],
+  },
+  {
+    id: 61,
+    text: "Qual é sua reação ao ouvir 'David Bowie'?",
+    answers: [
+      { text: "ARTISTA REVOLUCIONÁRIO! Genial!", points: 3 },
+      { text: "Gosto de algumas músicas", points: 1 },
+      { text: "Não é meu estilo", points: 0 },
+    ],
+  },
+  {
+    id: 62,
+    text: "Como você se sente com homens que usam perfume sofisticado?",
+    answers: [
+      { text: "Que aroma! Muito atraente!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Não me importa", points: 0 },
+    ],
+  },
+  {
+    id: 63,
+    text: "Qual é sua reação ao ver um homem com sorriso bonito?",
+    answers: [
+      { text: "Que lindo! Derrete meu coração!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Não me importa", points: 0 },
+    ],
+  },
+  {
+    id: 64,
+    text: "Como você se sente com a série 'Sense8'?",
+    answers: [
+      { text: "Obra prima! Adorei!", points: 3 },
+      { text: "É uma boa série", points: 1 },
+      { text: "Não é meu tipo", points: 0 },
+    ],
+  },
+  {
+    id: 65,
+    text: "Qual é sua reação ao ouvir 'Tina Turner'?",
+    answers: [
+      { text: "RAINHA DO ROCK! Incomparável!", points: 3 },
+      { text: "Gosto de algumas músicas", points: 1 },
+      { text: "Não é meu estilo", points: 0 },
+    ],
+  },
+  {
+    id: 66,
+    text: "Como você se sente com homens que usam maquiagem?",
+    answers: [
+      { text: "Que confiante! Muito bonito!", points: 3 },
+      { text: "Acho interessante", points: 1 },
+      { text: "Acho estranho", points: 0 },
+    ],
+  },
+  {
+    id: 67,
+    text: "Qual é sua reação ao ver um homem com cabelo curly/cacheado?",
+    answers: [
+      { text: "Que lindo! Muito bonito!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Não gosto", points: 0 },
+    ],
+  },
+  {
+    id: 68,
+    text: "Como você se sente com a série 'Euphoria'?",
+    answers: [
+      { text: "Intenso e bom! Adorei!", points: 3 },
+      { text: "É uma boa série", points: 1 },
+      { text: "Não é meu tipo", points: 0 },
+    ],
+  },
+  {
+    id: 69,
+    text: "Qual é sua reação ao ouvir 'Donna Summer'?",
+    answers: [
+      { text: "RAINHA DA DISCO! Incomparável!", points: 3 },
+      { text: "Gosto de algumas músicas", points: 1 },
+      { text: "Não é meu estilo", points: 0 },
+    ],
+  },
+  {
+    id: 70,
+    text: "Como você se sente com homens que são confiantes e autênticos?",
+    answers: [
+      { text: "Que atraente! Muito sexy!", points: 3 },
+      { text: "Acho legal", points: 1 },
+      { text: "Não me importa", points: 0 },
+    ],
+  },
+];
+
+const RESULTS: Result[] = [
+  {
+    percentage: 0,
+    title: "Hétero Confirmado ✅",
+    description:
+      "Você é tão hétero que até a bússola fica confusa! Mas hey, tudo bem ser você mesmo. Volte em 5 anos para fazer o teste novamente! 😄",
+    emoji: "🎯",
+    badge: "Hétero Puro",
+  },
+  {
+    percentage: 5,
+    title: "Hétero com Pitadas 🌈",
+    description:
+      "Você é principalmente hétero, mas tem aquele amigo que... você sabe. Nada de errado com isso! Você é um aliado de coração!",
+    emoji: "🤝",
+    badge: "Aliado",
+  },
+  {
+    percentage: 15,
+    title: "Hétero Questionador 🤔",
+    description:
+      "Algo está acontecendo aqui... Talvez você esteja apenas explorando seus sentimentos. E tudo bem! A vida é uma jornada.",
+    emoji: "🛤️",
+    badge: "Explorador",
+  },
+  {
+    percentage: 25,
+    title: "Bi-Curious 👀",
+    description:
+      "Você está claramente curioso! Talvez não seja 100% hétero, mas também não é 100% gay. Bem-vindo ao espectro!",
+    emoji: "🌊",
+    badge: "Curioso",
+  },
+  {
+    percentage: 35,
+    title: "Bi Confirmado 💜",
+    description:
+      "Você gosta de homens E mulheres? Parabéns! Você tem o dobro de opções de crush. Que privilégio! 😉",
+    emoji: "💜",
+    badge: "Bi Lindo",
+  },
+  {
+    percentage: 45,
+    title: "Bem no Meio 🎪",
+    description:
+      "Você é tão equilibrado que poderia ser acrobata! Homens e mulheres têm a mesma chance com você. Você é a definição de 50/50!",
+    emoji: "⚖️",
+    badge: "Equilibrado",
+  },
+  {
+    percentage: 55,
+    title: "Mais para Gay 🏳️‍🌈",
+    description:
+      "Você está claramente mais para o lado gay da força! Mas ainda tem espaço para apreciar a beleza de todos.",
+    emoji: "🌟",
+    badge: "Meio Gay",
+  },
+  {
+    percentage: 65,
+    title: "Gay Assumido 🏳️‍🌈",
+    description:
+      "Você é gay! E sabe o que? Isso é INCRÍVEL! Você sabe quem você é e não tem medo de mostrar. Rainha/Rei!",
+    emoji: "👑",
+    badge: "Gay Assumido",
+  },
+  {
+    percentage: 75,
+    title: "Super Gay 🔥",
+    description:
+      "Você é tão gay que até o arco-íris fica com inveja! Você é a personificação da comunidade LGBTQ+. Lendário!",
+    emoji: "🔥",
+    badge: "Super Gay",
+  },
+  {
+    percentage: 85,
+    title: "Mega Ultra Gay 🌈✨",
+    description:
+      "Você é tão gay que as outras letras da sigla LGBTQ+ estão com ciúmes! Você é uma lenda viva, um ícone, uma RAINHA/REI! O universo se inclina perante você! 👑✨",
+    emoji: "✨",
+    badge: "Rainha do Drama",
   },
 ];
 
