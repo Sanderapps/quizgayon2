@@ -1168,7 +1168,7 @@ export default function Home() {
         <div className="w-full max-w-2xl">
           {/* Resultado Principal */}
           <div className="text-center mb-12">
-            <div className="text-8xl mb-6 animate-bounce">{result.emoji}</div>
+            <div className="text-6xl mb-6 animate-bounce">{result.emoji}</div>
             <h1 className="text-5xl font-bold mb-4 text-white drop-shadow-lg">
               {result.title}
             </h1>
@@ -1188,7 +1188,7 @@ export default function Home() {
                 />
               </div>
             </div>
-            <p className="text-white text-2xl md:text-3xl leading-relaxed drop-shadow-lg max-w-xl mx-auto">
+            <p className="text-white text-xl md:text-2xl leading-relaxed drop-shadow-lg max-w-xl mx-auto px-4 whitespace-normal break-words">
               {result.description}
             </p>
           </div>
@@ -1221,8 +1221,14 @@ export default function Home() {
             </Button>
           </div>
 
-          {/* Botão Tentar Novamente */}
-          <div className="max-w-md mx-auto mb-12">
+          {/* Botões de Ação */}
+          <div className="max-w-md mx-auto mb-12 space-y-4">
+            <Button
+              onClick={() => setShowLeaderboard(true)}
+              className="w-full bg-white hover:bg-gray-100 text-purple-600 font-bold py-3 text-lg shadow-lg"
+            >
+              🏆 Ver Placar de Líderes
+            </Button>
             <Button
               onClick={resetQuiz}
               className="w-full bg-white hover:bg-gray-100 text-purple-600 font-bold py-3 text-lg shadow-lg"
@@ -1311,7 +1317,7 @@ export default function Home() {
             <Button
               key={index}
               onClick={() => handleAnswer(answer.points)}
-              className="w-full p-6 h-auto text-left text-lg font-semibold bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-300 hover:to-purple-300 text-gray-800 border-2 border-purple-300 hover:border-purple-500 transition-all duration-200 transform hover:scale-105 active:scale-95"
+              className="w-full p-6 h-auto text-left text-lg font-semibold bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-300 hover:to-purple-300 text-gray-800 border-2 border-purple-300 hover:border-purple-500 transition-all duration-200 transform hover:scale-105 active:scale-95 whitespace-normal"
             >
               {answer.text}
             </Button>
