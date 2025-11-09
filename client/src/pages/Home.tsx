@@ -817,7 +817,7 @@ const CanvasConfetti = () => {
 const AnimatedEmoji = ({ emoji }: { emoji: string }) => {
   return (
     <span className="inline-block animate-bounce" style={{
-      animation: "bounce 0.6s infinite, pulse 1s infinite"
+      animation: "bounce 0.6s infinite, pulse 0.8s infinite"
     }}>
       {emoji}
     </span>
