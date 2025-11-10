@@ -1,8 +1,11 @@
 interface RankBadgeProps {
   rank: number;
+  category?: 'divas' | 'alfas';
 }
 
-export const RankBadge = ({ rank }: RankBadgeProps) => {
+export const RankBadge = ({ rank, category = 'divas' }: RankBadgeProps) => {
+  // Top 3 são iguais para ambas categorias
+  
   // 1º lugar - Coroa Dourada
   if (rank === 1) {
     return (
@@ -89,29 +92,22 @@ export const RankBadge = ({ rank }: RankBadgeProps) => {
     );
   }
 
-  // 4º lugar - Estrela Roxa
-  if (rank === 4) {
-    return (
+  // 4º-10º lugar - Diferentes para Divas e Alfas
+  if (category === 'divas') {
+    // Insígnias Divas (originais)
+    if (rank === 4) return (
       <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
         <path d="M15 6 L17 12 L23 12 L18 16 L20 22 L15 18 L10 22 L12 16 L7 12 L13 12 Z" 
               fill="#9333EA" stroke="#7C3AED" strokeWidth="1"/>
       </svg>
     );
-  }
-
-  // 5º lugar - Coração Rosa
-  if (rank === 5) {
-    return (
+    if (rank === 5) return (
       <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
         <path d="M15 25 C15 25 5 18 5 11 C5 7 8 5 11 5 C13 5 15 7 15 7 C15 7 17 5 19 5 C22 5 25 7 25 11 C25 18 15 25 15 25 Z" 
               fill="#EC4899" stroke="#DB2777" strokeWidth="1"/>
       </svg>
     );
-  }
-
-  // 6º lugar - Arco-íris Mini
-  if (rank === 6) {
-    return (
+    if (rank === 6) return (
       <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
         <path d="M5 20 Q15 5 25 20" stroke="#FF0000" strokeWidth="2" fill="none"/>
         <path d="M6 20 Q15 7 24 20" stroke="#FFA500" strokeWidth="2" fill="none"/>
@@ -121,11 +117,7 @@ export const RankBadge = ({ rank }: RankBadgeProps) => {
         <path d="M10 20 Q15 15 20 20" stroke="#8B00FF" strokeWidth="2" fill="none"/>
       </svg>
     );
-  }
-
-  // 7º lugar - Chama Lilás
-  if (rank === 7) {
-    return (
+    if (rank === 7) return (
       <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
         <defs>
           <linearGradient id="flame" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -137,11 +129,7 @@ export const RankBadge = ({ rank }: RankBadgeProps) => {
               fill="url(#flame)" stroke="#7C3AED" strokeWidth="1"/>
       </svg>
     );
-  }
-
-  // 8º lugar - Diamante
-  if (rank === 8) {
-    return (
+    if (rank === 8) return (
       <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
         <defs>
           <linearGradient id="diamond" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -153,11 +141,7 @@ export const RankBadge = ({ rank }: RankBadgeProps) => {
         <path d="M15 5 L15 25 M8 12 L22 12" stroke="#93C5FD" strokeWidth="0.5" opacity="0.5"/>
       </svg>
     );
-  }
-
-  // 9º lugar - Borboleta
-  if (rank === 9) {
-    return (
+    if (rank === 9) return (
       <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
         <ellipse cx="10" cy="12" rx="5" ry="7" fill="#F472B6" stroke="#EC4899" strokeWidth="1"/>
         <ellipse cx="20" cy="12" rx="5" ry="7" fill="#F472B6" stroke="#EC4899" strokeWidth="1"/>
@@ -166,11 +150,7 @@ export const RankBadge = ({ rank }: RankBadgeProps) => {
         <line x1="15" y1="8" x2="15" y2="24" stroke="#BE185D" strokeWidth="2"/>
       </svg>
     );
-  }
-
-  // 10º lugar - Flor
-  if (rank === 10) {
-    return (
+    if (rank === 10) return (
       <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
         <circle cx="15" cy="10" r="3" fill="#FCD34D" stroke="#F59E0B" strokeWidth="1"/>
         <circle cx="20" cy="15" r="3" fill="#FCD34D" stroke="#F59E0B" strokeWidth="1"/>
@@ -179,12 +159,112 @@ export const RankBadge = ({ rank }: RankBadgeProps) => {
         <circle cx="15" cy="15" r="2.5" fill="#F59E0B"/>
       </svg>
     );
+  } else {
+    // Insígnias Alfas (masculinas)
+    if (rank === 4) return ( // Leão
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <defs>
+          <linearGradient id="lion" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style={{ stopColor: '#F59E0B' }} />
+            <stop offset="100%" style={{ stopColor: '#D97706' }} />
+          </linearGradient>
+        </defs>
+        <circle cx="15" cy="15" r="10" fill="url(#lion)" stroke="#B45309" strokeWidth="1"/>
+        <circle cx="12" cy="13" r="1.5" fill="#000"/>
+        <circle cx="18" cy="13" r="1.5" fill="#000"/>
+        <path d="M12 18 Q15 20 18 18" stroke="#000" strokeWidth="1.5" fill="none"/>
+        {/* Juba */}
+        <circle cx="8" cy="10" r="2" fill="#F59E0B"/>
+        <circle cx="22" cy="10" r="2" fill="#F59E0B"/>
+        <circle cx="6" cy="15" r="2" fill="#F59E0B"/>
+        <circle cx="24" cy="15" r="2" fill="#F59E0B"/>
+        <circle cx="8" cy="20" r="2" fill="#F59E0B"/>
+        <circle cx="22" cy="20" r="2" fill="#F59E0B"/>
+      </svg>
+    );
+    if (rank === 5) return ( // Fogo
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <defs>
+          <linearGradient id="fire" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style={{ stopColor: '#EF4444' }} />
+            <stop offset="100%" style={{ stopColor: '#DC2626' }} />
+          </linearGradient>
+        </defs>
+        <path d="M15 5 Q18 10 17 15 Q20 18 18 23 Q17 26 15 26 Q13 26 12 23 Q10 18 13 15 Q12 10 15 5 Z" 
+              fill="url(#fire)" stroke="#B91C1C" strokeWidth="1"/>
+        <path d="M15 10 Q16 13 15.5 16 Q17 18 16 21 Q15.5 23 15 23 Q14.5 23 14 21 Q13 18 14.5 16 Q14 13 15 10 Z" 
+              fill="#FBBF24" opacity="0.7"/>
+      </svg>
+    );
+    if (rank === 6) return ( // Raio
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <defs>
+          <linearGradient id="lightning" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style={{ stopColor: '#FBBF24' }} />
+            <stop offset="100%" style={{ stopColor: '#F59E0B' }} />
+          </linearGradient>
+        </defs>
+        <path d="M18 5 L10 15 L15 15 L12 25 L22 13 L17 13 Z" 
+              fill="url(#lightning)" stroke="#D97706" strokeWidth="1"/>
+      </svg>
+    );
+    if (rank === 7) return ( // Escudo
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <defs>
+          <linearGradient id="shield" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style={{ stopColor: '#3B82F6' }} />
+            <stop offset="100%" style={{ stopColor: '#2563EB' }} />
+          </linearGradient>
+        </defs>
+        <path d="M15 5 L25 10 L25 18 Q25 25 15 28 Q5 25 5 18 L5 10 Z" 
+              fill="url(#shield)" stroke="#1D4ED8" strokeWidth="1"/>
+        <path d="M15 8 L20 11 L20 17 Q20 21 15 23 Q10 21 10 17 L10 11 Z" 
+              fill="#60A5FA" opacity="0.5"/>
+      </svg>
+    );
+    if (rank === 8) return ( // Espada
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <defs>
+          <linearGradient id="sword" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style={{ stopColor: '#9CA3AF' }} />
+            <stop offset="100%" style={{ stopColor: '#6B7280' }} />
+          </linearGradient>
+        </defs>
+        <rect x="13" y="5" width="4" height="15" fill="url(#sword)" stroke="#4B5563" strokeWidth="1"/>
+        <rect x="11" y="20" width="8" height="2" fill="#8B4513"/>
+        <rect x="10" y="22" width="10" height="3" rx="1" fill="#8B4513"/>
+        <path d="M13 5 L17 5 L16 3 L14 3 Z" fill="#9CA3AF"/>
+      </svg>
+    );
+    if (rank === 9) return ( // Montanha
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <defs>
+          <linearGradient id="mountain" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style={{ stopColor: '#78716C' }} />
+            <stop offset="100%" style={{ stopColor: '#57534E' }} />
+          </linearGradient>
+        </defs>
+        <path d="M15 6 L25 24 L5 24 Z" fill="url(#mountain)" stroke="#44403C" strokeWidth="1"/>
+        <path d="M15 6 L20 15 L15 12 L10 15 Z" fill="#A8A29E" opacity="0.5"/>
+      </svg>
+    );
+    if (rank === 10) return ( // Âncora
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <defs>
+          <linearGradient id="anchor" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style={{ stopColor: '#64748B' }} />
+            <stop offset="100%" style={{ stopColor: '#475569' }} />
+          </linearGradient>
+        </defs>
+        <circle cx="15" cy="8" r="3" fill="none" stroke="url(#anchor)" strokeWidth="1.5"/>
+        <line x1="15" y1="11" x2="15" y2="22" stroke="url(#anchor)" strokeWidth="2"/>
+        <path d="M10 18 L8 22 Q8 24 10 24" stroke="url(#anchor)" strokeWidth="1.5" fill="none"/>
+        <path d="M20 18 L22 22 Q22 24 20 24" stroke="url(#anchor)" strokeWidth="1.5" fill="none"/>
+        <line x1="10" y1="15" x2="20" y2="15" stroke="url(#anchor)" strokeWidth="1.5"/>
+      </svg>
+    );
   }
 
   // 11º e 12º lugar - Sem insígnia
-  if (rank > 10) {
-    return null;
-  }
-
   return null;
 };
