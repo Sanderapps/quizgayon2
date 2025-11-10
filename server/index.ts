@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { Server } from "socket.io";
 import { pool, initializeDatabase, type Score, type ChatMessage } from "./db.js";
+import { checkAntiSpam } from "./middleware/antiSpam.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -401,150 +402,14 @@ async function startServer() {
       }
 
       const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
-      const now = Date.now();
 
-      // ========== VERIFICAÇÃO DE BANIMENTO ==========
-      const banStatus = isIpBanned(clientIp);
-      if (banStatus.banned) {
-        return res.status(403).json({
-          error: `Seu IP foi banido por spam. Tempo restante: ${banStatus.timeLeft} minutos. Razão: ${banStatus.reason}`,
+      // Aplicar sistema anti-spam
+      const antiSpamResult = checkAntiSpam(clientIp, apelido, pontuacao, tempo_segundos);
+      if (!antiSpamResult.allowed) {
+        return res.status(antiSpamResult.statusCode || 429).json({
+          error: antiSpamResult.error
         });
       }
-
-      // ========== REGRA 1: Rate Limiting - 3 submissões por minuto ==========
-      let rateLimitData = ipRateLimit.get(clientIp);
-      if (!rateLimitData) {
-        rateLimitData = { submissions: [] };
-        ipRateLimit.set(clientIp, rateLimitData);
-      }
-
-      // Remover submissões antigas (fora da janela de 1 minuto)
-      rateLimitData.submissions = rateLimitData.submissions.filter(
-        timestamp => now - timestamp < RATE_LIMIT_WINDOW_MS
-      );
-
-      if (rateLimitData.submissions.length >= MAX_SUBMISSIONS_PER_WINDOW) {
-        return res.status(429).json({
-          error: `Limite de ${MAX_SUBMISSIONS_PER_WINDOW} submissões por minuto atingido. Aguarde antes de tentar novamente.`,
-        });
-      }
-
-      // ========== REGRA 2: Cooldown - 30 segundos entre submissões ==========
-      const lastCooldown = ipCooldown.get(clientIp);
-      if (lastCooldown && now - lastCooldown < COOLDOWN_MS) {
-        const waitTime = Math.ceil((COOLDOWN_MS - (now - lastCooldown)) / 1000);
-        return res.status(429).json({
-          error: `Aguarde ${waitTime} segundos antes de enviar outra pontuação`,
-        });
-      }
-
-      // ========== REGRA 3: Detecção de padrões suspeitos ==========
-      let userPatterns = recentSubmissions.get(clientIp);
-      if (!userPatterns) {
-        userPatterns = [];
-        recentSubmissions.set(clientIp, userPatterns);
-      }
-
-      // Remover submissões antigas (fora da janela de 5 minutos)
-      userPatterns = userPatterns.filter(
-        pattern => now - pattern.timestamp < PATTERN_WINDOW_MS
-      );
-      recentSubmissions.set(clientIp, userPatterns);
-
-      // Regra 3a: Mais de 2 submissões no mesmo segundo
-      const sameSecondSubmissions = userPatterns.filter(
-        pattern => Math.floor(pattern.timestamp / 1000) === Math.floor(now / 1000)
-      );
-      if (sameSecondSubmissions.length >= 2) {
-        return res.status(429).json({
-          error: "Padrão de spam detectado: múltiplas submissões no mesmo segundo bloqueadas",
-        });
-      }
-
-      // Regra 3b: Mais de 3 submissões com mesma pontuação em menos de 5 minutos
-      const samePontuacaoSubmissions = userPatterns.filter(
-        pattern => pattern.pontuacao === pontuacao
-      );
-      if (samePontuacaoSubmissions.length >= 3) {
-        return res.status(429).json({
-          error: "Padrão de spam detectado: múltiplas submissões idênticas bloqueadas",
-        });
-      }
-
-      // Regra 3c: Mesmo apelido + mesma pontuação + menos de 60 segundos
-      const duplicateSubmission = userPatterns.find(
-        pattern => 
-          pattern.apelido === apelido && 
-          pattern.pontuacao === pontuacao && 
-          now - pattern.timestamp < 60 * 1000
-      );
-      if (duplicateSubmission) {
-        return res.status(429).json({
-          error: "Submissão duplicada detectada. Aguarde 60 segundos para enviar a mesma pontuação novamente.",
-        });
-      }
-
-      // ========== REGRA 4: Validação de variação de nome (Nome-XXXX) ==========
-      if (isNameVariationPattern(apelido)) {
-        return res.status(400).json({
-          error: "Padrão de nome suspeito detectado. Use um apelido sem números aleatórios no final.",
-        });
-      }
-
-      // ========== REGRA 5: Detecção de comportamento idêntico (pontuação + tempo) ==========
-      let behaviorData = behaviorPatterns.get(clientIp);
-      if (!behaviorData) {
-        behaviorData = [];
-        behaviorPatterns.set(clientIp, behaviorData);
-      }
-
-      // Remover padrões antigos (fora da janela de 10 minutos)
-      behaviorData = behaviorData.filter(
-        pattern => now - pattern.timestamp < BEHAVIOR_WINDOW_MS
-      );
-      behaviorPatterns.set(clientIp, behaviorData);
-
-      // Detectar submissões com pontuação E tempo idênticos (tolerância de ±2 segundos)
-      const identicalBehavior = behaviorData.filter(
-        pattern => 
-          pattern.pontuacao === pontuacao && 
-          Math.abs(pattern.tempo_segundos - tempo_segundos) <= 2
-      );
-
-      if (identicalBehavior.length >= MAX_IDENTICAL_BEHAVIOR) {
-        // Banir IP por 2 horas
-        banIp(clientIp, `Múltiplas submissões com pontuação ${pontuacao} e tempo ${tempo_segundos}s idênticos`);
-        return res.status(403).json({
-          error: "Padrão de spam detectado! Seu IP foi BANIDO por 2 horas por múltiplas submissões com pontuação e tempo idênticos.",
-        });
-      }
-
-      // ========== REGRA 1 (Avançada): Detecção de prefixo - 3 submissões com mesmo prefixo em 5 minutos ==========
-      const namePrefix = extractNamePrefix(apelido);
-      let prefixData = prefixSubmissions.get(namePrefix);
-      if (!prefixData) {
-        prefixData = [];
-        prefixSubmissions.set(namePrefix, prefixData);
-      }
-
-      // Remover submissões antigas do prefixo
-      prefixData = prefixData.filter(
-        submission => now - submission.timestamp < PREFIX_WINDOW_MS
-      );
-      prefixSubmissions.set(namePrefix, prefixData);
-
-      if (prefixData.length >= MAX_PREFIX_SUBMISSIONS) {
-        return res.status(429).json({
-          error: `Limite de submissões para nomes similares a "${namePrefix}" atingido. Aguarde 5 minutos ou use um nome diferente.`,
-        });
-      }
-
-      // Registrar submissão atual
-      rateLimitData.submissions.push(now);
-      ipCooldown.set(clientIp, now);
-      userPatterns.push({ apelido, pontuacao, timestamp: now });
-      prefixData.push({ fullName: apelido, timestamp: now });
-      behaviorData.push({ apelido, pontuacao, tempo_segundos, timestamp: now });
 
       // Validação básica
       if (!apelido || pontuacao === undefined || tempo_segundos === undefined) {
