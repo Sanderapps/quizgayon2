@@ -193,7 +193,7 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
     let bgGradient, borderClass, glowClass, rankColor, specialAnimation = null, cardAnimation = '';
     
     if (rank === 1) {
-      bgGradient = 'from-yellow-100 via-yellow-50 to-amber-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800';
+      bgGradient = 'from-yellow-100 via-yellow-50 to-amber-100 dark:from-black dark:via-gray-900 dark:to-black';
       
       // Animações diferentes para Divas e Alpha
       if (category === 'divas') {
@@ -225,31 +225,31 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
         );
       }
 
-      rankColor = 'text-yellow-600';
+      rankColor = 'text-yellow-600 dark:text-yellow-300';
     } else if (rank === 2) {
       bgGradient = 'from-gray-100 via-gray-50 to-slate-100 dark:from-gray-700 dark:via-gray-800 dark:to-gray-700';
       borderClass = 'border-3 border-gray-300';
       glowClass = 'shadow-[0_0_25px_rgba(255,215,0,0.9)]';
 
-      rankColor = 'text-gray-600';
+      rankColor = 'text-gray-600 dark:text-gray-300';
     } else if (rank === 3) {
       bgGradient = 'from-orange-100 via-orange-50 to-amber-100 dark:from-gray-700 dark:via-gray-800 dark:to-gray-700';
       borderClass = 'border-3 border-orange-400';
       glowClass = 'shadow-[0_0_20px_rgba(205,127,50,0.8)]';
 
-      rankColor = 'text-orange-600';
+      rankColor = 'text-orange-600 dark:text-orange-300';
     } else if (rank <= 6) {
       bgGradient = 'from-pink-200 via-purple-200 to-blue-200 dark:from-gray-700 dark:via-gray-800 dark:to-gray-700';
       borderClass = 'border-2 border-purple-300';
       glowClass = 'shadow-md';
 
-      rankColor = 'text-purple-600';
+      rankColor = 'text-purple-600 dark:text-purple-300';
     } else {
       bgGradient = 'from-pink-100 to-purple-100 dark:from-gray-800 dark:to-gray-900';
       borderClass = 'border border-purple-200';
       glowClass = 'shadow-sm';
 
-      rankColor = 'text-purple-500';
+      rankColor = 'text-purple-500 dark:text-purple-300';
     }
     
     return (
@@ -260,14 +260,14 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
             <span className={`text-xs sm:text-sm font-bold ${rankColor}`}>#{rank}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className={`font-bold text-sm sm:text-base md:text-lg ${getCategoryTextColor(entry.percentage)} truncate`}>{entry.name}</p>
+            <p className={`font-bold text-sm sm:text-base md:text-lg ${getCategoryTextColor(entry.percentage)} dark:text-gray-100 truncate`}>{entry.name}</p>
             <p className={`text-[10px] sm:text-xs px-1 sm:px-2 py-0.5 rounded-full inline-block ${getCategoryBadgeColor(entry.percentage)} font-medium truncate max-w-full`}>{entry.result}</p>
             <p className="text-[9px] sm:text-xs text-gray-600 hidden sm:block">{entry.date} {entry.tempo_segundos && rank <= 3 ? <span className="font-bold text-purple-600">({entry.tempo_segundos.toFixed(2)}s)</span> : entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}</p>
           </div>
         </div>
         <div className="flex flex-col items-center gap-0.5">
           <RankBadge rank={rank} category={category} />
-          <span className="text-lg sm:text-xl md:text-2xl font-bold text-purple-600">{entry.percentage}%</span>
+          <span className="text-lg sm:text-xl md:text-2xl font-bold text-purple-600 dark:text-purple-300">{entry.percentage}%</span>
         </div>
       </div>
     );

@@ -86,7 +86,7 @@ export const SuggestionButton = () => {
 
             {/* Descrição */}
             <p className="text-gray-600 dark:text-gray-300 text-sm">
-              Tem alguma ideia para melhorar o quiz? Manda pra gente! 🌈
+              Manda aquela sua idéia louca pra nós!
             </p>
 
             {/* Form */}

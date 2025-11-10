@@ -7,7 +7,7 @@ import { Leaderboard } from "@/components/Leaderboard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ChatWidget } from "@/components/ChatWidget";
 import { SuggestionButton } from "@/components/SuggestionButton";
-import { Sidebar } from "@/components/Sidebar";
+import { TopMenu } from "@/components/TopMenu";
 import { WelcomeAnimation } from "@/components/WelcomeAnimation";
 import { LoadingSkeleton, CardSkeleton } from "@/components/LoadingSkeleton";
 
@@ -1029,7 +1029,7 @@ export default function Home() {
   if (showLeaderboard) {
     return (
       <>
-      <Sidebar />
+      <TopMenu />
       <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex items-center justify-center p-4 pt-20">
         <Card className="w-full max-w-2xl p-8 bg-white dark:bg-gray-800 shadow-2xl max-h-96 overflow-y-auto">
           <h1 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
@@ -1068,7 +1068,7 @@ export default function Home() {
   if (showNameInput && !showResult) {
     return (
       <>
-        <Sidebar />
+        <TopMenu />
         <ThemeToggle />
         <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex items-center justify-center p-4 pt-20">
         <Card className="w-full max-w-md p-8 text-center bg-white dark:bg-gray-800 shadow-2xl">
@@ -1100,7 +1100,7 @@ export default function Home() {
   if (!quizStarted) {
     return (
       <>
-        <Sidebar />
+        <TopMenu />
         <ThemeToggle />
         <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center p-4 pt-20 py-8 overflow-y-auto">
         <div className="w-full max-w-2xl">
@@ -1148,7 +1148,7 @@ export default function Home() {
 
     return (
       <>
-        <Sidebar />
+        <TopMenu />
         <ThemeToggle />
         <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center p-4 pt-20 py-8 overflow-y-auto">
         {showConfetti && <CanvasConfetti />}
@@ -1233,7 +1233,7 @@ export default function Home() {
     return (
     <>
       <WelcomeAnimation />
-      <Sidebar />
+      <TopMenu />
       <ThemeToggle />
       <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex items-center justify-center p-4 pt-20">
         <CardSkeleton />
@@ -1249,7 +1249,7 @@ export default function Home() {
 
   return (
     <>
-      <Sidebar />
+      <TopMenu />
       <ThemeToggle />
       <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center justify-center p-4 pt-20">
         <Card

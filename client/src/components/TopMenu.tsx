@@ -1,0 +1,158 @@
+import { useState } from "react";
+import { changelog } from "@/data/changelog";
+
+interface TopMenuProps {
+  onNavigate?: (page: string) => void;
+}
+
+export function TopMenu({ onNavigate }: TopMenuProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const menuItems = [
+    { icon: "🏠", page: "home", label: "Início" },
+    { icon: "🎮", page: "quiz", label: "Jogar" },
+    { icon: "🏆", page: "leaderboard", label: "Placar" },
+    { icon: "💬", page: "chat", label: "Chat" },
+    { icon: "👮", page: "admin", label: "Admin" },
+  ];
+
+  const handleItemClick = (page: string) => {
+    if (page === "chat") {
+      setIsOpen(false);
+      return;
+    }
+    
+    if (page === "admin") {
+      window.location.href = "/admin";
+      setIsOpen(false);
+      return;
+    }
+    
+    if (page === "home") {
+      window.location.href = "/";
+      setIsOpen(false);
+      return;
+    }
+    
+    if (onNavigate) {
+      onNavigate(page);
+    }
+    setIsOpen(false);
+  };
+
+  return (
+    <>
+      {/* Botão circular no topo central */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] w-14 h-14 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center text-2xl border-2 border-white/50 dark:border-gray-700"
+        aria-label="Menu"
+        title="Menu"
+      >
+        <span className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+          {isOpen ? '✕' : '☰'}
+        </span>
+      </button>
+
+      {/* Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-[55] transition-opacity"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Dropdown Menu */}
+      {isOpen && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden animate-dropdown">
+          {/* Seção: Menu de Navegação */}
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 text-center">
+              🌈 Navegação
+            </h3>
+            <div className="grid grid-cols-5 gap-3">
+              {menuItems.map((item) => (
+                <button
+                  key={item.page}
+                  onClick={() => handleItemClick(item.page)}
+                  className="flex flex-col items-center justify-center p-3 rounded-xl hover:bg-pink-100 dark:hover:bg-gray-700 transition-all group"
+                  title={item.label}
+                >
+                  <span className="text-3xl group-hover:scale-125 transition-transform">
+                    {item.icon}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Seção: Changelog */}
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700 max-h-64 overflow-y-auto">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+              <span>📋</span>
+              <span>Atualizações</span>
+            </h3>
+            <div className="space-y-3">
+              {changelog.map((entry, index) => (
+                <div
+                  key={index}
+                  className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <span className="text-2xl flex-shrink-0">{entry.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-bold text-sm text-gray-800 dark:text-white">
+                        {entry.version}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {entry.date}
+                      </span>
+                    </div>
+                    <p
+                      className="text-sm font-medium"
+                      style={{ color: entry.color }}
+                    >
+                      {entry.text}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Seção: Créditos */}
+          <div className="p-6 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500">
+            <div className="text-center text-white">
+              <p className="text-sm font-medium mb-1">
+                👤 Desenvolvido por
+              </p>
+              <p className="text-2xl font-bold">
+                Sandev
+              </p>
+              <p className="text-xs mt-2 opacity-80">
+                © 2025 Quiz Gayôn
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Animação CSS */}
+      <style>{`
+        @keyframes dropdown {
+          from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+          }
+        }
+        .animate-dropdown {
+          animation: dropdown 0.3s ease-out;
+        }
+      `}</style>
+    </>
+  );
+}
