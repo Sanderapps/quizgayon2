@@ -113,19 +113,11 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
             </div>
           </div>
 
-          {/* Seção: Créditos */}
-          <footer className="p-6 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500">
-            <div className="text-center text-white">
-              <p className="text-sm font-medium mb-1">
-                👤 Desenvolvido por
-              </p>
-              <p className="text-2xl font-bold">
-                Sandev
-              </p>
-              <p className="text-xs mt-2 opacity-80">
-                © 2025 Quiz Gayôn
-              </p>
-            </div>
+          {/* Rodapé */}
+          <footer className="p-3 text-center">
+            <p className="text-[10px] text-gray-400 dark:text-gray-600">
+              𝗕𝗼𝗱𝗼𝘀 𝗼𝘀 𝗱𝗶𝗻𝗲𝗶𝘁𝗼𝘀 𝗒𝗻𝗱𝘃 © 2025
+            </p>
           </footer>
         </div>
       )}
