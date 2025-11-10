@@ -7,9 +7,6 @@ interface TenorGif {
     gif: {
       url: string;
     };
-    tinygif: {
-      url: string;
-    };
   };
 }
 
@@ -39,7 +36,7 @@ export function GifPicker({ onSelect, onClose }: GifPickerProps) {
       const data = await response.json();
       // Filtrar GIFs que têm a estrutura completa de media_formats
       const validGifs = (data.results || []).filter(
-        (gif: TenorGif) => gif.media_formats?.gif?.url && gif.media_formats?.tinygif?.url
+        (gif: TenorGif) => gif.media_formats?.gif?.url
       );
       setGifs(validGifs);
     } catch (error) {
@@ -62,7 +59,7 @@ export function GifPicker({ onSelect, onClose }: GifPickerProps) {
       const data = await response.json();
       // Filtrar GIFs que têm a estrutura completa de media_formats
       const validGifs = (data.results || []).filter(
-        (gif: TenorGif) => gif.media_formats?.gif?.url && gif.media_formats?.tinygif?.url
+        (gif: TenorGif) => gif.media_formats?.gif?.url
       );
       setGifs(validGifs);
     } catch (error) {
@@ -127,7 +124,7 @@ export function GifPicker({ onSelect, onClose }: GifPickerProps) {
                   className="relative aspect-square overflow-hidden rounded-lg hover:ring-4 hover:ring-pink-500 transition-all active:scale-95"
                 >
                   <img
-                    src={gif.media_formats.tinygif.url}
+                    src={gif.media_formats.gif.url}
                     alt={gif.title}
                     className="w-full h-full object-cover"
                     loading="lazy"
