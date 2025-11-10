@@ -181,26 +181,9 @@ export const RankBadge = ({ rank }: RankBadgeProps) => {
     );
   }
 
-  // 11º lugar - Lua
-  if (rank === 11) {
-    return (
-      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-        <path d="M15 5 C10 5 6 9 6 14 C6 19 10 23 15 23 C13 23 11 21 11 18 C11 13 13 8 15 5 Z" 
-              fill="#A78BFA" stroke="#8B5CF6" strokeWidth="1"/>
-        <circle cx="13" cy="12" r="1.5" fill="#E9D5FF"/>
-        <circle cx="11" cy="16" r="1" fill="#E9D5FF"/>
-      </svg>
-    );
-  }
-
-  // 12º lugar - Estrela Simples
-  if (rank === 12) {
-    return (
-      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-        <path d="M15 8 L17 14 L23 14 L18 18 L20 24 L15 20 L10 24 L12 18 L7 14 L13 14 Z" 
-              fill="#FDE047" stroke="#FACC15" strokeWidth="1"/>
-      </svg>
-    );
+  // 11º e 12º lugar - Sem insígnia
+  if (rank > 10) {
+    return null;
   }
 
   return null;

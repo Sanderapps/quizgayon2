@@ -3,6 +3,7 @@ import { salvarPontuacao, buscarPlacar, pontuacaoParaPercentual } from "@/servic
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { RankBadge } from "@/components/RankBadge";
+import { Leaderboard } from "@/components/Leaderboard";
 
 interface Question {
   id: number;
@@ -1095,40 +1096,38 @@ export default function Home() {
 
   if (!quizStarted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex flex-col items-center justify-center p-4">
-        <Card className="w-full max-w-md p-8 text-center bg-white shadow-2xl">
-          <div className="text-6xl mb-6">
-            <AnimatedEmoji emoji="🌈" />
-          </div>
-          <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
-            Descubra se você é Gay!
-          </h1>
-          <p className="text-gray-600 mb-6 text-lg">
-            Um teste 100% científico (não é) para descobrir seu nível de gayness! 
-            Responda com honestidade e divirta-se! 😄
-          </p>
-	          <Button
-	            onClick={startQuiz} // NOVO: Chama a função startQuiz que registra o tempo
-	            className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-3 text-lg mb-3"
-	          >
-	            Começar Quiz! 🚀
-	          </Button>
+      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex flex-col items-center p-4 py-8 overflow-y-auto">
+        <div className="w-full max-w-2xl">
+          <Card className="w-full p-8 text-center bg-white shadow-2xl mb-8">
+            <div className="text-6xl mb-6">
+              <AnimatedEmoji emoji="🌈" />
+            </div>
+            <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
+              Descubra se você é Gay!
+            </h1>
+            <p className="text-gray-600 mb-6 text-lg">
+              Um teste 100% científico (não é) para descobrir seu nível de gayness! 
+              Responda com honestidade e divirta-se! 😄
+            </p>
+	            <Button
+	              onClick={startQuiz}
+	              className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-3 text-lg mb-3"
+	            >
+	              Começar Quiz! 🚀
+	            </Button>
 
-          <Button
-            onClick={() => setAudioEnabled(!audioEnabled)}
-            variant="outline"
-            className="w-full mb-3"
-          >
-            {audioEnabled ? "🔊 Som Ativado" : "🔇 Som Desativado"}
-          </Button>
-          <Button
-            onClick={() => setShowLeaderboard(true)}
-            variant="outline"
-            className="w-full"
-          >
-            🏆 Ver Placar de Líderes
-          </Button>
-        </Card>
+            <Button
+              onClick={() => setAudioEnabled(!audioEnabled)}
+              variant="outline"
+              className="w-full"
+            >
+              {audioEnabled ? "🔊 Som Ativado" : "🔇 Som Desativado"}
+            </Button>
+          </Card>
+
+          {/* Placar de Líderes na tela inicial */}
+          <Leaderboard leaderboard={leaderboard} maxItems={12} />
+        </div>
       </div>
     );
   }
@@ -1181,79 +1180,7 @@ export default function Home() {
           </div>
 
           {/* Placar de Líderes */}
-          <div className="bg-white/20 backdrop-blur-md rounded-lg shadow-2xl p-8 border-2 border-white/30">
-            <h2 className="text-4xl font-bold mb-6 text-center text-white drop-shadow-lg">
-              🏆 Placar de Líderes 🏆
-            </h2>
-            {leaderboard.length === 0 ? (
-              <p className="text-center text-gray-600 text-lg">Nenhum resultado ainda. Seja o primeiro!</p>
-            ) : (
-              <div className="space-y-2">
-                {leaderboard.slice(0, 12).map((entry, index) => {
-                  const rank = index + 1;
-                  
-                  // Estilos personalizados por colocação
-                  let bgGradient, borderClass, glowClass, nameColor, badgeBg, rankColor;
-                  
-                  if (rank === 1) {
-                    bgGradient = 'from-yellow-100 via-yellow-50 to-amber-100';
-                    borderClass = 'border-4 border-yellow-400';
-                    glowClass = 'shadow-[0_0_25px_rgba(255,215,0,0.9)] animate-pulse';
-                    nameColor = 'text-yellow-700';
-                    badgeBg = 'bg-yellow-200';
-                    rankColor = 'text-yellow-600';
-                  } else if (rank === 2) {
-                    bgGradient = 'from-gray-100 via-gray-50 to-slate-100';
-                    borderClass = 'border-3 border-gray-400';
-                    glowClass = 'shadow-[0_0_20px_rgba(192,192,192,0.8)]';
-                    nameColor = 'text-gray-700';
-                    badgeBg = 'bg-gray-200';
-                    rankColor = 'text-gray-600';
-                  } else if (rank === 3) {
-                    bgGradient = 'from-orange-100 via-orange-50 to-amber-100';
-                    borderClass = 'border-3 border-orange-400';
-                    glowClass = 'shadow-[0_0_20px_rgba(205,127,50,0.8)]';
-                    nameColor = 'text-orange-700';
-                    badgeBg = 'bg-orange-200';
-                    rankColor = 'text-orange-600';
-                  } else if (rank <= 6) {
-                    bgGradient = 'from-pink-200 via-purple-200 to-blue-200';
-                    borderClass = 'border-2 border-purple-300';
-                    glowClass = 'shadow-md';
-                    nameColor = 'text-purple-800';
-                    badgeBg = 'bg-purple-100';
-                    rankColor = 'text-purple-600';
-                  } else {
-                    bgGradient = 'from-pink-100 to-purple-100';
-                    borderClass = 'border border-purple-200';
-                    glowClass = 'shadow-sm';
-                    nameColor = 'text-gray-800';
-                    badgeBg = 'bg-purple-50';
-                    rankColor = 'text-purple-500';
-                  }
-                  
-                  return (
-	                  <div key={index} className={`flex justify-between items-center p-2 bg-gradient-to-r ${bgGradient} rounded-lg hover:scale-[1.01] transition-all duration-300 ${borderClass} ${glowClass}`}>
-	                    <div className="flex items-center gap-3 flex-1">
-                      <div className="flex flex-col items-center">
-                        <span className={`text-sm font-bold ${rankColor}`}>#{rank}</span>
-                      </div>
-	                      <div className="flex-1">
-	                        <p className={`font-bold text-base ${nameColor}`}>{entry.name}</p>
-	                        <p className={`text-xs px-2 py-0.5 rounded-full inline-block ${badgeBg} text-gray-700 font-medium`}>{entry.result}</p>
-	                        <p className="text-xs text-gray-600">{entry.date} {entry.tempo_segundos && rank <= 3 ? <span className="font-bold text-purple-600">({entry.tempo_segundos.toFixed(2)}s)</span> : entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}</p>
-	                      </div>
-	                    </div>
-                    <div className="flex flex-col items-center gap-0.5">
-                      <RankBadge rank={rank} />
-                      <p className={`font-bold text-base ${rankColor}`}>{entry.percentage}%</p>
-                    </div>
-                  </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          <Leaderboard leaderboard={leaderboard} maxItems={12} />
 
           {/* Botões de Compartilhamento */}
           <div className="grid grid-cols-2 gap-3 mt-8 max-w-md mx-auto">
