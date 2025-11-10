@@ -671,7 +671,7 @@ const RESULTS: Result[] = [
   },
   {
     percentage: 5,
-    title: "Hétero com Pitadas 🌈",
+    title: "Hétero com Pitadas",
     description:
       "Você é principalmente hétero, mas tem aquele amigo que... você sabe. Nada de errado com isso! Você é um aliado de coração!",
     emoji: "🤝",
@@ -679,7 +679,7 @@ const RESULTS: Result[] = [
   },
   {
     percentage: 15,
-    title: "Hétero Questionador 🤔",
+    title: "Hétero Questionador",
     description:
       "Algo está acontecendo aqui... Talvez você esteja apenas explorando seus sentimentos. E tudo bem! A vida é uma jornada.",
     emoji: "🛤️",
@@ -687,7 +687,7 @@ const RESULTS: Result[] = [
   },
   {
     percentage: 25,
-    title: "Bi-Curious 👀",
+    title: "Bi-Curious",
     description:
       "Você está claramente curioso! Talvez não seja 100% hétero, mas também não é 100% gay. Bem-vindo ao espectro!",
     emoji: "🌊",
@@ -695,15 +695,15 @@ const RESULTS: Result[] = [
   },
   {
     percentage: 35,
-    title: "Bi Confirmado 💜",
+    title: "Bi Confirmado",
     description:
-      "Você gosta de homens E mulheres? Parabéns! Você tem o dobro de opções de crush. Que privilégio! 😉",
+      "Você gosta de homens E mulheres? Parabéns! Você tem o dobro de opções de crush. Que privilégio!",
     emoji: "💜",
     badge: "Bi Lindo",
   },
   {
     percentage: 45,
-    title: "Bem no Meio 🎪",
+    title: "Bem no Meio",
     description:
       "Você é tão equilibrado que poderia ser acrobata! Homens e mulheres têm a mesma chance com você. Você é a definição de 50/50!",
     emoji: "⚖️",
@@ -711,7 +711,7 @@ const RESULTS: Result[] = [
   },
   {
     percentage: 55,
-    title: "Mais para Gay 🏳️‍🌈",
+    title: "Mais para Gay",
     description:
       "Você está claramente mais para o lado gay da força! Mas ainda tem espaço para apreciar a beleza de todos.",
     emoji: "🌟",
@@ -719,7 +719,7 @@ const RESULTS: Result[] = [
   },
   {
     percentage: 65,
-    title: "Gay Assumido 🏳️‍🌈",
+    title: "Gay Assumido",
     description:
       "Você é gay! E sabe o que? Isso é INCRÍVEL! Você sabe quem você é e não tem medo de mostrar. Rainha/Rei!",
     emoji: "👑",
@@ -727,7 +727,7 @@ const RESULTS: Result[] = [
   },
   {
     percentage: 75,
-    title: "Super Gay 🔥",
+    title: "Super Gay",
     description:
       "Você é tão gay que até o arco-íris fica com inveja! Você é a personificação da comunidade LGBTQ+. Lendário!",
     emoji: "🔥",
@@ -735,9 +735,9 @@ const RESULTS: Result[] = [
   },
   {
     percentage: 85,
-    title: "Mega Ultra Gay 🌈✨",
+    title: "Mega Ultra Gay",
     description:
-      "Você é tão gay que as outras letras da sigla LGBTQ+ estão com ciúmes! Você é uma lenda viva, um ícone, uma RAINHA/REI! O universo se inclina perante você! 👑✨",
+      "Você é tão gay que as outras letras da sigla LGBTQ+ estão com ciúmes! Você é uma lenda viva, um ícone, uma RAINHA/REI! O universo se inclina perante você!",
     emoji: "✨",
     badge: "Rainha do Drama",
   },
