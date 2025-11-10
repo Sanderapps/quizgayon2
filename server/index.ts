@@ -95,9 +95,11 @@ async function startServer() {
       mensagem: string;
       cor?: string;
       emoji_avatar?: string;
+      tipo?: 'text' | 'gif';
+      gif_url?: string;
     }) => {
       try {
-        const { apelido, mensagem, cor, emoji_avatar } = data;
+        const { apelido, mensagem, cor, emoji_avatar, tipo, gif_url } = data;
 
         // Validação
         if (!apelido || !mensagem || mensagem.length > 200) {
@@ -119,10 +121,17 @@ async function startServer() {
 
         // Salvar no banco
         const result = await pool.query(
-          `INSERT INTO chat_messages (apelido, mensagem, cor, emoji_avatar) 
-           VALUES ($1, $2, $3, $4) 
+          `INSERT INTO chat_messages (apelido, mensagem, cor, emoji_avatar, tipo, gif_url) 
+           VALUES ($1, $2, $3, $4, $5, $6) 
            RETURNING *`,
-          [apelido, filteredMessage, cor || '#FF6B6B', emoji_avatar || '😀']
+          [
+            apelido, 
+            filteredMessage, 
+            cor || '#FF6B6B', 
+            emoji_avatar || '😀',
+            tipo || 'text',
+            gif_url || null
+          ]
         );
 
         const newMessage = result.rows[0];

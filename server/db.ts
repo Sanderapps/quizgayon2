@@ -52,6 +52,13 @@ export async function initializeDatabase() {
       ADD COLUMN IF NOT EXISTS emoji_avatar TEXT DEFAULT '😀';
     `);
 
+    // Adicionar colunas tipo e gif_url para suporte a GIFs (migração)
+    await pool.query(`
+      ALTER TABLE chat_messages 
+      ADD COLUMN IF NOT EXISTS tipo TEXT DEFAULT 'text',
+      ADD COLUMN IF NOT EXISTS gif_url TEXT;
+    `);
+
     // Criar tabela de reports se não existir
     await pool.query(`
       CREATE TABLE IF NOT EXISTS chat_reports (
@@ -99,4 +106,6 @@ export interface ChatMessage {
   cor?: string;
   emoji_avatar?: string;
   data_envio?: Date;
+  tipo?: 'text' | 'gif';
+  gif_url?: string;
 }

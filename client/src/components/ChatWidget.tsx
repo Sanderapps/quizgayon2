@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
+import { GifPicker } from "./GifPicker";
 
 interface ChatMessage {
   id: number;
@@ -9,6 +10,8 @@ interface ChatMessage {
   cor: string;
   emoji_avatar?: string;
   data_envio: string;
+  tipo?: 'text' | 'gif';
+  gif_url?: string;
 }
 
 const COLOR_PALETTE = [
@@ -28,12 +31,15 @@ export function ChatWidget() {
   const [error, setError] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [showGifPicker, setShowGifPicker] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const lastReadMessageIdRef = useRef<number>(0);
 
   // Carregar apelido salvo do LocalStorage
   useEffect(() => {
@@ -107,6 +113,14 @@ export function ChatWidget() {
       socket.on("new_message", (message: ChatMessage) => {
         setMessages((prev) => [...prev, message]);
         setTimeout(scrollToBottom, 100);
+        
+        // Incrementar contador se chat estiver fechado e não for mensagem própria
+        setIsOpen((currentIsOpen) => {
+          if (!currentIsOpen && message.id > lastReadMessageIdRef.current) {
+            setUnreadCount((prev) => prev + 1);
+          }
+          return currentIsOpen;
+        });
       });
 
       // Receber mensagem deletada
@@ -154,10 +168,24 @@ export function ChatWidget() {
       mensagem: inputMessage.trim(),
       cor: selectedColor,
       emoji_avatar: selectedEmoji,
+      tipo: 'text',
     });
 
     setInputMessage("");
     setShowEmojiPicker(false);
+  };
+
+  const handleSendGif = (gifUrl: string) => {
+    if (!socketRef.current) return;
+
+    socketRef.current.emit("send_message", {
+      apelido,
+      mensagem: "[GIF]",
+      cor: selectedColor,
+      emoji_avatar: selectedEmoji,
+      tipo: 'gif',
+      gif_url: gifUrl,
+    });
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -204,8 +232,17 @@ export function ChatWidget() {
     <>
       {/* Botão flutuante retangular chamativo */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 px-6 py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-white font-bold text-lg animate-gradient"
+        onClick={() => {
+          setIsOpen(!isOpen);
+          if (!isOpen) {
+            // Ao abrir, zera contador e salva última mensagem
+            setUnreadCount(0);
+            if (messages.length > 0) {
+              lastReadMessageIdRef.current = messages[messages.length - 1].id;
+            }
+          }
+        }}
+        className="fixed bottom-6 right-6 z-50 px-6 py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-white font-bold text-lg animate-gradient relative"
         title="Chat Global"
         style={{
           animation: "gradient 3s ease infinite",
@@ -215,6 +252,11 @@ export function ChatWidget() {
       >
         <span className="text-2xl">💬</span>
         <span>Chat</span>
+        {unreadCount > 0 && !isOpen && (
+          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center animate-pulse">
+            {unreadCount > 99 ? '99+' : unreadCount}
+          </span>
+        )}
       </button>
 
       <style>{`
@@ -224,6 +266,14 @@ export function ChatWidget() {
           100% { background-position: 0% 50%; }
         }
       `}</style>
+
+      {/* GIF Picker Modal */}
+      {showGifPicker && isApelidoSet && (
+        <GifPicker 
+          onSelect={handleSendGif} 
+          onClose={() => setShowGifPicker(false)} 
+        />
+      )}
 
       {/* Janela do chat */}
       {isOpen && (
@@ -331,9 +381,20 @@ export function ChatWidget() {
                         >
                           {msg.apelido}:
                         </span>{" "}
-                        <span className="text-gray-800 dark:text-gray-200 break-words overflow-wrap-anywhere whitespace-pre-wrap" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-                          {msg.mensagem}
-                        </span>
+                        {msg.tipo === 'gif' && msg.gif_url ? (
+                          <div className="mt-1">
+                            <img 
+                              src={msg.gif_url} 
+                              alt="GIF" 
+                              className="max-w-full rounded-lg max-h-48 object-contain"
+                              loading="lazy"
+                            />
+                          </div>
+                        ) : (
+                          <span className="text-gray-800 dark:text-gray-200 break-words overflow-wrap-anywhere whitespace-pre-wrap" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                            {msg.mensagem}
+                          </span>
+                        )}
                       </div>
                       {/* Botões de ação (sempre visíveis em mobile, hover em desktop) */}
                       <div className="flex md:hidden group-hover:flex gap-1">
@@ -380,6 +441,13 @@ export function ChatWidget() {
                   title="Adicionar emoji"
                 >
                   😀
+                </button>
+                <button
+                  onClick={() => setShowGifPicker(true)}
+                  className="text-2xl hover:scale-110 transition-transform"
+                  title="Enviar GIF"
+                >
+                  🎬
                 </button>
                 <textarea
                   value={inputMessage}
