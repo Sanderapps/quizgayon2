@@ -53,6 +53,25 @@ const prefixSubmissions = new Map<string, PrefixSubmission[]>();
 const PREFIX_WINDOW_MS = 5 * 60 * 1000; // 5 minutos
 const MAX_PREFIX_SUBMISSIONS = 3; // Máximo 3 submissões com mesmo prefixo em 5 minutos
 
+// 5. Detecção de comportamento idêntico (pontuação + tempo + IP)
+interface BehaviorPattern {
+  pontuacao: number;
+  tempo_segundos: number;
+  timestamp: number;
+  apelido: string;
+}
+const behaviorPatterns = new Map<string, BehaviorPattern[]>();
+const BEHAVIOR_WINDOW_MS = 10 * 60 * 1000; // 10 minutos
+const MAX_IDENTICAL_BEHAVIOR = 2; // Máximo 2 submissões com pontuação+tempo idênticos em 10 min
+
+// 6. Sistema de banimento de IP por 2 horas
+interface IpBan {
+  bannedAt: number;
+  reason: string;
+}
+const bannedIps = new Map<string, IpBan>();
+const BAN_DURATION_MS = 2 * 60 * 60 * 1000; // 2 horas
+
 // Função para extrair prefixo do nome (antes do hífen ou número)
 function extractNamePrefix(apelido: string): string {
   // Remove números e hífens do final: "Guardian-1234" -> "Guardian"
@@ -63,6 +82,46 @@ function extractNamePrefix(apelido: string): string {
 function isNameVariationPattern(apelido: string): boolean {
   // Detecta padrões como "Guardian-1234", "Nome_5678", etc.
   return /^[a-zA-Z]+[-_]\d+$/.test(apelido);
+}
+
+// Função para normalizar nome (remover caracteres especiais e substituições)
+function normalizeNameForPattern(apelido: string): string {
+  return apelido
+    .toLowerCase()
+    .replace(/[0-9@\$\*\!\?]/g, '') // Remove números e símbolos
+    .replace(/[4áàâã]/g, 'a')
+    .replace(/[3éê]/g, 'e')
+    .replace(/[1í]/g, 'i')
+    .replace(/[0óôõ]/g, 'o')
+    .replace(/[ú]/g, 'u')
+    .replace(/[\s\-_]/g, '') // Remove espaços, hífens e underscores
+    .trim();
+}
+
+// Função para verificar se IP está banido
+function isIpBanned(ip: string): { banned: boolean; reason?: string; timeLeft?: number } {
+  const banData = bannedIps.get(ip);
+  if (!banData) return { banned: false };
+  
+  const now = Date.now();
+  const timeElapsed = now - banData.bannedAt;
+  
+  if (timeElapsed >= BAN_DURATION_MS) {
+    bannedIps.delete(ip);
+    return { banned: false };
+  }
+  
+  const timeLeft = Math.ceil((BAN_DURATION_MS - timeElapsed) / 1000 / 60); // minutos
+  return { banned: true, reason: banData.reason, timeLeft };
+}
+
+// Função para banir IP
+function banIp(ip: string, reason: string): void {
+  bannedIps.set(ip, {
+    bannedAt: Date.now(),
+    reason
+  });
+  console.log(`[BAN] IP ${ip} banido por 2 horas. Razão: ${reason}`);
 }
 
 // Função para gerar token único
@@ -344,6 +403,14 @@ async function startServer() {
       const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
       const now = Date.now();
 
+      // ========== VERIFICAÇÃO DE BANIMENTO ==========
+      const banStatus = isIpBanned(clientIp);
+      if (banStatus.banned) {
+        return res.status(403).json({
+          error: `Seu IP foi banido por spam. Tempo restante: ${banStatus.timeLeft} minutos. Razão: ${banStatus.reason}`,
+        });
+      }
+
       // ========== REGRA 1: Rate Limiting - 3 submissões por minuto ==========
       let rateLimitData = ipRateLimit.get(clientIp);
       if (!rateLimitData) {
@@ -424,6 +491,34 @@ async function startServer() {
         });
       }
 
+      // ========== REGRA 5: Detecção de comportamento idêntico (pontuação + tempo) ==========
+      let behaviorData = behaviorPatterns.get(clientIp);
+      if (!behaviorData) {
+        behaviorData = [];
+        behaviorPatterns.set(clientIp, behaviorData);
+      }
+
+      // Remover padrões antigos (fora da janela de 10 minutos)
+      behaviorData = behaviorData.filter(
+        pattern => now - pattern.timestamp < BEHAVIOR_WINDOW_MS
+      );
+      behaviorPatterns.set(clientIp, behaviorData);
+
+      // Detectar submissões com pontuação E tempo idênticos (tolerância de ±2 segundos)
+      const identicalBehavior = behaviorData.filter(
+        pattern => 
+          pattern.pontuacao === pontuacao && 
+          Math.abs(pattern.tempo_segundos - tempo_segundos) <= 2
+      );
+
+      if (identicalBehavior.length >= MAX_IDENTICAL_BEHAVIOR) {
+        // Banir IP por 2 horas
+        banIp(clientIp, `Múltiplas submissões com pontuação ${pontuacao} e tempo ${tempo_segundos}s idênticos`);
+        return res.status(403).json({
+          error: "Padrão de spam detectado! Seu IP foi BANIDO por 2 horas por múltiplas submissões com pontuação e tempo idênticos.",
+        });
+      }
+
       // ========== REGRA 1 (Avançada): Detecção de prefixo - 3 submissões com mesmo prefixo em 5 minutos ==========
       const namePrefix = extractNamePrefix(apelido);
       let prefixData = prefixSubmissions.get(namePrefix);
@@ -449,6 +544,7 @@ async function startServer() {
       ipCooldown.set(clientIp, now);
       userPatterns.push({ apelido, pontuacao, timestamp: now });
       prefixData.push({ fullName: apelido, timestamp: now });
+      behaviorData.push({ apelido, pontuacao, tempo_segundos, timestamp: now });
 
       // Validação básica
       if (!apelido || pontuacao === undefined || tempo_segundos === undefined) {
@@ -542,11 +638,29 @@ async function startServer() {
         });
       }
 
-      // Deletar todas as entradas do Guardian e entradas com tempo suspeito
+      // Deletar entradas com padrões de spam:
+      // 1. Tempo muito baixo (menos de 10 segundos)
+      // 2. Entradas com mesma pontuação e tempo idêntico (tolerância de ±2s) do mesmo IP
       const deleteResult = await pool.query(
-        `DELETE FROM scores 
-         WHERE apelido ILIKE 'Guardian%' OR tempo_segundos < 10
-         RETURNING id, apelido, pontuacao, tempo_segundos`
+        `WITH spam_patterns AS (
+          SELECT id, apelido, pontuacao, tempo_segundos
+          FROM scores
+          WHERE tempo_segundos < 10
+        ),
+        duplicate_behavior AS (
+          SELECT s1.id
+          FROM scores s1
+          JOIN scores s2 ON s1.id != s2.id
+          WHERE s1.pontuacao = s2.pontuacao
+            AND ABS(s1.tempo_segundos - s2.tempo_segundos) <= 2
+            AND s1.data_registro::date = s2.data_registro::date
+          GROUP BY s1.id
+          HAVING COUNT(*) >= 2
+        )
+        DELETE FROM scores
+        WHERE id IN (SELECT id FROM spam_patterns)
+           OR id IN (SELECT id FROM duplicate_behavior)
+        RETURNING id, apelido, pontuacao, tempo_segundos`
       );
 
       console.log(`🗑️ LIMPEZA: ${deleteResult.rows.length} entradas de spam deletadas`);
