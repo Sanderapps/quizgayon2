@@ -322,16 +322,16 @@ export function ChatWidget() {
                 )}
                 {messages.map((msg) => (
                   <div key={msg.id} className="text-sm group relative">
-                    <div className="flex items-start gap-1">
+                    <div className="flex items-start gap-1 max-w-full">
                       <span className="text-lg">{msg.emoji_avatar || "😀"}</span>
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0 max-w-full">
                         <span
                           className="font-bold"
                           style={{ color: msg.cor }}
                         >
                           {msg.apelido}:
                         </span>{" "}
-                        <span className="text-gray-800 dark:text-gray-200 break-words whitespace-pre-wrap">
+                        <span className="text-gray-800 dark:text-gray-200 break-words overflow-wrap-anywhere whitespace-pre-wrap" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                           {msg.mensagem}
                         </span>
                       </div>
