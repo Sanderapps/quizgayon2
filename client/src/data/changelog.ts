@@ -15,11 +15,39 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: "v2.5",
+    date: "2025-01-10",
+    emoji: "🛡️",
+    color: "#00D9FF",
+    text: "Módulo de segurança GUARDIAN atualizado - proteção anti-spam avançada"
+  },
+  {
+    version: "v2.4",
+    date: "2025-01-10",
+    emoji: "🌟",
+    color: "#FFD700",
+    text: "Novo menu dropdown circular no topo com changelog e créditos"
+  },
+  {
+    version: "v2.3",
+    date: "2025-01-10",
+    emoji: "⚫",
+    color: "#1A1A1A",
+    text: "Card do Top 1 Divas agora é preto no dark mode (estilo premium)"
+  },
+  {
+    version: "v2.2",
+    date: "2025-01-10",
+    emoji: "🔆",
+    color: "#FFFFFF",
+    text: "Contraste dos textos aumentado para melhor legibilidade no dark mode"
+  },
+  {
     version: "v2.1",
     date: "2025-01-10",
     emoji: "🎨",
     color: "#FF6B9D",
-    text: "Novo menu dropdown circular e melhorias de contraste no dark mode"
+    text: "Melhorias gerais de UX e acessibilidade"
   },
   {
     version: "v2.0",
