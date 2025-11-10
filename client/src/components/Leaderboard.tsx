@@ -190,7 +190,7 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
     const rank = index + 1;
     
     // Estilos personalizados por colocação
-    let bgGradient, borderClass, glowClass, rankColor, specialAnimation = null;
+    let bgGradient, borderClass, glowClass, rankColor, specialAnimation = null, cardAnimation = '';
     
     if (rank === 1) {
       bgGradient = 'from-yellow-100 via-yellow-50 to-amber-100';
@@ -229,7 +229,8 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
     } else if (rank === 2) {
       bgGradient = 'from-gray-100 via-gray-50 to-slate-100';
       borderClass = 'border-3 border-gray-300';
-      glowClass = 'shadow-[0_0_25px_rgba(255,215,0,0.9)] animate-pulse';
+      glowClass = 'shadow-[0_0_25px_rgba(255,215,0,0.9)]';
+      cardAnimation = 'animate-pulse';
 
       rankColor = 'text-gray-600';
     } else if (rank === 3) {
@@ -253,7 +254,7 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
     }
     
     return (
-      <div key={`${category}-${index}`} className={`relative flex justify-between items-center p-1 sm:p-2 bg-gradient-to-r ${bgGradient} rounded-lg hover:scale-[1.01] transition-all duration-300 ${borderClass} ${glowClass}`}>
+      <div key={`${category}-${index}`} className={`relative flex justify-between items-center p-1 sm:p-2 bg-gradient-to-r ${bgGradient} rounded-lg hover:scale-[1.01] transition-all duration-300 ${borderClass} ${glowClass} ${cardAnimation}`}>
         {specialAnimation}
         <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-1">
           <div className="flex flex-col items-center">
