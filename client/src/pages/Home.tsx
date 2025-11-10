@@ -1030,7 +1030,7 @@ export default function Home() {
 
     setShowNameInput(false);
     setShowResult(true);
-  };, mas bom para robustez)
+  };
       const result = getResult();
       const maxPoints = questions.length * 3;
       const percentage = Math.round((totalPoints / maxPoints) * 100);
