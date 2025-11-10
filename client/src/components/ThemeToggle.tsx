@@ -19,10 +19,13 @@ export const ThemeToggle = () => {
   return (
     <button
       onClick={() => setIsDark(!isDark)}
-      className="fixed top-4 right-4 z-50 w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border-2 border-white/30 hover:bg-white/30 transition-all duration-300 flex items-center justify-center text-2xl shadow-lg"
+      className="fixed top-4 right-4 z-50 w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border-2 border-white/30 hover:bg-white/30 hover:scale-110 transition-all duration-300 flex items-center justify-center text-2xl shadow-lg active:scale-95"
       aria-label="Toggle theme"
+      title={isDark ? "Ativar modo claro" : "Ativar modo escuro"}
     >
-      {isDark ? "⚪" : "⚫"}
+      <span className="transition-transform duration-300 hover:rotate-12">
+        {isDark ? "☀️" : "🌙"}
+      </span>
     </button>
   );
 };
