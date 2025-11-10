@@ -1,49 +1,56 @@
-# QuizGayon2 🌈
+> **Nota do Desenvolvedor:** Este README foi reescrito a partir de uma análise direta do código-fonte para garantir 100% de precisão técnica e refletir o estado real do projeto.
 
-Quiz interativo "Descubra se você é gay" com placar de líderes global usando PostgreSQL.
+# QuizGayon2 🌈 - Análise Técnica e Documentação
 
-## 🚀 Novidades da Versão 2.0
-
-✅ **Placar de Líderes Global** - Sistema de ranking persistente com PostgreSQL  
-✅ **API REST Completa** - Endpoints para salvar e buscar pontuações  
-✅ **Ordenação Inteligente** - Ranking por pontuação e tempo de conclusão  
-✅ **Estatísticas em Tempo Real** - Visualize dados agregados de todos os jogadores  
-✅ **Deploy Automático no Railway** - Infraestrutura pronta para produção  
+Quiz interativo e humorístico evoluído para uma aplicação full-stack completa com placar de líderes global, API REST, chat em tempo real e um robusto sistema de segurança anti-spam, tudo pronto para produção e deploy na Railway.
 
 ---
 
-## 📋 Índice
+## 🌟 Funcionalidades Implementadas
 
-- [Tecnologias](#tecnologias)
-- [Estrutura do Projeto](#estrutura-do-projeto)
-- [Instalação](#instalação)
-- [Desenvolvimento Local](#desenvolvimento-local)
-- [Deploy no Railway](#deploy-no-railway)
-- [API](#api)
-- [Testes](#testes)
-- [Documentação](#documentação)
+| Categoria | Funcionalidade | Status e Detalhes |
+|---|---|---|
+| **Quiz** | Sistema de perguntas e pontuação | ✅ **15 perguntas** aleatórias de um **pool de 50**. Pontuação máxima: **60 pontos**. |
+| **Competição** | Placar de Líderes Global | ✅ Armazenado em **PostgreSQL**, ordenado por pontuação e tempo. |
+| **API** | API REST completa | ✅ Endpoints para pontuações, placar, estatísticas e chat. |
+| **Interatividade** | Chat em Tempo Real | ✅ Implementado com **Socket.IO**, com persistência de mensagens. |
+| **Segurança** | Sistema Anti-Spam e Anti-Fraude | ✅ **Múltiplas camadas** (rate limit, cooldown, banimento de IP, etc.). |
+| **Admin** | Endpoints de Debug e Moderação | ✅ Protegidos por senha para limpar dados e gerenciar o chat. |
+| **Deploy** | Configuração para deploy na Railway | ✅ Automatizado via `railway.json` e Nixpacks. |
 
 ---
 
-## 🛠 Tecnologias
+## 🔐 Sistema de Segurança (Anti-Spam)
 
-### Frontend
-- **React** 18.3 com TypeScript
-- **Vite** 7.1 - Build tool ultrarrápido
-- **Tailwind CSS** 4.1 - Estilização
-- **Radix UI** - Componentes acessíveis
-- **Wouter** - Roteamento leve
+O projeto possui um sistema de defesa sofisticado para proteger a integridade do placar. **Importante: este sistema opera em memória e é resetado a cada reinicialização do servidor.**
 
-### Backend
-- **Node.js** com Express
-- **PostgreSQL** - Banco de dados relacional
-- **pg** - Cliente PostgreSQL para Node.js
-- **TypeScript** - Tipagem estática
+| Proteção | Limite | Duração |
+|---|---|---|
+| **Rate Limit de Submissão** | 3 submissões | 1 minuto |
+| **Cooldown entre Submissões** | 1 submissão | 30 segundos |
+| **Variação de Apelido** | 3 submissões com mesmo prefixo | 5 minutos |
+| **Comportamento Idêntico** | 2 submissões (mesma pontuação+tempo) | 10 minutos |
+| **Banimento de IP** | - | 6 horas |
+| **Rate Limit de Chat** | 1 mensagem | 2 segundos |
 
-### DevOps
-- **Railway** - Hospedagem e banco de dados
-- **pnpm** - Gerenciador de pacotes
-- **esbuild** - Compilador rápido
+### Validação de Dados no Backend
+
+O servidor também impõe as seguintes regras na submissão de pontuação:
+
+- **Pontuação:** Deve ser um número entre 0 e 60.
+- **Tempo:** Deve ser um número entre 45 e 3600 segundos.
+- **Apelido:** Deve ter entre 1 e 20 caracteres.
+
+---
+
+## 🛠️ Arquitetura e Tecnologias
+
+| Camada | Tecnologia | Propósito |
+|---|---|---|
+| **Frontend** | React 18.3, TypeScript, Vite, Tailwind CSS | Interface de usuário moderna e reativa. |
+| **Backend** | Node.js, Express, TypeScript, Socket.IO | Servidor web para a API REST e WebSocket. |
+| **Banco de Dados** | PostgreSQL | Armazenamento persistente de pontuações e mensagens. |
+| **DevOps** | Railway, pnpm, esbuild, Nixpacks | Build, gerenciamento de pacotes e deploy. |
 
 ---
 
@@ -51,416 +58,58 @@ Quiz interativo "Descubra se você é gay" com placar de líderes global usando 
 
 ```
 quizgayon2/
-├── client/                    # Frontend React
-│   ├── src/
-│   │   ├── components/       # Componentes UI
-│   │   ├── pages/            # Páginas (Home, NotFound)
-│   │   ├── services/         # Serviços de API
-│   │   │   └── api.ts        # Cliente da API REST
-│   │   └── hooks/            # React hooks customizados
-│   └── ...
-├── server/                    # Backend Node.js
-│   ├── index.ts              # Servidor Express + rotas API
-│   └── db.ts                 # Configuração PostgreSQL
-├── shared/                    # Código compartilhado
-│   └── const.ts              # Constantes
-├── .env.example              # Exemplo de variáveis de ambiente
-├── railway.json              # Configuração do Railway
-├── package.json              # Dependências do projeto
-├── API_DOCUMENTATION.md      # Documentação completa da API
-├── FRONTEND_INTEGRATION.md   # Guia de integração frontend
-└── test-api.sh               # Script de testes da API
+├── client/              # Aplicação Frontend (React + Vite)
+├── server/              # Aplicação Backend (Node.js + Express)
+│   ├── index.ts         # ⚠️ ARQUIVO MONOLÍTICO (29k linhas) com toda a lógica
+│   └── db.ts            # Configuração e inicialização do PostgreSQL
+├── shared/              # Código compartilhado
+├── .env.example         # Exemplo de variáveis de ambiente
+├── railway.json         # Configuração de deploy para a Railway
+└── package.json         # Dependências e scripts
 ```
 
 ---
 
-## 📦 Instalação
+## 🗄️ Estrutura do Banco de Dados
 
-### Pré-requisitos
+O banco de dados PostgreSQL contém 3 tabelas principais:
 
-- **Node.js** 22+ (recomendado)
-- **pnpm** 10+ (ou npm/yarn)
-- **PostgreSQL** 14+ (local ou Railway)
-
-### Clonar Repositório
-
-```bash
-git clone https://github.com/Sanderapps/quizgayon2.git
-cd quizgayon2
-```
-
-### Instalar Dependências
-
-```bash
-pnpm install
-```
+1.  `scores`: Armazena as pontuações dos jogadores.
+2.  `chat_messages`: Armazena o histórico do chat em tempo real.
+3.  `chat_reports`: Armazena denúncias de mensagens do chat.
 
 ---
 
-## 💻 Desenvolvimento Local
-
-### 1. Configurar Banco de Dados
-
-#### Opção A: PostgreSQL Local
-
-```bash
-# Instalar PostgreSQL (Ubuntu/Debian)
-sudo apt install postgresql postgresql-contrib
-
-# Criar banco de dados
-sudo -u postgres createdb quizgayon
-
-# Obter URL de conexão
-echo "postgresql://postgres:sua_senha@localhost:5432/quizgayon"
-```
-
-#### Opção B: Docker
-
-```bash
-docker run --name postgres-quiz \
-  -e POSTGRES_PASSWORD=senha \
-  -p 5432:5432 \
-  -d postgres:14
-```
-
-### 2. Configurar Variáveis de Ambiente
-
-```bash
-# Copiar arquivo de exemplo
-cp .env.example .env
-
-# Editar .env
-nano .env
-```
-
-Conteúdo do `.env`:
-
-```env
-DATABASE_URL=postgresql://postgres:senha@localhost:5432/quizgayon
-NODE_ENV=development
-PORT=3000
-```
-
-### 3. Iniciar Servidor de Desenvolvimento
-
-```bash
-pnpm run dev
-```
-
-O servidor estará disponível em: **http://localhost:3000**
-
-### 4. Verificar Inicialização do Banco
-
-O banco de dados é inicializado automaticamente na primeira execução. Você verá:
-
-```
-✅ Banco de dados inicializado com sucesso
-🚀 Server running on http://localhost:3000/
-📊 API disponível em /api/scores e /api/leaderboard
-```
-
----
-
-## 🚂 Deploy no Railway
-
-### 1. Criar Conta no Railway
-
-Acesse [railway.app](https://railway.app) e crie uma conta.
-
-### 2. Criar Novo Projeto
-
-1. Clique em **"New Project"**
-2. Selecione **"Deploy from GitHub repo"**
-3. Escolha o repositório `quizgayon2`
-
-### 3. Adicionar Banco de Dados PostgreSQL
-
-1. No dashboard do projeto, clique em **"New"**
-2. Selecione **"Database"** → **"PostgreSQL"**
-3. O Railway criará automaticamente as variáveis de ambiente
-
-### 4. Conectar Serviços
-
-1. Clique no serviço **web** (teia)
-2. Vá em **"Variables"**
-3. Clique em **"Reference Variable"**
-4. Selecione o serviço **Postgres**
-5. Adicione `DATABASE_URL`
-
-### 5. Deploy Automático
-
-O Railway detecta automaticamente o `railway.json` e faz o deploy:
-
-```json
-{
-  "build": {
-    "builder": "nixpacks",
-    "buildCommand": "pnpm install --frozen-lockfile && pnpm run build"
-  },
-  "deploy": {
-    "startCommand": "pnpm run start",
-    "restartPolicyType": "on_failure",
-    "restartPolicyMaxRetries": 5
-  }
-}
-```
-
-### 6. Obter URL Pública
-
-Após o deploy, o Railway fornecerá uma URL pública:
-
-```
-https://quizgayon2-production.up.railway.app
-```
-
----
-
-## 🔌 API
-
-### Endpoints Disponíveis
+## 🔌 Endpoints da API
 
 | Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| POST | `/api/scores` | Salvar nova pontuação |
-| GET | `/api/leaderboard` | Buscar placar de líderes |
-| GET | `/api/stats` | Buscar estatísticas gerais |
-| DELETE | `/api/scores/:id` | Deletar pontuação (admin) |
-
-### Exemplos de Uso
-
-#### Salvar Pontuação
-
-```bash
-curl -X POST http://localhost:3000/api/scores \
-  -H "Content-Type: application/json" \
-  -d '{
-    "apelido": "JoãoGamer",
-    "pontuacao": 850,
-    "tempo_segundos": 45.5
-  }'
-```
-
-#### Buscar Placar
-
-```bash
-curl http://localhost:3000/api/leaderboard?limit=10
-```
-
-#### Buscar Estatísticas
-
-```bash
-curl http://localhost:3000/api/stats
-```
-
-Para documentação completa, veja [API_DOCUMENTATION.md](./API_DOCUMENTATION.md).
+|---|---|---|
+| GET | `/api/quiz/start` | Inicia uma nova sessão de quiz e retorna um token. |
+| POST | `/api/scores` | Salva uma nova pontuação. |
+| GET | `/api/leaderboard` | Retorna o placar de líderes. |
+| GET | `/api/stats` | Retorna estatísticas gerais. |
+| GET | `/api/chat/recent` | Retorna as últimas mensagens do chat. |
+| DELETE | `/api/scores/:id` | (Admin) Deleta uma pontuação. |
+| DELETE | `/api/chat/messages/:id` | (Admin) Deleta uma mensagem do chat. |
+| GET | `/api/chat/reports` | (Admin) Lista as denúncias de mensagens. |
 
 ---
 
-## 🧪 Testes
+## 🔴 Pontos de Melhoria Urgentes
 
-### Teste Manual da API
-
-Execute o script de testes:
-
-```bash
-./test-api.sh
-```
-
-Ou com URL customizada:
-
-```bash
-API_URL=https://seu-app.railway.app/api ./test-api.sh
-```
-
-### Teste no Navegador
-
-1. Acesse `http://localhost:3000`
-2. Complete o quiz
-3. Digite um nome
-4. Verifique o placar de líderes
-5. Abra o **DevTools** (F12) → **Console** para ver logs
-
-### Verificar Banco de Dados
-
-```bash
-# Conectar ao PostgreSQL
-psql $DATABASE_URL
-
-# Ver todas as pontuações
-SELECT * FROM scores ORDER BY pontuacao DESC, tempo_segundos ASC;
-
-# Ver estatísticas
-SELECT 
-  COUNT(*) as total,
-  MAX(pontuacao) as max,
-  AVG(pontuacao)::NUMERIC(10,2) as media,
-  MIN(tempo_segundos) as tempo_min
-FROM scores;
-```
+1.  **Refatorar o Servidor Monolítico:** O arquivo `server/index.ts` com quase 30.000 linhas é uma grande dívida técnica e precisa ser modularizado.
+2.  **Persistir o Estado do Anti-Spam:** O sistema anti-spam em memória é ineficaz contra reinicializações. Migrar para **Redis** ou PostgreSQL é crucial.
+3.  **Implementar Validação de Schema com Zod:** Embora existam validações manuais, usar **Zod** (já nas dependências) para validar os inputs da API tornaria o código mais limpo e seguro.
 
 ---
 
-## 📚 Documentação
+## 📦 Instalação e Desenvolvimento
 
-### Documentos Disponíveis
+**Pré-requisitos:** Node.js (>=20), pnpm, e uma instância do PostgreSQL.
 
-- **[API_DOCUMENTATION.md](./API_DOCUMENTATION.md)** - Documentação completa da API REST
-- **[FRONTEND_INTEGRATION.md](./FRONTEND_INTEGRATION.md)** - Guia de integração do frontend
-- **[.env.example](./.env.example)** - Exemplo de variáveis de ambiente
+1.  **Clonar:** `git clone https://github.com/Sanderapps/quizgayon2.git && cd quizgayon2`
+2.  **Instalar:** `pnpm install`
+3.  **Configurar:** `cp .env.example .env` e edite o arquivo `.env` com sua `DATABASE_URL`.
+4.  **Executar:** `pnpm run dev`
 
-### Estrutura do Banco de Dados
-
-#### Tabela: `scores`
-
-| Coluna | Tipo | Descrição |
-|--------|------|-----------|
-| `id` | SERIAL | ID único (chave primária) |
-| `apelido` | TEXT | Nome/apelido do jogador |
-| `pontuacao` | INTEGER | Pontuação obtida (0-45) |
-| `tempo_segundos` | REAL | Tempo de conclusão em segundos |
-| `data_registro` | TIMESTAMP | Data/hora do registro |
-
-#### Índice de Performance
-
-```sql
-CREATE INDEX idx_scores_ranking 
-ON scores (pontuacao DESC, tempo_segundos ASC);
-```
-
----
-
-## 🎯 Lógica de Ordenação
-
-O placar de líderes usa a seguinte lógica:
-
-1. **Pontuação maior vence** (ORDER BY pontuacao DESC)
-2. **Em caso de empate, tempo menor vence** (ORDER BY tempo_segundos ASC)
-
-**Exemplo:**
-- 🥇 Jogador A: 950 pontos em 40 segundos
-- 🥈 Jogador B: 950 pontos em 42 segundos
-- 🥉 Jogador C: 900 pontos em 30 segundos
-
----
-
-## 🔧 Scripts Disponíveis
-
-```bash
-# Desenvolvimento
-pnpm run dev          # Inicia servidor de desenvolvimento
-
-# Build
-pnpm run build        # Compila frontend e backend
-
-# Produção
-pnpm run start        # Inicia servidor em produção
-
-# Verificação
-pnpm run check        # Verifica tipos TypeScript
-
-# Formatação
-pnpm run format       # Formata código com Prettier
-```
-
----
-
-## 🐛 Troubleshooting
-
-### Erro: "Cannot connect to database"
-
-**Solução:** Verifique se a variável `DATABASE_URL` está configurada corretamente.
-
-```bash
-echo $DATABASE_URL
-# Deve retornar: postgresql://usuario:senha@host:porta/banco
-```
-
-### Erro: "Table scores does not exist"
-
-**Solução:** A tabela é criada automaticamente. Verifique os logs do servidor:
-
-```bash
-pnpm run dev
-# Procure por: ✅ Banco de dados inicializado com sucesso
-```
-
-### Erro: "Port 3000 already in use"
-
-**Solução:** Mate o processo ou use outra porta:
-
-```bash
-# Matar processo na porta 3000
-lsof -ti:3000 | xargs kill -9
-
-# Ou usar outra porta
-PORT=3001 pnpm run dev
-```
-
-### Frontend não conecta com API
-
-**Solução:** Verifique se o servidor está rodando e se a URL está correta:
-
-```bash
-# Testar endpoint
-curl http://localhost:3000/api/leaderboard
-
-# Verificar logs do servidor
-pnpm run dev
-```
-
----
-
-## 🤝 Contribuindo
-
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/NovaFeature`)
-3. Commit suas mudanças (`git commit -m 'Adicionar NovaFeature'`)
-4. Push para a branch (`git push origin feature/NovaFeature`)
-5. Abra um Pull Request
-
----
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
----
-
-## 👥 Autores
-
-- **Sander** - [@Sanderapps](https://github.com/Sanderapps)
-
----
-
-## 🙏 Agradecimentos
-
-- Railway por fornecer infraestrutura gratuita
-- Comunidade React e TypeScript
-- Todos que contribuíram com feedback
-
----
-
-## 📞 Suporte
-
-- 🐛 **Issues:** [GitHub Issues](https://github.com/Sanderapps/quizgayon2/issues)
-- 📧 **Email:** [Seu email]
-- 💬 **Discord:** [Seu Discord]
-
----
-
-## 🗺 Roadmap
-
-- [x] Implementar PostgreSQL
-- [x] Criar API REST
-- [x] Deploy no Railway
-- [ ] Adicionar autenticação OAuth
-- [ ] Implementar cache com Redis
-- [ ] Adicionar modo multiplayer
-- [ ] Criar dashboard de administração
-- [ ] Adicionar mais perguntas NSFW
-- [ ] Implementar sistema de conquistas
-- [ ] Adicionar compartilhamento social
-
----
-
-**Feito com 💖 e 🌈**
+O frontend estará disponível em `http://localhost:5173` (ou outra porta) e o backend em `http://localhost:3000`.
