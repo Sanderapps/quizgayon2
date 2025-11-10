@@ -141,7 +141,7 @@ export function percentualParaPontuacao(
   percentual: number,
   totalPerguntas: number = 15
 ): number {
-  const maxPoints = totalPerguntas * 3;
+  const maxPoints = totalPerguntas * 4;
   return Math.round((percentual / 100) * maxPoints);
 }
 
@@ -152,6 +152,6 @@ export function pontuacaoParaPercentual(
   pontuacao: number,
   totalPerguntas: number = 15
 ): number {
-  const maxPoints = totalPerguntas * 3;
+  const maxPoints = totalPerguntas * 4;
   return Math.round((pontuacao / maxPoints) * 100);
 }
