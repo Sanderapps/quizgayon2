@@ -1222,10 +1222,17 @@ export default function Home() {
               <p className="text-center text-gray-600 text-lg">Nenhum resultado ainda. Seja o primeiro!</p>
             ) : (
               <div className="space-y-3 max-h-80 overflow-y-auto">
-                {leaderboard.slice(0, 10).map((entry, index) => (
-	                  <div key={index} className="flex justify-between items-center p-4 bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg hover:shadow-md transition-shadow">
+                {leaderboard.slice(0, 10).map((entry, index) => {
+                  const isTop3 = index < 3;
+                  const glowClass = index === 0 ? 'shadow-[0_0_20px_rgba(255,215,0,0.8)] border-2 border-yellow-400 animate-pulse' : 
+                                    index === 1 ? 'shadow-[0_0_15px_rgba(192,192,192,0.7)] border-2 border-gray-400' : 
+                                    index === 2 ? 'shadow-[0_0_15px_rgba(205,127,50,0.7)] border-2 border-orange-400' : '';
+                  const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+                  
+                  return (
+	                  <div key={index} className={`flex justify-between items-center p-4 bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg hover:shadow-md transition-all ${glowClass}`}>
 	                    <div className="flex-1">
-	                      <p className="font-bold text-gray-800 text-lg">#{index + 1} {entry.name}</p>
+	                      <p className="font-bold text-gray-800 text-lg">{medal} #{index + 1} {entry.name}</p>
 	                      <p className="text-sm text-gray-600">{entry.result}</p>
 	                      <p className="text-xs text-gray-500">{entry.date} {entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}</p>
 	                    </div>
@@ -1234,7 +1241,8 @@ export default function Home() {
                       <p className="font-bold text-purple-600 text-lg">{entry.percentage}%</p>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
