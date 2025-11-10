@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import { Server } from "socket.io";
 import { pool, initializeDatabase, type Score, type ChatMessage } from "./db.js";
 import { checkAntiSpam, cleanupOldEvents, cleanupExpiredBans } from "./middleware/antiSpam.js";
+import { ScoreSubmissionSchema } from "./schemas/validation.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -296,15 +297,20 @@ async function startServer() {
   // POST /api/scores - Salvar nova pontuação
   app.post("/api/scores", async (req, res) => {
     try {
-      const { apelido, pontuacao, tempo_segundos, quiz_token } = req.body as Score & { quiz_token?: string };
-
-      // Validação de token de sessão
-      if (!quiz_token) {
-        return res.status(401).json({
-          error: "Token de sessão obrigatório. Inicie o quiz primeiro.",
+      // Validação com Zod
+      const validationResult = ScoreSubmissionSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        const firstError = validationResult.error.issues[0];
+        return res.status(400).json({
+          error: firstError.message,
+          field: firstError.path.join('.')
         });
       }
 
+      const { apelido, pontuacao, tempo_segundos, quiz_token } = validationResult.data;
+
+      // Validação de token de sessão
       if (!validateQuizToken(quiz_token)) {
         return res.status(401).json({
           error: "Token inválido ou expirado. Inicie o quiz novamente.",
@@ -324,39 +330,6 @@ async function startServer() {
       if (!antiSpamResult.allowed) {
         return res.status(antiSpamResult.statusCode || 429).json({
           error: antiSpamResult.error
-        });
-      }
-
-      // Validação básica
-      if (!apelido || pontuacao === undefined || tempo_segundos === undefined) {
-        return res.status(400).json({
-          error: "Campos obrigatórios: apelido, pontuacao, tempo_segundos",
-        });
-      }
-
-      // Validações de segurança
-      const MAX_PONTUACAO = 60; // 15 perguntas * 4 pontos cada
-      
-      // ========== REGRA 5: Tempo mínimo - 45 segundos para completar o quiz ==========
-      const MIN_TEMPO = 45; // Mínimo 45 segundos para completar o quiz (tempo realista)
-      const MAX_TEMPO = 3600; // Máximo 1 hora
-      const MAX_APELIDO_LENGTH = 20;
-
-      if (typeof pontuacao !== 'number' || pontuacao < 0 || pontuacao > MAX_PONTUACAO) {
-        return res.status(400).json({
-          error: `Pontuação inválida. Deve estar entre 0 e ${MAX_PONTUACAO}`,
-        });
-      }
-
-      if (typeof tempo_segundos !== 'number' || tempo_segundos < MIN_TEMPO || tempo_segundos > MAX_TEMPO) {
-        return res.status(400).json({
-          error: `Tempo inválido. Deve estar entre ${MIN_TEMPO} e ${MAX_TEMPO} segundos`,
-        });
-      }
-
-      if (typeof apelido !== 'string' || apelido.length === 0 || apelido.length > MAX_APELIDO_LENGTH) {
-        return res.status(400).json({
-          error: `Apelido inválido. Deve ter entre 1 e ${MAX_APELIDO_LENGTH} caracteres`,
         });
       }
 
