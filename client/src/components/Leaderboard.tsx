@@ -140,11 +140,11 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
         🏆 Placar de Líderes 🏆
       </h2>
       
-      {/* Layout Mobile: Stack vertical */}
-      {/* Layout Desktop: 2 colunas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+      {/* Layout Mobile: Flex vertical (empilha sempre) */}
+      {/* Layout Desktop: Grid 2 colunas */}
+      <div className="flex flex-col md:grid md:grid-cols-2 gap-4 sm:gap-6">
         {/* Top Divas */}
-        <div>
+        <div className="min-h-[200px]">
           <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-center text-pink-300 drop-shadow-lg">
             👑 Top Divas
           </h3>
@@ -158,7 +158,7 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
         </div>
 
         {/* Top Alfas */}
-        <div>
+        <div className="min-h-[200px]">
           <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-center text-blue-300 drop-shadow-lg">
             💪 Top Alfas
           </h3>
