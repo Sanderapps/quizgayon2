@@ -64,7 +64,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden animate-dropdown">
+        <div className="fixed top-20 left-1/2 z-[60] w-[90%] max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden" style={{animation: 'dropdown 0.3s ease-out', transform: 'translateX(-50%)'}}>
           {/* Seção: Menu de Navegação */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 text-center">
@@ -87,34 +87,28 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
           </div>
 
           {/* Seção: Changelog */}
-          <div className="p-6 border-b border-gray-200 dark:border-gray-700 max-h-64 overflow-y-auto">
-            <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700 max-h-56 overflow-y-auto">
+            <h3 className="text-sm font-bold text-gray-800 dark:text-white mb-3 flex items-center gap-2">
               <span>📋</span>
               <span>Atualizações</span>
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-1.5">
               {changelog.map((entry, index) => (
                 <div
                   key={index}
-                  className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="flex items-center gap-2 py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
                 >
-                  <span className="text-2xl flex-shrink-0">{entry.emoji}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-sm text-gray-800 dark:text-white">
-                        {entry.version}
-                      </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {entry.date}
-                      </span>
-                    </div>
-                    <p
-                      className="text-sm font-medium"
-                      style={{ color: entry.color }}
-                    >
-                      {entry.text}
-                    </p>
-                  </div>
+                  <span className="text-lg flex-shrink-0">{entry.emoji}</span>
+                  <span className="font-bold text-xs text-gray-600 dark:text-gray-400 flex-shrink-0 w-10">
+                    {entry.version}
+                  </span>
+                  <p
+                    className="text-xs font-medium truncate flex-1"
+                    style={{ color: entry.color }}
+                    title={entry.text}
+                  >
+                    {entry.text}
+                  </p>
                 </div>
               ))}
             </div>
@@ -142,15 +136,12 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
         @keyframes dropdown {
           from {
             opacity: 0;
-            transform: translateX(-50%) translateY(-20px);
+            transform: translateY(-20px);
           }
           to {
             opacity: 1;
-            transform: translateX(-50%) translateY(0);
+            transform: translateY(0);
           }
-        }
-        .animate-dropdown {
-          animation: dropdown 0.3s ease-out;
         }
       `}</style>
     </>

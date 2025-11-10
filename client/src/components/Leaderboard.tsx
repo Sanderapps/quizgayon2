@@ -260,7 +260,7 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
             <span className={`text-xs sm:text-sm font-bold ${rankColor}`}>#{rank}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className={`font-bold text-sm sm:text-base md:text-lg ${getCategoryTextColor(entry.percentage)} dark:text-gray-100 truncate`}>{entry.name}</p>
+            <p className={`font-bold text-sm sm:text-base md:text-lg ${getCategoryTextColor(entry.percentage)} ${entry.percentage >= 90 ? 'dark:text-pink-400' : 'dark:text-gray-100'} truncate`}>{entry.name}</p>
             <p className={`text-[10px] sm:text-xs px-1 sm:px-2 py-0.5 rounded-full inline-block ${getCategoryBadgeColor(entry.percentage)} font-medium truncate max-w-full`}>{entry.result}</p>
             <p className="text-[9px] sm:text-xs text-gray-600 hidden sm:block">{entry.date} {entry.tempo_segundos && rank <= 3 ? <span className="font-bold text-purple-600">({entry.tempo_segundos.toFixed(2)}s)</span> : entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}</p>
           </div>
