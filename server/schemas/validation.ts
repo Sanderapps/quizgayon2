@@ -27,7 +27,7 @@ export const ScoreSubmissionSchema = z.object({
   
   tempo_segundos: z
     .number()
-    .min(45, "O tempo mínimo é 45 segundos")
+    .min(6, "O tempo mínimo é 6 segundos")
     .max(3600, "O tempo máximo é 3600 segundos (1 hora)"),
   
   quiz_token: z
