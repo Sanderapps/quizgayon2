@@ -282,7 +282,7 @@ export function ChatWidget() {
           zIndex: 99999,
           position: "fixed",
           bottom: "1.5rem",
-          left: "1.5rem"
+          right: "1.5rem"
         }}
       >
         <span className="text-2xl">💬</span>

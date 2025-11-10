@@ -21,9 +21,28 @@ interface QuizToken {
 const quizTokens = new Map<string, QuizToken>();
 const TOKEN_EXPIRY_MS = 5 * 60 * 1000; // 5 minutos
 
-// Rate limiting por IP
-const ipRateLimit = new Map<string, number>();
-const RATE_LIMIT_MS = 3 * 60 * 1000; // 3 minutos entre pontuações
+// ==================== SISTEMA ANTI-SPAM ====================
+
+// 1. Rate limiting por IP: 3 submissões por minuto
+interface RateLimitData {
+  submissions: number[];
+}
+const ipRateLimit = new Map<string, RateLimitData>();
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minuto
+const MAX_SUBMISSIONS_PER_WINDOW = 3;
+
+// 2. Cooldown entre submissões: 30 segundos
+const ipCooldown = new Map<string, number>();
+const COOLDOWN_MS = 30 * 1000; // 30 segundos
+
+// 3. Detecção de padrões suspeitos
+interface SubmissionPattern {
+  apelido: string;
+  pontuacao: number;
+  timestamp: number;
+}
+const recentSubmissions = new Map<string, SubmissionPattern[]>();
+const PATTERN_WINDOW_MS = 5 * 60 * 1000; // 5 minutos
 
 // Função para gerar token único
 function generateQuizToken(): string {
@@ -301,19 +320,86 @@ async function startServer() {
         tokenData.used = true;
       }
 
-      // Rate limiting por IP
       const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
-      const lastSubmission = ipRateLimit.get(clientIp);
       const now = Date.now();
 
-      if (lastSubmission && now - lastSubmission < RATE_LIMIT_MS) {
-        const waitTime = Math.ceil((RATE_LIMIT_MS - (now - lastSubmission)) / 1000);
+      // ========== REGRA 1: Rate Limiting - 3 submissões por minuto ==========
+      let rateLimitData = ipRateLimit.get(clientIp);
+      if (!rateLimitData) {
+        rateLimitData = { submissions: [] };
+        ipRateLimit.set(clientIp, rateLimitData);
+      }
+
+      // Remover submissões antigas (fora da janela de 1 minuto)
+      rateLimitData.submissions = rateLimitData.submissions.filter(
+        timestamp => now - timestamp < RATE_LIMIT_WINDOW_MS
+      );
+
+      if (rateLimitData.submissions.length >= MAX_SUBMISSIONS_PER_WINDOW) {
+        return res.status(429).json({
+          error: `Limite de ${MAX_SUBMISSIONS_PER_WINDOW} submissões por minuto atingido. Aguarde antes de tentar novamente.`,
+        });
+      }
+
+      // ========== REGRA 2: Cooldown - 30 segundos entre submissões ==========
+      const lastCooldown = ipCooldown.get(clientIp);
+      if (lastCooldown && now - lastCooldown < COOLDOWN_MS) {
+        const waitTime = Math.ceil((COOLDOWN_MS - (now - lastCooldown)) / 1000);
         return res.status(429).json({
           error: `Aguarde ${waitTime} segundos antes de enviar outra pontuação`,
         });
       }
 
-      ipRateLimit.set(clientIp, now);
+      // ========== REGRA 3: Detecção de padrões suspeitos ==========
+      let userPatterns = recentSubmissions.get(clientIp);
+      if (!userPatterns) {
+        userPatterns = [];
+        recentSubmissions.set(clientIp, userPatterns);
+      }
+
+      // Remover submissões antigas (fora da janela de 5 minutos)
+      userPatterns = userPatterns.filter(
+        pattern => now - pattern.timestamp < PATTERN_WINDOW_MS
+      );
+      recentSubmissions.set(clientIp, userPatterns);
+
+      // Regra 3a: Mais de 2 submissões no mesmo segundo
+      const sameSecondSubmissions = userPatterns.filter(
+        pattern => Math.floor(pattern.timestamp / 1000) === Math.floor(now / 1000)
+      );
+      if (sameSecondSubmissions.length >= 2) {
+        return res.status(429).json({
+          error: "Padrão de spam detectado: múltiplas submissões no mesmo segundo bloqueadas",
+        });
+      }
+
+      // Regra 3b: Mais de 3 submissões com mesma pontuação em menos de 5 minutos
+      const samePontuacaoSubmissions = userPatterns.filter(
+        pattern => pattern.pontuacao === pontuacao
+      );
+      if (samePontuacaoSubmissions.length >= 3) {
+        return res.status(429).json({
+          error: "Padrão de spam detectado: múltiplas submissões idênticas bloqueadas",
+        });
+      }
+
+      // Regra 3c: Mesmo apelido + mesma pontuação + menos de 60 segundos
+      const duplicateSubmission = userPatterns.find(
+        pattern => 
+          pattern.apelido === apelido && 
+          pattern.pontuacao === pontuacao && 
+          now - pattern.timestamp < 60 * 1000
+      );
+      if (duplicateSubmission) {
+        return res.status(429).json({
+          error: "Submissão duplicada detectada. Aguarde 60 segundos para enviar a mesma pontuação novamente.",
+        });
+      }
+
+      // Registrar submissão atual
+      rateLimitData.submissions.push(now);
+      ipCooldown.set(clientIp, now);
+      userPatterns.push({ apelido, pontuacao, timestamp: now });
 
       // Validação básica
       if (!apelido || pontuacao === undefined || tempo_segundos === undefined) {
@@ -324,7 +410,9 @@ async function startServer() {
 
       // Validações de segurança
       const MAX_PONTUACAO = 60; // 15 perguntas * 4 pontos cada
-      const MIN_TEMPO = 5; // Mínimo 5 segundos para completar o quiz
+      
+      // ========== REGRA 5: Tempo mínimo - 45 segundos para completar o quiz ==========
+      const MIN_TEMPO = 45; // Mínimo 45 segundos para completar o quiz (tempo realista)
       const MAX_TEMPO = 3600; // Máximo 1 hora
       const MAX_APELIDO_LENGTH = 20;
 
