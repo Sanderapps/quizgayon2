@@ -1071,7 +1071,9 @@ export default function Home() {
 
   if (showNameInput && !showResult) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex items-center justify-center p-4">
+      <>
+        <ThemeToggle />
+        <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex items-center justify-center p-4">
         <Card className="w-full max-w-md p-8 text-center bg-white shadow-2xl">
           <div className="text-6xl mb-6 animate-bounce">🎉</div>
           <h1 className="text-2xl font-bold mb-4 text-gray-800">Parabéns!</h1>
@@ -1092,7 +1094,7 @@ export default function Home() {
           </Button>
         </Card>
       </div>
-    </>
+      </>
     );
   }
 
@@ -1222,13 +1224,16 @@ export default function Home() {
   }
 
   if (questions.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex items-center justify-center p-4">
+  return (
+    <>
+      <ThemeToggle />
+      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex items-center justify-center p-4">
         <Card className="w-full max-w-md p-8 text-center bg-white shadow-2xl">
           <div className="text-4xl mb-6 animate-spin">⏳</div>
           <p className="text-gray-600 text-lg">Carregando perguntas...</p>
         </Card>
       </div>
+    </>
     );
   }
 
