@@ -1252,12 +1252,6 @@ export default function Home() {
           {/* Botões de Ação */}
           <div className="max-w-md mx-auto mb-12 space-y-4">
             <Button
-              onClick={() => setShowLeaderboard(true)}
-              className="w-full bg-white hover:bg-gray-100 text-purple-600 font-bold py-3 text-lg shadow-lg"
-            >
-              🏆 Ver Placar de Líderes
-            </Button>
-            <Button
               onClick={resetQuiz}
               className="w-full bg-white hover:bg-gray-100 text-purple-600 font-bold py-3 text-lg shadow-lg"
             >
@@ -1274,7 +1268,7 @@ export default function Home() {
               <p className="text-center text-gray-600 text-lg">Nenhum resultado ainda. Seja o primeiro!</p>
             ) : (
               <div className="space-y-3 max-h-80 overflow-y-auto">
-                {leaderboard.slice(0, 20).map((entry, index) => (
+                {leaderboard.slice(0, 10).map((entry, index) => (
 	                  <div key={index} className="flex justify-between items-center p-4 bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg hover:shadow-md transition-shadow">
 	                    <div className="flex-1">
 	                      <p className="font-bold text-gray-800 text-lg">#{index + 1} {entry.name}</p>
