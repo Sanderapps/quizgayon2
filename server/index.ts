@@ -70,7 +70,7 @@ interface IpBan {
   reason: string;
 }
 const bannedIps = new Map<string, IpBan>();
-const BAN_DURATION_MS = 2 * 60 * 60 * 1000; // 2 horas
+const BAN_DURATION_MS = 6 * 60 * 60 * 1000; // 6 horas
 
 // Função para extrair prefixo do nome (antes do hífen ou número)
 function extractNamePrefix(apelido: string): string {
