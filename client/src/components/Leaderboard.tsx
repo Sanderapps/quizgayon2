@@ -342,7 +342,7 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
   };
 
   return (
-    <div className="bg-white/20 dark:bg-black/30 backdrop-blur-md rounded-lg shadow-2xl p-4 sm:p-8 border-2 border-white/30 dark:border-gray-700">
+    <div data-leaderboard className="bg-white/20 dark:bg-black/30 backdrop-blur-md rounded-lg shadow-2xl p-4 sm:p-8 border-2 border-white/30 dark:border-gray-700 max-h-[600px] overflow-y-auto">
       <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6 text-center text-white drop-shadow-lg">
         🏆 Placar de Líderes 🏆
       </h2>

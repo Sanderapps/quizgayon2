@@ -6,6 +6,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import { AdminDashboard } from "./components/AdminDashboard";
+import { useEasterEggs } from "./hooks/useEasterEggs";
+import { EasterEggEffects } from "./components/EasterEggEffects";
 
 function Router() {
   return (
@@ -25,6 +27,8 @@ function Router() {
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
 function App() {
+  const easterEggState = useEasterEggs();
+
   return (
     <ErrorBoundary>
       <ThemeProvider
@@ -32,6 +36,7 @@ function App() {
       >
         <TooltipProvider>
           <Toaster />
+          <EasterEggEffects state={easterEggState} />
           <Router />
         </TooltipProvider>
       </ThemeProvider>

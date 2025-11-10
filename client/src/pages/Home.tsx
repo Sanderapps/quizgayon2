@@ -10,6 +10,8 @@ import { SuggestionButton } from "@/components/SuggestionButton";
 import { TopMenu } from "@/components/TopMenu";
 import { WelcomeAnimation } from "@/components/WelcomeAnimation";
 import { LoadingSkeleton, CardSkeleton } from "@/components/LoadingSkeleton";
+import { useEasterEggs } from "@/hooks/useEasterEggs";
+import { HomeEasterEggs, LeaderboardEasterEgg } from "@/components/HomeEasterEggs";
 
 interface Question {
   id: number;
@@ -733,6 +735,29 @@ export default function Home() {
   const [showNameInput, setShowNameInput] = useState(false);
   const [startTime, setStartTime] = useState<number>(0); // NOVO: Rastrear tempo de início
 
+  // Easter Eggs
+  const easterEggs = useEasterEggs();
+
+  const handleSecretName = (message: string) => {
+    easterEggs.showSecretMessage(message, 5000);
+  };
+
+  const handleSpecialScore = (score: number) => {
+    if (score === 0) {
+      easterEggs.activateBlackScreen();
+    } else if (score === 69) {
+      easterEggs.showSecretMessage("😏 Nice! Pontuação especial detectada!", 5000);
+      setShowConfetti(true);
+    } else if (score === 60) {
+      easterEggs.showSecretMessage("🏆 PERFEITO! Você é um mestre do quiz!", 5000);
+      setShowConfetti(true);
+    }
+  };
+
+  const handleLeaderboardEnd = () => {
+    easterEggs.showSecretMessage("🌈 Você chegou ao fim do arco-íris! ✨", 5000);
+  };
+
   // AudioContext global reutilizável (corrige problema mobile de limite de contextos)
   const audioContextRef = useRef<AudioContext | null>(null);
   
@@ -1061,6 +1086,7 @@ export default function Home() {
       </div>
       <ChatWidget />
       <SuggestionButton />
+      <LeaderboardEasterEgg onReachEnd={handleLeaderboardEnd} />
       </>
     );
   }
@@ -1093,6 +1119,12 @@ export default function Home() {
       </div>
       <ChatWidget />
       <SuggestionButton />
+      <HomeEasterEggs
+        playerName={playerName}
+        totalPoints={totalPoints}
+        onSecretName={handleSecretName}
+        onSpecialScore={handleSpecialScore}
+      />
       </>
     );
   }
@@ -1137,6 +1169,13 @@ export default function Home() {
       </div>
       <ChatWidget />
       <SuggestionButton />
+      <LeaderboardEasterEgg onReachEnd={handleLeaderboardEnd} />
+      <HomeEasterEggs
+        playerName={playerName}
+        totalPoints={totalPoints}
+        onSecretName={handleSecretName}
+        onSpecialScore={handleSpecialScore}
+      />
       </>
     );
   }
@@ -1225,6 +1264,13 @@ export default function Home() {
       </div>
       <ChatWidget />
       <SuggestionButton />
+      <LeaderboardEasterEgg onReachEnd={handleLeaderboardEnd} />
+      <HomeEasterEggs
+        playerName={playerName}
+        totalPoints={totalPoints}
+        onSecretName={handleSecretName}
+        onSpecialScore={handleSpecialScore}
+      />
       </>
     );
   }

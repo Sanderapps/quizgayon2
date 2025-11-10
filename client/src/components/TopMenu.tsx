@@ -114,7 +114,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
           </div>
 
           {/* Seção: Créditos */}
-          <div className="p-6 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500">
+          <footer className="p-6 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500">
             <div className="text-center text-white">
               <p className="text-sm font-medium mb-1">
                 👤 Desenvolvido por
@@ -126,7 +126,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
                 © 2025 Quiz Gayôn
               </p>
             </div>
-          </div>
+          </footer>
         </div>
       )}
 
