@@ -279,7 +279,10 @@ export function ChatWidget() {
           animation: "gradient 3s ease infinite",
           backgroundSize: "200% 200%",
           boxShadow: "0 0 20px rgba(236, 72, 153, 0.6), 0 0 40px rgba(168, 85, 247, 0.4)",
-          zIndex: 9999
+          zIndex: 99999,
+          position: "fixed",
+          bottom: "1.5rem",
+          left: "1.5rem"
         }}
       >
         <span className="text-2xl">💬</span>
