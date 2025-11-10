@@ -568,7 +568,7 @@ export default function Home() {
   const [startTime, setStartTime] = useState<number>(0); // NOVO: Rastrear tempo de início
 
   // AudioContext global reutilizável (corrige problema mobile de limite de contextos)
-  const audioContextRef = React.useRef<AudioContext | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
   
   const getAudioContext = () => {
     if (!audioContextRef.current) {
