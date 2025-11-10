@@ -82,6 +82,16 @@ export async function initializeDatabase() {
       ON chat_messages (data_envio DESC);
     `);
 
+    // Criar tabela de sugestões se não existir
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS suggestions (
+        id SERIAL PRIMARY KEY,
+        apelido TEXT NOT NULL,
+        mensagem TEXT NOT NULL,
+        data_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
     console.log("✅ Banco de dados inicializado com sucesso");
   } catch (error) {
     console.error("❌ Erro ao inicializar banco de dados:", error);

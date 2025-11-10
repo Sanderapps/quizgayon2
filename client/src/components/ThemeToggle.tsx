@@ -24,7 +24,7 @@ export const ThemeToggle = () => {
       title={isDark ? "Ativar modo claro" : "Ativar modo escuro"}
     >
       <span className="transition-transform duration-300 hover:rotate-12">
-        {isDark ? "☀️" : "🌙"}
+        {isDark ? "🌙" : "☀️"}
       </span>
     </button>
   );

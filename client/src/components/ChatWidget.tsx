@@ -274,7 +274,7 @@ export function ChatWidget() {
           }
         }}
         className="px-6 py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-white font-bold text-lg animate-gradient relative"
-        title="Chat Global"
+        title={unreadCount > 0 ? `Chat Global (${unreadCount} novas mensagens)` : "Chat Global"}
         style={{
           animation: "gradient 3s ease infinite",
           backgroundSize: "200% 200%",

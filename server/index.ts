@@ -464,6 +464,52 @@ async function startServer() {
     }
   });
 
+  // POST /api/suggestions - Salvar sugestão
+  app.post("/api/suggestions", async (req, res) => {
+    try {
+      const { apelido, mensagem } = req.body;
+
+      // Validação básica
+      if (!apelido || !mensagem) {
+        return res.status(400).json({
+          error: "Campos obrigatórios: apelido, mensagem",
+        });
+      }
+
+      if (typeof apelido !== 'string' || apelido.length === 0 || apelido.length > 30) {
+        return res.status(400).json({
+          error: "Apelido inválido. Deve ter entre 1 e 30 caracteres",
+        });
+      }
+
+      if (typeof mensagem !== 'string' || mensagem.length === 0 || mensagem.length > 500) {
+        return res.status(400).json({
+          error: "Mensagem inválida. Deve ter entre 1 e 500 caracteres",
+        });
+      }
+
+      // Inserir sugestão no banco de dados
+      const result = await pool.query(
+        `INSERT INTO suggestions (apelido, mensagem) 
+         VALUES ($1, $2) 
+         RETURNING *`,
+        [apelido.trim(), mensagem.trim()]
+      );
+
+      console.log(`💡 Nova sugestão de ${apelido}: ${mensagem.substring(0, 50)}...`);
+
+      res.status(201).json({
+        success: true,
+        suggestion: result.rows[0],
+      });
+    } catch (error) {
+      console.error("Erro ao salvar sugestão:", error);
+      res.status(500).json({
+        error: "Erro ao salvar sugestão",
+      });
+    }
+  });
+
   // GET /api/leaderboard - Buscar placar de líderes
   app.get("/api/leaderboard", async (req, res) => {
     try {

@@ -6,6 +6,7 @@ import { RankBadge } from "@/components/RankBadge";
 import { Leaderboard } from "@/components/Leaderboard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ChatWidget } from "@/components/ChatWidget";
+import { SuggestionButton } from "@/components/SuggestionButton";
 import { Sidebar } from "@/components/Sidebar";
 import { WelcomeAnimation } from "@/components/WelcomeAnimation";
 import { LoadingSkeleton, CardSkeleton } from "@/components/LoadingSkeleton";
@@ -601,17 +602,17 @@ const RESULTS: Result[] = [
   { percentage: 0, title: "Homão da Poha", description: "Você é tão macho que até o Chuck Norris pede dicas! Testosterona pura correndo nas veias. Respeito máximo, guerreiro!", emoji: "💪", badge: "Machão Raiz" },
   { percentage: 3, title: "Macho Alfa (SQN)", description: "Você é o líder do grupo, o que paga de durão. Mas a gente sabe que você usa o shampoo da sua namorada escondido.", emoji: "🦁", badge: "Hétero Top" },
   { percentage: 6, title: "Hétero Top Curioso", description: "Você não é curioso sobre o Vale, você é curioso sobre 'qual o melhor whey protein'. Sua praia é a academia, não a boate.", emoji: "😎", badge: "Hétero Confirmado" },
-  { percentage: 9, title: "Bofe com Potencial", description: "Potencial... para ser o capitão do time de futebol. Você é o galã da turma, mas seu repertório de cantada é de 2009.", emoji: "🍫", badge: "Aliado" },
+  { percentage: 9, title: "Galã Raiz", description: "Você é o capitão do time de futebol e o galã da turma. Seu repertório de cantada pode ser de 2009, mas funciona!", emoji: "🏋️", badge: "Galã" },
   { percentage: 12, title: "\"Não sou gay, mas...\"", description: "Você completa essa frase com '...meu carro é automático'. Sua maior preocupação é se o IPVA tá pago. Continue assim, campeão.", emoji: "👀", badge: "Questionador" },
-  { percentage: 15, title: "Amigo das Bee", description: "Você é o suporte emocional do bonde, o que segura a bolsa e dá conselho amoroso. Um aliado de respeito!", emoji: "🚪", badge: "No Armário" },
-  { percentage: 18, title: "Iniciando no Vale", description: "Você comprou o ingresso pro Vale dos Homossexuais. Ainda tá na entrada, mas já sente a música tocando.", emoji: "🍓", badge: "Moranguinho" },
-  { percentage: 21, title: "Soltando a Franga", description: "Começando a soltar a franga! Você tá descobrindo seu lado mais livre e tá adorando.", emoji: "🎤", badge: "Pabllo Vibe" },
-  { percentage: 24, title: "Close de Leve", description: "Já tá sabendo fazer um carão no espelho e ensaiando umas poses. O Instagram que se prepare.", emoji: "🎸", badge: "Romântico" },
-  { percentage: 27, title: "Já sabe a coreografia", description: "Se tocar Anitta na festa, você não passa vergonha. Já é meio caminho andado pra dominar o mundo.", emoji: "🔥", badge: "Poderosa" },
-  { percentage: 30, title: "Gretchen Filósofa", description: "Você é um meme ambulante, cheio de sabedoria e rebolado. Sua presença é um acontecimento.", emoji: "⚡", badge: "Autêntica" },
-  { percentage: 33, title: "Fada Sensata", description: "Você não dá opinião, você dá sentença. Seus conselhos são lei e ai de quem duvidar.", emoji: "💅", badge: "Estilosa" },
-  { percentage: 36, title: "Preta Gil Equilibrado", description: "Você navega entre os mundos com a tranquilidade de quem já viu de tudo. Paz, amor e um bom drink.", emoji: "💖", badge: "Gostosa" },
-  { percentage: 39, title: "Ícone Acessível", description: "Você já inspira as gays mais novas. É tipo uma celebridade local, todo mundo te conhece na fila do pão.", emoji: "🤷", badge: "Descobrindo" },
+  { percentage: 15, title: "Brother Aliado", description: "Você é o brother que dá conselho amoroso e respeita todo mundo. Um aliado de verdade, sem preconceito!", emoji: "🤝", badge: "Aliado" },
+  { percentage: 18, title: "Sensível Moderno", description: "Você é daqueles caras que não tem medo de mostrar sentimentos. Masculinidade moderna, sem neuras!", emoji: "🎯", badge: "Moderno" },
+  { percentage: 21, title: "Estiloso Descolado", description: "Você se veste bem, curte música boa e não liga pro que os outros pensam. Estilo próprio!", emoji: "🕶️", badge: "Estiloso" },
+  { percentage: 24, title: "Metrossexual Raiz", description: "Você cuida da aparência, faz um carão no espelho e manda bem nas fotos. O Instagram agradece!", emoji: "💇", badge: "Vaidoso" },
+  { percentage: 27, title: "Dançarino nas Horas Vagas", description: "Se tocar um funk na festa, você manda ver. Dançar bem é coisa de quem tem ritmo, não tem nada a ver!", emoji: "🎵", badge: "Dançarino" },
+  { percentage: 30, title: "Filósofo de Boteco", description: "Você é cheio de sabedoria e sempre tem uma frase de efeito na ponta da língua. O mestre dos conselhos!", emoji: "🍺", badge: "Filósofo" },
+  { percentage: 33, title: "Conselheiro do Rolê", description: "Você não dá opinião, você dá sentença. Seus conselhos são lei no grupo!", emoji: "🎱", badge: "Conselheiro" },
+  { percentage: 36, title: "Zen Master", description: "Você navega entre os mundos com a tranquilidade de quem já viu de tudo. Paz, amor e um bom drink.", emoji: "🧘", badge: "Zen" },
+  { percentage: 39, title: "Influencer Raiz", description: "Você já inspira a galera mais nova. É tipo uma celebridade local, todo mundo te conhece na quebrada.", emoji: "📱", badge: "Influencer" },
   { percentage: 42, title: "Daniela Mercury", description: "O canto da cidade é você! Onde você chega, o carnaval começa. Pura energia e axé.", emoji: "⚖️", badge: "Equilibrada" },
   { percentage: 45, title: "Ney Matogrosso", description: "Andrógino, transgressor e com uma presença de palco inconfundível. Você não segue regras, você as cria.", emoji: "🌈", badge: "Livre" },
   { percentage: 48, title: "Glória Groove", description: "Uma metamorfose ambulante. Você tem múltiplas facetas e domina todas elas com perfeição. Lady Leste!", emoji: "🎵", badge: "Autêntica" },
@@ -1059,6 +1060,7 @@ export default function Home() {
         </Card>
       </div>
       <ChatWidget />
+      <SuggestionButton />
       </>
     );
   }
@@ -1090,6 +1092,7 @@ export default function Home() {
         </Card>
       </div>
       <ChatWidget />
+      <SuggestionButton />
       </>
     );
   }
@@ -1133,6 +1136,7 @@ export default function Home() {
         </div>
       </div>
       <ChatWidget />
+      <SuggestionButton />
       </>
     );
   }
@@ -1220,6 +1224,7 @@ export default function Home() {
         </div>
       </div>
       <ChatWidget />
+      <SuggestionButton />
       </>
     );
   }
@@ -1234,6 +1239,7 @@ export default function Home() {
         <CardSkeleton />
       </div>
       <ChatWidget />
+      <SuggestionButton />
     </>
     );
   }
@@ -1294,6 +1300,7 @@ export default function Home() {
         </Card>
       </div>
       <ChatWidget />
+      <SuggestionButton />
     </>
   );
 }
