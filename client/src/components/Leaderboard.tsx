@@ -1,36 +1,37 @@
-import { RankBadge } from "./RankBadge";
+import React from "react";
 
 // Função que retorna classes Tailwind baseadas na porcentagem (34 categorias)
+// Nova paleta: Preto → Cinza → Marrom → Azul Escuro → Verde → Ciano → Azul Bebê → Roxo → Vermelho → Rosa → Rosa Choque
 function getCategoryBadgeColor(percentage: number): string {
   if (percentage >= 99) return 'bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white animate-pulse';
-  if (percentage >= 96) return 'bg-gradient-to-r from-pink-600 to-rose-600 text-white';
-  if (percentage >= 93) return 'bg-gradient-to-r from-purple-500 to-blue-500 text-white';
-  if (percentage >= 90) return 'bg-gradient-to-r from-pink-500 to-purple-500 text-white';
-  if (percentage >= 87) return 'bg-pink-700 text-white';
-  if (percentage >= 84) return 'bg-red-500 text-white';
-  if (percentage >= 81) return 'bg-rose-600 text-white';
-  if (percentage >= 78) return 'bg-pink-600 text-white';
-  if (percentage >= 75) return 'bg-fuchsia-500 text-white';
-  if (percentage >= 72) return 'bg-purple-500 text-white';
-  if (percentage >= 69) return 'bg-indigo-500 text-white';
-  if (percentage >= 66) return 'bg-blue-500 text-white';
-  if (percentage >= 63) return 'bg-sky-500 text-white';
-  if (percentage >= 60) return 'bg-cyan-500 text-gray-900';
-  if (percentage >= 57) return 'bg-teal-500 text-white';
-  if (percentage >= 54) return 'bg-green-500 text-white';
-  if (percentage >= 51) return 'bg-lime-500 text-gray-900';
-  if (percentage >= 48) return 'bg-yellow-500 text-gray-900';
-  if (percentage >= 45) return 'bg-amber-500 text-white';
-  if (percentage >= 42) return 'bg-orange-500 text-white';
-  if (percentage >= 39) return 'bg-pink-400 text-gray-900';
-  if (percentage >= 36) return 'bg-pink-500 text-white';
-  if (percentage >= 33) return 'bg-pink-600 text-white';
-  if (percentage >= 30) return 'bg-purple-500 text-white';
-  if (percentage >= 27) return 'bg-purple-600 text-white';
-  if (percentage >= 24) return 'bg-indigo-600 text-white';
-  if (percentage >= 21) return 'bg-blue-600 text-white';
-  if (percentage >= 18) return 'bg-blue-800 text-white';
-  if (percentage >= 15) return 'bg-blue-900 text-white';
+  if (percentage >= 96) return 'bg-gradient-to-r from-fuchsia-500 to-pink-600 text-white';
+  if (percentage >= 93) return 'bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white';
+  if (percentage >= 90) return 'bg-pink-700 text-white';
+  if (percentage >= 87) return 'bg-pink-600 text-white';
+  if (percentage >= 84) return 'bg-pink-500 text-white';
+  if (percentage >= 81) return 'bg-rose-500 text-white';
+  if (percentage >= 78) return 'bg-red-500 text-white';
+  if (percentage >= 75) return 'bg-red-600 text-white';
+  if (percentage >= 72) return 'bg-fuchsia-600 text-white';
+  if (percentage >= 69) return 'bg-purple-700 text-white';
+  if (percentage >= 66) return 'bg-purple-600 text-white';
+  if (percentage >= 63) return 'bg-purple-500 text-white';
+  if (percentage >= 60) return 'bg-violet-500 text-white';
+  if (percentage >= 57) return 'bg-violet-400 text-white';
+  if (percentage >= 54) return 'bg-blue-400 text-gray-900';
+  if (percentage >= 51) return 'bg-sky-500 text-white';
+  if (percentage >= 48) return 'bg-sky-400 text-gray-900';
+  if (percentage >= 45) return 'bg-cyan-500 text-white';
+  if (percentage >= 42) return 'bg-teal-500 text-white';
+  if (percentage >= 39) return 'bg-teal-600 text-white';
+  if (percentage >= 36) return 'bg-emerald-600 text-white';
+  if (percentage >= 33) return 'bg-emerald-700 text-white';
+  if (percentage >= 30) return 'bg-emerald-800 text-white';
+  if (percentage >= 27) return 'bg-blue-700 text-white';
+  if (percentage >= 24) return 'bg-blue-800 text-white';
+  if (percentage >= 21) return 'bg-blue-900 text-white';
+  if (percentage >= 18) return 'bg-stone-600 text-white';
+  if (percentage >= 15) return 'bg-stone-700 text-white';
   if (percentage >= 12) return 'bg-gray-600 text-white';
   if (percentage >= 9) return 'bg-gray-700 text-white';
   if (percentage >= 6) return 'bg-gray-800 text-white';
@@ -41,34 +42,34 @@ function getCategoryBadgeColor(percentage: number): string {
 // Função que retorna cor do texto (nome) baseada na porcentagem
 function getCategoryTextColor(percentage: number): string {
   if (percentage >= 99) return 'text-pink-600 font-bold';
-  if (percentage >= 96) return 'text-rose-700 font-bold';
-  if (percentage >= 93) return 'text-purple-600 font-bold';
-  if (percentage >= 90) return 'text-pink-600 font-bold';
-  if (percentage >= 87) return 'text-pink-800';
-  if (percentage >= 84) return 'text-red-600';
+  if (percentage >= 96) return 'text-fuchsia-600 font-bold';
+  if (percentage >= 93) return 'text-pink-600 font-bold';
+  if (percentage >= 90) return 'text-pink-800';
+  if (percentage >= 87) return 'text-pink-700';
+  if (percentage >= 84) return 'text-pink-700';
   if (percentage >= 81) return 'text-rose-700';
-  if (percentage >= 78) return 'text-pink-700';
-  if (percentage >= 75) return 'text-fuchsia-600';
-  if (percentage >= 72) return 'text-purple-600';
-  if (percentage >= 69) return 'text-indigo-600';
-  if (percentage >= 66) return 'text-blue-600';
-  if (percentage >= 63) return 'text-sky-600';
-  if (percentage >= 60) return 'text-cyan-700';
-  if (percentage >= 57) return 'text-teal-600';
-  if (percentage >= 54) return 'text-green-600';
-  if (percentage >= 51) return 'text-lime-700';
-  if (percentage >= 48) return 'text-yellow-700';
-  if (percentage >= 45) return 'text-amber-700';
-  if (percentage >= 42) return 'text-orange-700';
-  if (percentage >= 39) return 'text-pink-600';
-  if (percentage >= 36) return 'text-pink-700';
-  if (percentage >= 33) return 'text-pink-700';
-  if (percentage >= 30) return 'text-purple-700';
-  if (percentage >= 27) return 'text-purple-700';
-  if (percentage >= 24) return 'text-indigo-700';
-  if (percentage >= 21) return 'text-blue-700';
-  if (percentage >= 18) return 'text-blue-800';
-  if (percentage >= 15) return 'text-blue-900';
+  if (percentage >= 78) return 'text-red-600';
+  if (percentage >= 75) return 'text-red-700';
+  if (percentage >= 72) return 'text-fuchsia-700';
+  if (percentage >= 69) return 'text-purple-800';
+  if (percentage >= 66) return 'text-purple-700';
+  if (percentage >= 63) return 'text-purple-600';
+  if (percentage >= 60) return 'text-violet-700';
+  if (percentage >= 57) return 'text-violet-700';
+  if (percentage >= 54) return 'text-blue-600';
+  if (percentage >= 51) return 'text-sky-700';
+  if (percentage >= 48) return 'text-sky-700';
+  if (percentage >= 45) return 'text-cyan-700';
+  if (percentage >= 42) return 'text-teal-700';
+  if (percentage >= 39) return 'text-teal-700';
+  if (percentage >= 36) return 'text-emerald-700';
+  if (percentage >= 33) return 'text-emerald-800';
+  if (percentage >= 30) return 'text-emerald-900';
+  if (percentage >= 27) return 'text-blue-800';
+  if (percentage >= 24) return 'text-blue-900';
+  if (percentage >= 21) return 'text-blue-900';
+  if (percentage >= 18) return 'text-stone-700';
+  if (percentage >= 15) return 'text-stone-800';
   if (percentage >= 12) return 'text-gray-700';
   if (percentage >= 9) return 'text-gray-800';
   if (percentage >= 6) return 'text-gray-900';
@@ -89,6 +90,27 @@ interface LeaderboardProps {
   maxItems?: number;
 }
 
+interface RankBadgeProps {
+  rank: number;
+  category: 'divas' | 'alfas';
+}
+
+const RankBadge = ({ rank, category }: RankBadgeProps) => {
+  if (rank === 1) {
+    return <span className="text-3xl">⭐</span>;
+  }
+  if (rank === 2) {
+    return <span className="text-2xl">⭐</span>;
+  }
+  if (rank === 3) {
+    return <span className="text-2xl">🥉</span>;
+  }
+  if (rank <= 6) {
+    return <span className="text-xl">⭐</span>;
+  }
+  return null;
+};
+
 export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) => {
   if (leaderboard.length === 0) {
     return (
@@ -96,13 +118,18 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
         <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6 text-center text-white drop-shadow-lg">
           🏆 Placar de Líderes 🏆
         </h2>
-        <p className="text-center text-white text-base sm:text-lg">Nenhum resultado ainda. Seja o primeiro!</p>
+        <p className="text-center text-white/70 text-sm sm:text-base">
+          Nenhum resultado ainda. Seja o primeiro!
+        </p>
       </div>
     );
   }
 
-  // Dividir em Divas (>=50%) e Alfas (<50%)
-  const divas = leaderboard.filter(entry => entry.percentage >= 50).slice(0, maxItems);
+  // Separar em Divas (>=50%) e Alfas (<50%)
+  const divas = leaderboard
+    .filter(entry => entry.percentage >= 50)
+    .slice(0, maxItems);
+  
   // Alfas ordenados de forma CRESCENTE (menores % primeiro = mais héteros)
   const alfas = leaderboard
     .filter(entry => entry.percentage < 50)
@@ -161,7 +188,7 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
         </div>
         <div className="flex flex-col items-center gap-0.5">
           <RankBadge rank={rank} category={category} />
-          <p className={`font-bold text-sm sm:text-base ${rankColor}`}>{entry.percentage}%</p>
+          <span className="text-lg sm:text-xl md:text-2xl font-bold text-purple-600">{entry.percentage}%</span>
         </div>
       </div>
     );
@@ -198,7 +225,7 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
             {alfas.length > 0 ? (
               alfas.map((entry, index) => renderEntry(entry, index, 'alfas'))
             ) : (
-              <p className="text-center text-white/70 text-sm">Nenhum alfa ainda!</p>
+              <p className="text-center text-white/70 text-sm">Nenhum alpha ainda!</p>
             )}
           </div>
         </div>
