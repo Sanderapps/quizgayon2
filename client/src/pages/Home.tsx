@@ -1038,20 +1038,20 @@ export default function Home() {
   if (showLeaderboard) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl p-8 bg-white shadow-2xl max-h-96 overflow-y-auto">
+        <Card className="w-full max-w-2xl p-8 bg-white dark:bg-gray-800 shadow-2xl max-h-96 overflow-y-auto">
           <h1 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
             🏆 Placar de Líderes 🏆
           </h1>
           {leaderboard.length === 0 ? (
-            <p className="text-center text-gray-600">Nenhum resultado ainda. Seja o primeiro!</p>
+            <p className="text-center text-gray-600 dark:text-gray-300">Nenhum resultado ainda. Seja o primeiro!</p>
           ) : (
             <div className="space-y-3">
               {leaderboard.map((entry, index) => (
                 <div key={index} className="flex justify-between items-center p-3 bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg">
                   <div>
-	                    <p className="font-bold text-gray-800">#{index + 1} {entry.name}</p>
-	                    <p className="text-sm text-gray-600">{entry.result} ({entry.percentage}%)</p>
-	                    <p className="text-xs text-gray-500">{entry.date} {entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}</p>
+	                    <p className="font-bold text-gray-800 dark:text-white">#{index + 1} {entry.name}</p>
+	                    <p className="text-sm text-gray-600 dark:text-gray-300">{entry.result} ({entry.percentage}%)</p>
+	                    <p className="text-xs text-gray-500 dark:text-gray-400">{entry.date} {entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}</p>
                   </div>
                   <p className="text-2xl">{entry.percentage >= 85 ? "👑" : entry.percentage >= 65 ? "🌟" : "💜"}</p>
                 </div>
@@ -1074,10 +1074,10 @@ export default function Home() {
       <>
         <ThemeToggle />
         <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex items-center justify-center p-4">
-        <Card className="w-full max-w-md p-8 text-center bg-white shadow-2xl">
+        <Card className="w-full max-w-md p-8 text-center bg-white dark:bg-gray-800 shadow-2xl">
           <div className="text-6xl mb-6 animate-bounce">🎉</div>
-          <h1 className="text-2xl font-bold mb-4 text-gray-800">Parabéns!</h1>
-          <p className="text-gray-600 mb-6">Quer aparecer no placar de líderes?</p>
+          <h1 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Parabéns!</h1>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">Quer aparecer no placar de líderes?</p>
           <input
             type="text"
             placeholder="Seu nome (ou deixe em branco para anônimo)"
@@ -1104,14 +1104,14 @@ export default function Home() {
         <ThemeToggle />
         <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center p-4 py-8 overflow-y-auto">
         <div className="w-full max-w-2xl">
-          <Card className="w-full p-8 text-center bg-white shadow-2xl mb-8">
+          <Card className="w-full p-8 text-center bg-white dark:bg-gray-800 shadow-2xl mb-8">
             <div className="text-6xl mb-6">
               <AnimatedEmoji emoji="🌈" />
             </div>
             <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
               Descubra se você é Gay!
             </h1>
-            <p className="text-gray-600 mb-6 text-lg">
+            <p className="text-gray-600 dark:text-gray-300 mb-6 text-lg">
               Um teste 100% científico (não é) para descobrir seu nível de gayness! 
               Responda com honestidade e divirta-se! 😄
             </p>
@@ -1158,7 +1158,7 @@ export default function Home() {
               {result.title}
             </h1>
             {result.badge && (
-              <div className="mb-4 inline-block bg-white px-5 py-2 rounded-full font-bold text-purple-600 shadow-lg text-sm">
+              <div className="mb-4 inline-block bg-white dark:bg-gray-700 px-5 py-2 rounded-full font-bold text-purple-600 dark:text-purple-300 shadow-lg text-sm">
                 {result.badge}
               </div>
             )}
@@ -1166,7 +1166,7 @@ export default function Home() {
               <div className="text-6xl font-bold text-white drop-shadow-lg mb-3">
                 {percentage}%
               </div>
-              <div className="w-full bg-white rounded-full h-4 overflow-hidden shadow-lg">
+              <div className="w-full bg-white dark:bg-gray-700 rounded-full h-4 overflow-hidden shadow-lg">
                 <div
                   className="bg-gradient-to-r from-pink-500 to-purple-600 h-full transition-all duration-500"
                   style={{ width: `${percentage}%` }}
@@ -1182,7 +1182,7 @@ export default function Home() {
           <div className="max-w-md mx-auto mb-12 space-y-4">
             <Button
               onClick={resetQuiz}
-              className="w-full bg-white hover:bg-gray-100 text-purple-600 font-bold py-3 text-lg shadow-lg"
+              className="w-full bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 text-purple-600 dark:text-purple-300 font-bold py-3 text-lg shadow-lg"
             >
               Tentar Novamente 🔄
             </Button>
@@ -1229,9 +1229,9 @@ export default function Home() {
     <>
       <ThemeToggle />
       <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex items-center justify-center p-4">
-        <Card className="w-full max-w-md p-8 text-center bg-white shadow-2xl">
+        <Card className="w-full max-w-md p-8 text-center bg-white dark:bg-gray-800 shadow-2xl">
           <div className="text-4xl mb-6 animate-spin">⏳</div>
-          <p className="text-gray-600 text-lg">Carregando perguntas...</p>
+          <p className="text-gray-600 dark:text-gray-300 text-lg">Carregando perguntas...</p>
         </Card>
       </div>
     </>
@@ -1246,21 +1246,21 @@ export default function Home() {
       <ThemeToggle />
       <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center justify-center p-4">
         <Card
-          className={`w-full max-w-2xl p-8 bg-white shadow-2xl transition-all duration-300 ${
+          className={`w-full max-w-2xl p-8 bg-white dark:bg-gray-800 shadow-2xl transition-all duration-300 ${
             fadeOut ? "opacity-50 scale-95" : "opacity-100 scale-100"
           }`}
         >
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-semibold text-gray-600">
+            <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">
               Pergunta {currentQuestion + 1} de {questions.length}
             </span>
             <span className="text-sm font-semibold text-purple-600">
               {Math.round(progress)}%
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
             <div
               className="bg-gradient-to-r from-pink-500 to-purple-600 h-full transition-all duration-300"
               style={{ width: `${progress}%` }}
@@ -1269,7 +1269,7 @@ export default function Home() {
         </div>
 
         {/* Question */}
-        <h2 className="text-2xl font-bold mb-8 text-gray-800 text-center animate-in fade-in">
+        <h2 className="text-2xl font-bold mb-8 text-gray-800 dark:text-white text-center animate-in fade-in">
           <AnimatedEmoji emoji={["🤔", "💭", "❓"][currentQuestion % 3]} /> {question.text}
         </h2>
 
@@ -1279,7 +1279,7 @@ export default function Home() {
             <Button
               key={index}
               onClick={() => handleAnswer(answer.points)}
-              className="w-full p-6 h-auto text-left text-lg font-semibold bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-300 hover:to-purple-300 text-gray-800 border-2 border-purple-300 hover:border-purple-500 transition-all duration-200 transform hover:scale-105 active:scale-95 whitespace-normal"
+              className="w-full p-6 h-auto text-left text-lg font-semibold bg-gradient-to-r from-pink-100 to-purple-100 dark:from-gray-700 dark:to-gray-600 hover:from-pink-300 hover:to-purple-300 dark:hover:from-gray-600 dark:hover:to-gray-500 text-gray-800 dark:text-white border-2 border-purple-300 dark:border-purple-500 hover:border-purple-500 transition-all duration-200 transform hover:scale-105 active:scale-95 whitespace-normal"
             >
               {answer.text}
             </Button>
@@ -1287,7 +1287,7 @@ export default function Home() {
         </div>
 
         {/* Skip info */}
-        <p className="text-center text-gray-500 text-sm mt-8">
+        <p className="text-center text-gray-500 dark:text-gray-400 text-sm mt-8">
           Pergunta {currentQuestion + 1}/{questions.length}
         </p>
         </Card>
