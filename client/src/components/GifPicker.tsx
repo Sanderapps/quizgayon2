@@ -37,7 +37,11 @@ export function GifPicker({ onSelect, onClose }: GifPickerProps) {
         `https://tenor.googleapis.com/v2/featured?key=${TENOR_API_KEY}&limit=20&media_filter=gif`
       );
       const data = await response.json();
-      setGifs(data.results || []);
+      // Filtrar GIFs que têm a estrutura completa de media_formats
+      const validGifs = (data.results || []).filter(
+        (gif: TenorGif) => gif.media_formats?.gif?.url && gif.media_formats?.tinygif?.url
+      );
+      setGifs(validGifs);
     } catch (error) {
       console.error("Erro ao buscar GIFs trending:", error);
     }
@@ -56,7 +60,11 @@ export function GifPicker({ onSelect, onClose }: GifPickerProps) {
         `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(term)}&key=${TENOR_API_KEY}&limit=20&media_filter=gif`
       );
       const data = await response.json();
-      setGifs(data.results || []);
+      // Filtrar GIFs que têm a estrutura completa de media_formats
+      const validGifs = (data.results || []).filter(
+        (gif: TenorGif) => gif.media_formats?.gif?.url && gif.media_formats?.tinygif?.url
+      );
+      setGifs(validGifs);
     } catch (error) {
       console.error("Erro ao buscar GIFs:", error);
     }
