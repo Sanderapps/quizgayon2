@@ -39,7 +39,26 @@ export async function initializeDatabase() {
         id SERIAL PRIMARY KEY,
         apelido TEXT NOT NULL,
         mensagem TEXT NOT NULL,
+        cor TEXT DEFAULT '#FF6B6B',
+        emoji_avatar TEXT DEFAULT '😀',
         data_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Adicionar colunas cor e emoji_avatar se não existirem (migração)
+    await pool.query(`
+      ALTER TABLE chat_messages 
+      ADD COLUMN IF NOT EXISTS cor TEXT DEFAULT '#FF6B6B',
+      ADD COLUMN IF NOT EXISTS emoji_avatar TEXT DEFAULT '😀';
+    `);
+
+    // Criar tabela de reports se não existir
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS chat_reports (
+        id SERIAL PRIMARY KEY,
+        message_id INTEGER REFERENCES chat_messages(id) ON DELETE CASCADE,
+        reason TEXT NOT NULL,
+        reported_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
 
@@ -70,5 +89,7 @@ export interface ChatMessage {
   id?: number;
   apelido: string;
   mensagem: string;
+  cor?: string;
+  emoji_avatar?: string;
   data_envio?: Date;
 }

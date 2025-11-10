@@ -8,6 +8,23 @@ import { pool, initializeDatabase, type Score, type ChatMessage } from "./db.js"
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Senha de admin (pode ser configurada via variável de ambiente)
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
+
+// Lista de palavrões para filtro (básico)
+const BADWORDS = [
+  "porra", "caralho", "puta", "merda", "fdp", "cu", "buceta", "pinto", "pau"
+];
+
+function filterBadWords(text: string): string {
+  let filtered = text;
+  BADWORDS.forEach(word => {
+    const regex = new RegExp(word, "gi");
+    filtered = filtered.replace(regex, "*".repeat(word.length));
+  });
+  return filtered;
+}
+
 async function startServer() {
   const app = express();
   const server = createServer(app);
@@ -30,17 +47,19 @@ async function startServer() {
   // Mapa para controlar rate limiting (anti-spam)
   const userLastMessage = new Map<string, number>();
   const RATE_LIMIT_MS = 2000; // 2 segundos entre mensagens
+  const MESSAGES_PER_PAGE = 50;
 
   io.on("connection", (socket) => {
     console.log("✅ Usuário conectado ao chat:", socket.id);
 
-    // Enviar histórico de mensagens ao conectar
+    // Enviar histórico de mensagens ao conectar (primeira página)
     socket.on("request_history", async () => {
       try {
         const result = await pool.query(
           `SELECT * FROM chat_messages 
            ORDER BY data_envio DESC 
-           LIMIT 50`
+           LIMIT $1`,
+          [MESSAGES_PER_PAGE]
         );
         socket.emit("chat_history", result.rows.reverse());
       } catch (error) {
@@ -48,10 +67,37 @@ async function startServer() {
       }
     });
 
-    // Receber e broadcast mensagens
-    socket.on("send_message", async (data: { apelido: string; mensagem: string }) => {
+    // Carregar mais mensagens (scroll infinito)
+    socket.on("request_more_history", async (data: { page: number }) => {
       try {
-        const { apelido, mensagem } = data;
+        const { page } = data;
+        const offset = (page - 1) * MESSAGES_PER_PAGE;
+
+        const result = await pool.query(
+          `SELECT * FROM chat_messages 
+           ORDER BY data_envio DESC 
+           LIMIT $1 OFFSET $2`,
+          [MESSAGES_PER_PAGE, offset]
+        );
+
+        socket.emit("more_history", {
+          messages: result.rows.reverse(),
+          hasMore: result.rows.length === MESSAGES_PER_PAGE
+        });
+      } catch (error) {
+        console.error("❌ Erro ao buscar mais mensagens:", error);
+      }
+    });
+
+    // Receber e broadcast mensagens
+    socket.on("send_message", async (data: { 
+      apelido: string; 
+      mensagem: string;
+      cor?: string;
+      emoji_avatar?: string;
+    }) => {
+      try {
+        const { apelido, mensagem, cor, emoji_avatar } = data;
 
         // Validação
         if (!apelido || !mensagem || mensagem.length > 200) {
@@ -68,12 +114,15 @@ async function startServer() {
         }
         userLastMessage.set(socket.id, now);
 
+        // Filtrar palavrões
+        const filteredMessage = filterBadWords(mensagem);
+
         // Salvar no banco
         const result = await pool.query(
-          `INSERT INTO chat_messages (apelido, mensagem) 
-           VALUES ($1, $2) 
+          `INSERT INTO chat_messages (apelido, mensagem, cor, emoji_avatar) 
+           VALUES ($1, $2, $3, $4) 
            RETURNING *`,
-          [apelido, mensagem]
+          [apelido, filteredMessage, cor || '#FF6B6B', emoji_avatar || '😀']
         );
 
         const newMessage = result.rows[0];
@@ -83,6 +132,51 @@ async function startServer() {
       } catch (error) {
         console.error("❌ Erro ao enviar mensagem:", error);
         socket.emit("error", "Erro ao enviar mensagem");
+      }
+    });
+
+    // Deletar mensagem (admin)
+    socket.on("delete_message", async (data: { messageId: number; adminPassword: string }) => {
+      try {
+        const { messageId, adminPassword } = data;
+
+        // Verificar senha de admin
+        if (adminPassword !== ADMIN_PASSWORD) {
+          socket.emit("error", "Senha de administrador incorreta");
+          return;
+        }
+
+        // Deletar mensagem
+        await pool.query(
+          `DELETE FROM chat_messages WHERE id = $1`,
+          [messageId]
+        );
+
+        // Notificar todos os clientes
+        io.emit("message_deleted", messageId);
+
+        console.log(`🗑️ Mensagem ${messageId} deletada por admin`);
+      } catch (error) {
+        console.error("❌ Erro ao deletar mensagem:", error);
+        socket.emit("error", "Erro ao deletar mensagem");
+      }
+    });
+
+    // Reportar mensagem
+    socket.on("report_message", async (data: { messageId: number; reason: string }) => {
+      try {
+        const { messageId, reason } = data;
+
+        // Salvar report no banco
+        await pool.query(
+          `INSERT INTO chat_reports (message_id, reason) 
+           VALUES ($1, $2)`,
+          [messageId, reason]
+        );
+
+        console.log(`🚨 Mensagem ${messageId} reportada: ${reason}`);
+      } catch (error) {
+        console.error("❌ Erro ao reportar mensagem:", error);
       }
     });
 
@@ -205,6 +299,29 @@ async function startServer() {
     }
   });
 
+  // GET /api/chat/reports - Ver reports (admin)
+  app.get("/api/chat/reports", async (req, res) => {
+    try {
+      const result = await pool.query(`
+        SELECT r.*, m.apelido, m.mensagem 
+        FROM chat_reports r
+        JOIN chat_messages m ON r.message_id = m.id
+        ORDER BY r.reported_at DESC
+        LIMIT 100
+      `);
+
+      res.json({
+        success: true,
+        reports: result.rows,
+      });
+    } catch (error) {
+      console.error("Erro ao buscar reports:", error);
+      res.status(500).json({
+        error: "Erro ao buscar reports",
+      });
+    }
+  });
+
   // ==================== ARQUIVOS ESTÁTICOS ====================
 
   // Serve static files from dist/public in production
@@ -225,6 +342,8 @@ async function startServer() {
   server.listen(port, () => {
     console.log(`🚀 Server running on http://localhost:${port}/`);
     console.log(`📊 API disponível em /api/scores e /api/leaderboard`);
+    console.log(`💬 Chat WebSocket ativo`);
+    console.log(`🔒 Admin password: ${ADMIN_PASSWORD}`);
   });
 }
 
