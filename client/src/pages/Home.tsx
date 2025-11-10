@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { salvarPontuacao, buscarPlacar, pontuacaoParaPercentual } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { RankBadge } from "@/components/RankBadge";i/card";
 
 interface Question {
   id: number;
@@ -1175,8 +1176,93 @@ export default function Home() {
             </p>
           </div>
 
+          {/* Botões de Ação */}
+          <div className="max-w-md mx-auto mb-12 space-y-4">
+            <Button
+              onClick={resetQuiz}
+              className="w-full bg-white hover:bg-gray-100 text-purple-600 font-bold py-3 text-lg shadow-lg"
+            >
+              Tentar Novamente 🔄
+            </Button>
+          </div>
+
+          {/* Placar de Líderes */}
+          <div className="bg-white/20 backdrop-blur-md rounded-lg shadow-2xl p-8 border-2 border-white/30">
+            <h2 className="text-4xl font-bold mb-6 text-center text-white drop-shadow-lg">
+              🏆 Placar de Líderes 🏆
+            </h2>
+            {leaderboard.length === 0 ? (
+              <p className="text-center text-gray-600 text-lg">Nenhum resultado ainda. Seja o primeiro!</p>
+            ) : (
+              <div className="space-y-3 max-h-80 overflow-y-auto">
+                {leaderboard.slice(0, 10).map((entry, index) => {
+                  const rank = index + 1;
+                  
+                  // Estilos personalizados por colocação
+                  let bgGradient, borderClass, glowClass, nameColor, badgeBg, rankColor;
+                  
+                  if (rank === 1) {
+                    bgGradient = 'from-yellow-100 via-yellow-50 to-amber-100';
+                    borderClass = 'border-4 border-yellow-400';
+                    glowClass = 'shadow-[0_0_25px_rgba(255,215,0,0.9)] animate-pulse';
+                    nameColor = 'text-yellow-700';
+                    badgeBg = 'bg-yellow-200';
+                    rankColor = 'text-yellow-600';
+                  } else if (rank === 2) {
+                    bgGradient = 'from-gray-100 via-gray-50 to-slate-100';
+                    borderClass = 'border-3 border-gray-400';
+                    glowClass = 'shadow-[0_0_20px_rgba(192,192,192,0.8)]';
+                    nameColor = 'text-gray-700';
+                    badgeBg = 'bg-gray-200';
+                    rankColor = 'text-gray-600';
+                  } else if (rank === 3) {
+                    bgGradient = 'from-orange-100 via-orange-50 to-amber-100';
+                    borderClass = 'border-3 border-orange-400';
+                    glowClass = 'shadow-[0_0_20px_rgba(205,127,50,0.8)]';
+                    nameColor = 'text-orange-700';
+                    badgeBg = 'bg-orange-200';
+                    rankColor = 'text-orange-600';
+                  } else if (rank <= 6) {
+                    bgGradient = 'from-pink-200 via-purple-200 to-blue-200';
+                    borderClass = 'border-2 border-purple-300';
+                    glowClass = 'shadow-md';
+                    nameColor = 'text-purple-800';
+                    badgeBg = 'bg-purple-100';
+                    rankColor = 'text-purple-600';
+                  } else {
+                    bgGradient = 'from-pink-100 to-purple-100';
+                    borderClass = 'border border-purple-200';
+                    glowClass = 'shadow-sm';
+                    nameColor = 'text-gray-800';
+                    badgeBg = 'bg-purple-50';
+                    rankColor = 'text-purple-500';
+                  }
+                  
+                  return (
+	                  <div key={index} className={`flex justify-between items-center p-4 bg-gradient-to-r ${bgGradient} rounded-lg hover:scale-[1.02] transition-all duration-300 ${borderClass} ${glowClass}`}>
+	                    <div className="flex items-center gap-3 flex-1">
+                      <div className="flex flex-col items-center">
+                        <span className={`text-sm font-bold ${rankColor}`}>#{rank}</span>
+                      </div>
+	                      <div className="flex-1">
+	                        <p className={`font-bold text-lg ${nameColor}`}>{entry.name}</p>
+	                        <p className={`text-xs px-2 py-0.5 rounded-full inline-block ${badgeBg} text-gray-700 font-medium`}>{entry.result}</p>
+	                        <p className="text-xs text-gray-600 mt-1">{entry.date} {entry.tempo_segundos && rank <= 3 ? <span className="font-bold text-purple-600">({entry.tempo_segundos.toFixed(2)}s)</span> : entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}</p>
+	                      </div>
+	                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <RankBadge rank={rank} />
+                      <p className={`font-bold text-lg ${rankColor}`}>{entry.percentage}%</p>
+                    </div>
+                  </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
           {/* Botões de Compartilhamento */}
-          <div className="grid grid-cols-2 gap-3 mb-8 max-w-md mx-auto">
+          <div className="grid grid-cols-2 gap-3 mt-8 max-w-md mx-auto">
             <Button
               onClick={() => shareResult("twitter")}
               className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-3 text-lg shadow-lg"
@@ -1201,50 +1287,6 @@ export default function Home() {
             >
               Telegram
             </Button>
-          </div>
-
-          {/* Botões de Ação */}
-          <div className="max-w-md mx-auto mb-12 space-y-4">
-            <Button
-              onClick={resetQuiz}
-              className="w-full bg-white hover:bg-gray-100 text-purple-600 font-bold py-3 text-lg shadow-lg"
-            >
-              Tentar Novamente 🔄
-            </Button>
-          </div>
-
-          {/* Placar de Líderes */}
-          <div className="bg-white rounded-lg shadow-2xl p-8">
-            <h2 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
-              🏆 Placar de Líderes 🏆
-            </h2>
-            {leaderboard.length === 0 ? (
-              <p className="text-center text-gray-600 text-lg">Nenhum resultado ainda. Seja o primeiro!</p>
-            ) : (
-              <div className="space-y-3 max-h-80 overflow-y-auto">
-                {leaderboard.slice(0, 10).map((entry, index) => {
-                  const isTop3 = index < 3;
-                  const glowClass = index === 0 ? 'shadow-[0_0_20px_rgba(255,215,0,0.8)] border-2 border-yellow-400 animate-pulse' : 
-                                    index === 1 ? 'shadow-[0_0_15px_rgba(192,192,192,0.7)] border-2 border-gray-400' : 
-                                    index === 2 ? 'shadow-[0_0_15px_rgba(205,127,50,0.7)] border-2 border-orange-400' : '';
-                  const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
-                  
-                  return (
-	                  <div key={index} className={`flex justify-between items-center p-4 bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg hover:shadow-md transition-all ${glowClass}`}>
-	                    <div className="flex-1">
-	                      <p className="font-bold text-gray-800 text-lg">{medal} #{index + 1} {entry.name}</p>
-	                      <p className="text-sm text-gray-600">{entry.result}</p>
-	                      <p className="text-xs text-gray-500">{entry.date} {entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}</p>
-	                    </div>
-                    <div className="text-right">
-                      <p className="text-3xl">{entry.percentage >= 85 ? "👑" : entry.percentage >= 65 ? "🌟" : "💜"}</p>
-                      <p className="font-bold text-purple-600 text-lg">{entry.percentage}%</p>
-                    </div>
-                  </div>
-                  );
-                })}
-              </div>
-            )}
           </div>
         </div>
       </div>
