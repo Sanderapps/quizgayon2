@@ -406,6 +406,29 @@ async function startServer() {
     }
   });
 
+  // GET /api/debug/scores - Ver dados brutos do banco (DEBUG)
+  app.get("/api/debug/scores", async (req, res) => {
+    try {
+      const result = await pool.query(`
+        SELECT id, apelido, pontuacao, tempo_segundos, data_registro 
+        FROM scores 
+        ORDER BY pontuacao DESC, tempo_segundos ASC 
+        LIMIT 10
+      `);
+      
+      res.json({
+        total: result.rows.length,
+        scores: result.rows
+      });
+    } catch (error) {
+      console.error("Erro ao buscar scores:", error);
+      res.status(500).json({
+        error: "Erro ao buscar scores",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   // ==================== ARQUIVOS ESTÁTICOS ====================
 
   // Serve static files from dist/public in production
