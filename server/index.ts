@@ -532,10 +532,10 @@ async function startServer() {
         });
       }
 
-      // Deletar entradas com pontuação > 60 ou tempo = 0
+      // Deletar entradas com pontuação > 60 ou tempo < 15s
       const result = await pool.query(`
         DELETE FROM scores 
-        WHERE pontuacao > 60 OR tempo_segundos < 5
+        WHERE pontuacao > 60 OR tempo_segundos < 15
         RETURNING *
       `);
 
