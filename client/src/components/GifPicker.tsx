@@ -18,7 +18,7 @@ interface GifPickerProps {
   onClose: () => void;
 }
 
-const TENOR_API_KEY = "AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCYQ"; // Key pública de teste
+const TENOR_API_KEY = "AIzaSyAJ_wFzBIsxGzZDNd5DxkysR6j78bz-roM"; // API key do usuário
 
 export function GifPicker({ onSelect, onClose }: GifPickerProps) {
   const [searchTerm, setSearchTerm] = useState("");
