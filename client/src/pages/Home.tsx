@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { RankBadge } from "@/components/RankBadge";
 import { Leaderboard } from "@/components/Leaderboard";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface Question {
   id: number;
@@ -1091,12 +1092,15 @@ export default function Home() {
           </Button>
         </Card>
       </div>
+    </>
     );
   }
 
   if (!quizStarted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex flex-col items-center p-4 py-8 overflow-y-auto">
+      <>
+        <ThemeToggle />
+        <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center p-4 py-8 overflow-y-auto">
         <div className="w-full max-w-2xl">
           <Card className="w-full p-8 text-center bg-white shadow-2xl mb-8">
             <div className="text-6xl mb-6">
@@ -1129,6 +1133,7 @@ export default function Home() {
           <Leaderboard leaderboard={leaderboard} maxItems={12} />
         </div>
       </div>
+      </>
     );
   }
 
@@ -1138,7 +1143,9 @@ export default function Home() {
     const percentage = Math.round((totalPoints / maxPoints) * 100);
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex flex-col items-center p-4 py-8 overflow-y-auto">
+      <>
+        <ThemeToggle />
+        <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center p-4 py-8 overflow-y-auto">
         {showConfetti && <CanvasConfetti />}
         
         <div className="w-full max-w-2xl">
@@ -1229,8 +1236,9 @@ export default function Home() {
   const progress = ((currentQuestion + 1) / questions.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex items-center justify-center p-4">
-      <Card
+    <>
+      <ThemeToggle />
+      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center justify-center p-4">ard
         className={`w-full max-w-2xl p-8 bg-white shadow-2xl transition-all duration-300 ${
           fadeOut ? "opacity-50 scale-95" : "opacity-100 scale-100"
         }`}

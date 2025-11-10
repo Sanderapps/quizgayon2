@@ -16,7 +16,7 @@ interface LeaderboardProps {
 export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) => {
   if (leaderboard.length === 0) {
     return (
-      <div className="bg-white/20 backdrop-blur-md rounded-lg shadow-2xl p-8 border-2 border-white/30">
+      <div className="bg-white/20 dark:bg-black/30 backdrop-blur-md rounded-lg shadow-2xl p-8 border-2 border-white/30 dark:border-gray-700">
         <h2 className="text-4xl font-bold mb-6 text-center text-white drop-shadow-lg">
           🏆 Placar de Líderes 🏆
         </h2>
@@ -26,7 +26,7 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
   }
 
   return (
-    <div className="bg-white/20 backdrop-blur-md rounded-lg shadow-2xl p-8 border-2 border-white/30">
+    <div className="bg-white/20 dark:bg-black/30 backdrop-blur-md rounded-lg shadow-2xl p-8 border-2 border-white/30 dark:border-gray-700">
       <h2 className="text-4xl font-bold mb-6 text-center text-white drop-shadow-lg">
         🏆 Placar de Líderes 🏆
       </h2>
