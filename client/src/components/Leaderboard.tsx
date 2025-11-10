@@ -229,7 +229,7 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
     } else if (rank === 2) {
       bgGradient = 'from-gray-100 via-gray-50 to-slate-100';
       borderClass = 'border-3 border-gray-300';
-      glowClass = 'shadow-[0_0_20px_rgba(229,231,235,0.9)] animate-pulse';
+      glowClass = 'shadow-[0_0_25px_rgba(255,215,0,0.9)] animate-pulse';
 
       rankColor = 'text-gray-600';
     } else if (rank === 3) {
