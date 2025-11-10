@@ -6,6 +6,9 @@ import { RankBadge } from "@/components/RankBadge";
 import { Leaderboard } from "@/components/Leaderboard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ChatWidget } from "@/components/ChatWidget";
+import { Sidebar } from "@/components/Sidebar";
+import { WelcomeAnimation } from "@/components/WelcomeAnimation";
+import { LoadingSkeleton, CardSkeleton } from "@/components/LoadingSkeleton";
 
 interface Question {
   id: number;
@@ -721,6 +724,7 @@ export default function Home() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(true);
+  const [superGayMode, setSuperGayMode] = useState(false);
 
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [leaderboard, setLeaderboard] = useState<LeaderEntry[]>([]);
@@ -753,6 +757,31 @@ export default function Home() {
     }
     return result;
   };
+
+  // EASTER EGG: Modo Super Gay
+  useEffect(() => {
+    let typed = "";
+    
+    const handleKeyPress = (e: KeyboardEvent) => {
+      typed = (typed + e.key).slice(-3);
+      
+      if (typed.toLowerCase() === "gay") {
+        setSuperGayMode(!superGayMode);
+        
+        if (!superGayMode) {
+          document.body.classList.add("super-gay-mode");
+          alert("🌈 MODO SUPER GAY ATIVADO! 🌈\n\nDigite 'gay' novamente para desativar.");
+        } else {
+          document.body.classList.remove("super-gay-mode");
+        }
+        
+        typed = "";
+      }
+    };
+
+    window.addEventListener("keypress", handleKeyPress);
+    return () => window.removeEventListener("keypress", handleKeyPress);
+  }, [superGayMode]);
 
   // Função para carregar o placar do banco de dados
   const loadLeaderboard = async () => {
@@ -984,7 +1013,8 @@ export default function Home() {
   if (showLeaderboard) {
     return (
       <>
-      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex items-center justify-center p-4">
+      <Sidebar />
+      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex items-center justify-center p-4 pt-20">
         <Card className="w-full max-w-2xl p-8 bg-white dark:bg-gray-800 shadow-2xl max-h-96 overflow-y-auto">
           <h1 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
             🏆 Placar de Líderes 🏆
@@ -1021,8 +1051,9 @@ export default function Home() {
   if (showNameInput && !showResult) {
     return (
       <>
+        <Sidebar />
         <ThemeToggle />
-        <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex items-center justify-center p-4 pt-20">
         <Card className="w-full max-w-md p-8 text-center bg-white dark:bg-gray-800 shadow-2xl">
           <div className="text-6xl mb-6 animate-bounce">🎉</div>
           <h1 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Parabéns!</h1>
@@ -1051,8 +1082,9 @@ export default function Home() {
   if (!quizStarted) {
     return (
       <>
+        <Sidebar />
         <ThemeToggle />
-        <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center p-4 py-8 overflow-y-auto">
+        <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center p-4 pt-20 py-8 overflow-y-auto">
         <div className="w-full max-w-2xl">
           <Card className="w-full p-8 text-center bg-white dark:bg-gray-800 shadow-2xl mb-8">
             <div className="text-6xl mb-6">
@@ -1097,8 +1129,9 @@ export default function Home() {
 
     return (
       <>
+        <Sidebar />
         <ThemeToggle />
-        <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center p-4 py-8 overflow-y-auto">
+        <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center p-4 pt-20 py-8 overflow-y-auto">
         {showConfetti && <CanvasConfetti />}
         
         <div className="w-full max-w-2xl">
@@ -1179,12 +1212,11 @@ export default function Home() {
   if (questions.length === 0) {
     return (
     <>
+      <WelcomeAnimation />
+      <Sidebar />
       <ThemeToggle />
-      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex items-center justify-center p-4">
-        <Card className="w-full max-w-md p-8 text-center bg-white dark:bg-gray-800 shadow-2xl">
-          <div className="text-4xl mb-6 animate-spin">⏳</div>
-          <p className="text-gray-600 dark:text-gray-300 text-lg">Carregando perguntas...</p>
-        </Card>
+      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex items-center justify-center p-4 pt-20">
+        <CardSkeleton />
       </div>
       <ChatWidget />
     </>
@@ -1196,8 +1228,9 @@ export default function Home() {
 
   return (
     <>
+      <Sidebar />
       <ThemeToggle />
-      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center justify-center p-4 pt-20">
         <Card
           className={`w-full max-w-2xl p-8 bg-white dark:bg-gray-800 shadow-2xl transition-all duration-300 ${
             fadeOut ? "opacity-50 scale-95" : "opacity-100 scale-100"

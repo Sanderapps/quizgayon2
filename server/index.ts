@@ -167,14 +167,37 @@ async function startServer() {
       try {
         const { messageId, reason } = data;
 
-        // Salvar report no banco
+        // Salvar report no banco com socket_id do reporter
         await pool.query(
-          `INSERT INTO chat_reports (message_id, reason) 
-           VALUES ($1, $2)`,
-          [messageId, reason]
+          `INSERT INTO chat_reports (message_id, reason, reporter_socket_id) 
+           VALUES ($1, $2, $3)`,
+          [messageId, reason, socket.id]
         );
 
         console.log(`🚨 Mensagem ${messageId} reportada: ${reason}`);
+
+        // AUTO-MODERAÇÃO: Verificar quantos reports únicos a mensagem tem
+        const reportCount = await pool.query(
+          `SELECT COUNT(DISTINCT reporter_socket_id) as count 
+           FROM chat_reports 
+           WHERE message_id = $1`,
+          [messageId]
+        );
+
+        const uniqueReports = parseInt(reportCount.rows[0].count);
+
+        // Se 3 ou mais pessoas diferentes reportaram, deletar automaticamente
+        if (uniqueReports >= 3) {
+          await pool.query(
+            `DELETE FROM chat_messages WHERE id = $1`,
+            [messageId]
+          );
+
+          // Notificar todos os clientes
+          io.emit("message_deleted", messageId);
+
+          console.log(`🛡️ AUTO-MODERAÇÃO: Mensagem ${messageId} deletada automaticamente (${uniqueReports} reports)`);
+        }
       } catch (error) {
         console.error("❌ Erro ao reportar mensagem:", error);
       }
@@ -318,6 +341,58 @@ async function startServer() {
       console.error("Erro ao buscar reports:", error);
       res.status(500).json({
         error: "Erro ao buscar reports",
+      });
+    }
+  });
+
+  // GET /api/chat/recent - Ver mensagens recentes (admin)
+  app.get("/api/chat/recent", async (req, res) => {
+    try {
+      const result = await pool.query(
+        `SELECT * FROM chat_messages 
+         ORDER BY data_envio DESC 
+         LIMIT 20`
+      );
+
+      res.json({
+        success: true,
+        messages: result.rows,
+      });
+    } catch (error) {
+      console.error("Erro ao buscar mensagens:", error);
+      res.status(500).json({
+        error: "Erro ao buscar mensagens",
+      });
+    }
+  });
+
+  // DELETE /api/chat/messages/:id - Deletar mensagem (admin via HTTP)
+  app.delete("/api/chat/messages/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const adminPassword = req.headers["x-admin-password"];
+
+      // Verificar senha de admin
+      if (adminPassword !== ADMIN_PASSWORD) {
+        return res.status(401).json({
+          error: "Senha de administrador incorreta",
+        });
+      }
+
+      // Deletar mensagem
+      await pool.query(
+        `DELETE FROM chat_messages WHERE id = $1`,
+        [id]
+      );
+
+      res.json({
+        success: true,
+        message: "Mensagem deletada",
+      });
+    } catch (error) {
+      console.error("Erro ao deletar mensagem:", error);
+      res.status(500).json({
+        error: "Erro ao deletar mensagem",
       });
     }
   });

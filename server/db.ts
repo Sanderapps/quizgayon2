@@ -58,8 +58,15 @@ export async function initializeDatabase() {
         id SERIAL PRIMARY KEY,
         message_id INTEGER REFERENCES chat_messages(id) ON DELETE CASCADE,
         reason TEXT NOT NULL,
+        reporter_socket_id TEXT,
         reported_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+    `);
+
+    // Adicionar coluna reporter_socket_id se não existir (migração)
+    await pool.query(`
+      ALTER TABLE chat_reports 
+      ADD COLUMN IF NOT EXISTS reporter_socket_id TEXT;
     `);
 
     // Criar índice para otimizar a busca de mensagens recentes

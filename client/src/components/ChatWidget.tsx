@@ -231,23 +231,12 @@ export function ChatWidget() {
           {/* Header */}
           <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-3 rounded-t-lg flex justify-between items-center">
             <h3 className="text-white font-bold">💬 Chat Global</h3>
-            <div className="flex gap-2">
-              {isApelidoSet && (
-                <button
-                  onClick={handleChangeApelido}
-                  className="text-white hover:bg-white/20 rounded px-2 text-xs"
-                  title="Trocar apelido"
-                >
-                  🔄
-                </button>
-              )}
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-white hover:bg-white/20 rounded px-2"
-              >
-                ✕
-              </button>
-            </div>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-white hover:bg-white/20 rounded px-2"
+            >
+              ✕
+            </button>
           </div>
 
           {/* Conteúdo */}
@@ -346,18 +335,18 @@ export function ChatWidget() {
                           {msg.mensagem}
                         </span>
                       </div>
-                      {/* Botões de ação (aparecem no hover) */}
-                      <div className="hidden group-hover:flex gap-1">
+                      {/* Botões de ação (sempre visíveis em mobile, hover em desktop) */}
+                      <div className="flex md:hidden group-hover:flex gap-1">
                         <button
                           onClick={() => handleReportMessage(msg.id)}
-                          className="text-xs text-red-500 hover:text-red-700"
+                          className="text-sm text-red-500 hover:text-red-700 active:scale-90 transition-transform p-1"
                           title="Reportar"
                         >
                           🚨
                         </button>
                         <button
                           onClick={() => handleDeleteMessage(msg.id)}
-                          className="text-xs text-gray-500 hover:text-gray-700"
+                          className="text-sm text-gray-500 hover:text-gray-700 active:scale-90 transition-transform p-1"
                           title="Deletar (admin)"
                         >
                           🗑️
