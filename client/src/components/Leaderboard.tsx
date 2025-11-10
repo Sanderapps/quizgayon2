@@ -1,5 +1,45 @@
 import React from "react";
 
+// Estilos CSS para animações customizadas
+const animationStyles = `
+  @keyframes rotate-gradient {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+  
+  .rainbow-border {
+    position: relative;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(90deg, 
+                  #ff0000, #ff7f00, #ffff00, #00ff00, 
+                  #00ffff, #0000ff, #8b00ff, #ff00ff,
+                  #ff0000) border-box;
+    background-size: 200% 100%;
+    animation: rotate-gradient 3s linear infinite;
+  }
+  
+  @keyframes orbit-spikes {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .spike-container {
+    position: absolute;
+    inset: -12px;
+    pointer-events: none;
+    animation: orbit-spikes 4s linear infinite;
+  }
+  
+  .spike {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 12px solid black;
+  }
+`;
+
 // Função que retorna classes Tailwind baseadas na porcentagem (34 categorias)
 // Nova paleta: Preto → Cinza → Marrom → Azul Escuro → Verde → Ciano → Azul Bebê → Roxo → Vermelho → Rosa → Rosa Choque
 function getCategoryBadgeColor(percentage: number): string {
@@ -112,6 +152,16 @@ const RankBadge = ({ rank, category }: RankBadgeProps) => {
 };
 
 export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) => {
+  // Injetar estilos CSS customizados
+  React.useEffect(() => {
+    const styleId = 'leaderboard-animations';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = animationStyles;
+      document.head.appendChild(style);
+    }
+  }, []);
   if (leaderboard.length === 0) {
     return (
       <div className="bg-white/20 dark:bg-black/30 backdrop-blur-md rounded-lg shadow-2xl p-4 sm:p-8 border-2 border-white/30 dark:border-gray-700">
@@ -140,12 +190,40 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
     const rank = index + 1;
     
     // Estilos personalizados por colocação
-    let bgGradient, borderClass, glowClass, rankColor;
+    let bgGradient, borderClass, glowClass, rankColor, specialAnimation = null;
     
     if (rank === 1) {
       bgGradient = 'from-yellow-100 via-yellow-50 to-amber-100';
-      borderClass = 'border-4 border-yellow-400';
-      glowClass = 'shadow-[0_0_25px_rgba(255,215,0,0.9)] animate-pulse';
+      
+      // Animações diferentes para Divas e Alpha
+      if (category === 'divas') {
+        borderClass = 'border-4 border-transparent rainbow-border';
+        glowClass = 'shadow-[0_0_25px_rgba(255,215,0,0.9)]';
+      } else {
+        borderClass = 'border-4 border-black';
+        glowClass = 'shadow-[0_0_25px_rgba(0,0,0,0.9)]';
+        // Espinhos orbitando (sempre apontam para fora)
+        specialAnimation = (
+          <div className="spike-container">
+            {/* Topo */}
+            <div className="spike" style={{ top: '-6px', left: '50%', transform: 'translateX(-50%) rotate(0deg)' }} />
+            {/* Topo-direita */}
+            <div className="spike" style={{ top: '10%', right: '10%', transform: 'rotate(45deg)' }} />
+            {/* Direita */}
+            <div className="spike" style={{ top: '50%', right: '-6px', transform: 'translateY(-50%) rotate(90deg)' }} />
+            {/* Baixo-direita */}
+            <div className="spike" style={{ bottom: '10%', right: '10%', transform: 'rotate(135deg)' }} />
+            {/* Baixo */}
+            <div className="spike" style={{ bottom: '-6px', left: '50%', transform: 'translateX(-50%) rotate(180deg)' }} />
+            {/* Baixo-esquerda */}
+            <div className="spike" style={{ bottom: '10%', left: '10%', transform: 'rotate(225deg)' }} />
+            {/* Esquerda */}
+            <div className="spike" style={{ top: '50%', left: '-6px', transform: 'translateY(-50%) rotate(270deg)' }} />
+            {/* Topo-esquerda */}
+            <div className="spike" style={{ top: '10%', left: '10%', transform: 'rotate(315deg)' }} />
+          </div>
+        );
+      }
 
       rankColor = 'text-yellow-600';
     } else if (rank === 2) {
@@ -175,7 +253,8 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
     }
     
     return (
-      <div key={`${category}-${index}`} className={`flex justify-between items-center p-1 sm:p-2 bg-gradient-to-r ${bgGradient} rounded-lg hover:scale-[1.01] transition-all duration-300 ${borderClass} ${glowClass}`}>
+      <div key={`${category}-${index}`} className={`relative flex justify-between items-center p-1 sm:p-2 bg-gradient-to-r ${bgGradient} rounded-lg hover:scale-[1.01] transition-all duration-300 ${borderClass} ${glowClass}`}>
+        {specialAnimation}
         <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-1">
           <div className="flex flex-col items-center">
             <span className={`text-xs sm:text-sm font-bold ${rankColor}`}>#{rank}</span>
