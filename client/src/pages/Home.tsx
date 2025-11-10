@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { RankBadge } from "@/components/RankBadge";
 import { Leaderboard } from "@/components/Leaderboard";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { ChatWidget } from "@/components/ChatWidget";
 
 interface Question {
   id: number;
@@ -1237,6 +1238,7 @@ export default function Home() {
         </p>
         </Card>
       </div>
+      <ChatWidget />
     </>
   );
 }

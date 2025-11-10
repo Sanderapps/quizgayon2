@@ -33,6 +33,22 @@ export async function initializeDatabase() {
       ON scores (pontuacao DESC, tempo_segundos ASC);
     `);
 
+    // Criar tabela de mensagens do chat se não existir
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS chat_messages (
+        id SERIAL PRIMARY KEY,
+        apelido TEXT NOT NULL,
+        mensagem TEXT NOT NULL,
+        data_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Criar índice para otimizar a busca de mensagens recentes
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_chat_messages_data 
+      ON chat_messages (data_envio DESC);
+    `);
+
     console.log("✅ Banco de dados inicializado com sucesso");
   } catch (error) {
     console.error("❌ Erro ao inicializar banco de dados:", error);
@@ -47,4 +63,12 @@ export interface Score {
   pontuacao: number;
   tempo_segundos: number;
   data_registro?: Date;
+}
+
+// Interface TypeScript para mensagens do chat
+export interface ChatMessage {
+  id?: number;
+  apelido: string;
+  mensagem: string;
+  data_envio?: Date;
 }

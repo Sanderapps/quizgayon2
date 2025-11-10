@@ -2,7 +2,8 @@ import express from "express";
 import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
-import { pool, initializeDatabase, type Score } from "./db.js";
+import { Server } from "socket.io";
+import { pool, initializeDatabase, type Score, type ChatMessage } from "./db.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,6 +17,80 @@ async function startServer() {
 
   // Inicializar banco de dados
   await initializeDatabase();
+
+  // ==================== SOCKET.IO (CHAT) ====================
+  
+  const io = new Server(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"]
+    }
+  });
+
+  // Mapa para controlar rate limiting (anti-spam)
+  const userLastMessage = new Map<string, number>();
+  const RATE_LIMIT_MS = 2000; // 2 segundos entre mensagens
+
+  io.on("connection", (socket) => {
+    console.log("✅ Usuário conectado ao chat:", socket.id);
+
+    // Enviar histórico de mensagens ao conectar
+    socket.on("request_history", async () => {
+      try {
+        const result = await pool.query(
+          `SELECT * FROM chat_messages 
+           ORDER BY data_envio DESC 
+           LIMIT 50`
+        );
+        socket.emit("chat_history", result.rows.reverse());
+      } catch (error) {
+        console.error("❌ Erro ao buscar histórico:", error);
+      }
+    });
+
+    // Receber e broadcast mensagens
+    socket.on("send_message", async (data: { apelido: string; mensagem: string }) => {
+      try {
+        const { apelido, mensagem } = data;
+
+        // Validação
+        if (!apelido || !mensagem || mensagem.length > 200) {
+          socket.emit("error", "Mensagem inválida");
+          return;
+        }
+
+        // Rate limiting (anti-spam)
+        const now = Date.now();
+        const lastMessage = userLastMessage.get(socket.id);
+        if (lastMessage && now - lastMessage < RATE_LIMIT_MS) {
+          socket.emit("error", "Aguarde 2 segundos entre mensagens");
+          return;
+        }
+        userLastMessage.set(socket.id, now);
+
+        // Salvar no banco
+        const result = await pool.query(
+          `INSERT INTO chat_messages (apelido, mensagem) 
+           VALUES ($1, $2) 
+           RETURNING *`,
+          [apelido, mensagem]
+        );
+
+        const newMessage = result.rows[0];
+
+        // Broadcast para todos
+        io.emit("new_message", newMessage);
+      } catch (error) {
+        console.error("❌ Erro ao enviar mensagem:", error);
+        socket.emit("error", "Erro ao enviar mensagem");
+      }
+    });
+
+    socket.on("disconnect", () => {
+      console.log("🔴 Usuário desconectado:", socket.id);
+      userLastMessage.delete(socket.id);
+    });
+  });
 
   // ==================== ROTAS DE API ====================
 
