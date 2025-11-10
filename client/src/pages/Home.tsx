@@ -925,9 +925,24 @@ export default function Home() {
     }, 300);
   };
 
-  const startQuiz = () => {
-    setQuizStarted(true);
-    setStartTime(Date.now()); // NOVO: Registra tempo de início
+  const startQuiz = async () => {
+    try {
+      // Solicitar token de sessão ao backend
+      const response = await fetch('/api/quiz/start');
+      const data = await response.json();
+      
+      if (data.success && data.token) {
+        // Armazenar token no sessionStorage
+        sessionStorage.setItem('quiz_token', data.token);
+        setQuizStarted(true);
+        setStartTime(Date.now());
+      } else {
+        alert('Erro ao iniciar quiz. Tente novamente.');
+      }
+    } catch (error) {
+      console.error('Erro ao obter token:', error);
+      alert('Erro ao conectar com o servidor. Tente novamente.');
+    }
   };
 
   const getResult = (): Result => {

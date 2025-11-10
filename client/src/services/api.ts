@@ -34,6 +34,15 @@ export async function salvarPontuacao(
   tempoSegundos: number
 ): Promise<Score | null> {
   try {
+    // Recuperar token de sessão
+    const quizToken = sessionStorage.getItem('quiz_token');
+    
+    if (!quizToken) {
+      console.error('Token de sessão não encontrado');
+      alert('Sessão expirada. Por favor, recarregue a página e jogue novamente.');
+      return null;
+    }
+
     const response = await fetch(`${API_BASE_URL}/scores`, {
       method: "POST",
       headers: {
@@ -43,6 +52,7 @@ export async function salvarPontuacao(
         apelido,
         pontuacao,
         tempo_segundos: tempoSegundos,
+        quiz_token: quizToken,
       }),
     });
 

@@ -11,6 +11,47 @@ const __dirname = path.dirname(__filename);
 // Senha de admin (pode ser configurada via variável de ambiente)
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 
+// Sistema de tokens de sessão para validação de quiz
+interface QuizToken {
+  token: string;
+  createdAt: number;
+  used: boolean;
+}
+
+const quizTokens = new Map<string, QuizToken>();
+const TOKEN_EXPIRY_MS = 5 * 60 * 1000; // 5 minutos
+
+// Rate limiting por IP
+const ipRateLimit = new Map<string, number>();
+const RATE_LIMIT_MS = 3 * 60 * 1000; // 3 minutos entre pontuações
+
+// Função para gerar token único
+function generateQuizToken(): string {
+  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+}
+
+// Função para validar token
+function validateQuizToken(token: string): boolean {
+  const tokenData = quizTokens.get(token);
+  if (!tokenData) return false;
+  if (tokenData.used) return false;
+  if (Date.now() - tokenData.createdAt > TOKEN_EXPIRY_MS) {
+    quizTokens.delete(token);
+    return false;
+  }
+  return true;
+}
+
+// Limpar tokens expirados a cada 10 minutos
+setInterval(() => {
+  const now = Date.now();
+  for (const [token, data] of quizTokens.entries()) {
+    if (now - data.createdAt > TOKEN_EXPIRY_MS) {
+      quizTokens.delete(token);
+    }
+  }
+}, 10 * 60 * 1000);
+
 // Lista de palavrões para filtro (básico)
 const BADWORDS = [
   "porra", "caralho", "puta", "merda", "fdp", "cu", "buceta", "pinto", "pau"
@@ -44,9 +85,9 @@ async function startServer() {
     }
   });
 
-  // Mapa para controlar rate limiting (anti-spam)
+  // Mapa para controlar rate limiting do chat (anti-spam)
   const userLastMessage = new Map<string, number>();
-  const RATE_LIMIT_MS = 2000; // 2 segundos entre mensagens
+  const CHAT_RATE_LIMIT_MS = 2000; // 2 segundos entre mensagens
   const MESSAGES_PER_PAGE = 50;
 
   io.on("connection", (socket) => {
@@ -110,7 +151,7 @@ async function startServer() {
         // Rate limiting (anti-spam)
         const now = Date.now();
         const lastMessage = userLastMessage.get(socket.id);
-        if (lastMessage && now - lastMessage < RATE_LIMIT_MS) {
+        if (lastMessage && now - lastMessage < CHAT_RATE_LIMIT_MS) {
           socket.emit("error", "Aguarde 2 segundos entre mensagens");
           return;
         }
@@ -220,10 +261,59 @@ async function startServer() {
 
   // ==================== ROTAS DE API ====================
 
+  // GET /api/quiz/start - Gerar token de sessão para iniciar quiz
+  app.get("/api/quiz/start", (req, res) => {
+    const token = generateQuizToken();
+    quizTokens.set(token, {
+      token,
+      createdAt: Date.now(),
+      used: false
+    });
+    
+    res.json({
+      success: true,
+      token,
+      expiresIn: TOKEN_EXPIRY_MS
+    });
+  });
+
   // POST /api/scores - Salvar nova pontuação
   app.post("/api/scores", async (req, res) => {
     try {
-      const { apelido, pontuacao, tempo_segundos } = req.body as Score;
+      const { apelido, pontuacao, tempo_segundos, quiz_token } = req.body as Score & { quiz_token?: string };
+
+      // Validação de token de sessão
+      if (!quiz_token) {
+        return res.status(401).json({
+          error: "Token de sessão obrigatório. Inicie o quiz primeiro.",
+        });
+      }
+
+      if (!validateQuizToken(quiz_token)) {
+        return res.status(401).json({
+          error: "Token inválido ou expirado. Inicie o quiz novamente.",
+        });
+      }
+
+      // Marcar token como usado
+      const tokenData = quizTokens.get(quiz_token);
+      if (tokenData) {
+        tokenData.used = true;
+      }
+
+      // Rate limiting por IP
+      const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
+      const lastSubmission = ipRateLimit.get(clientIp);
+      const now = Date.now();
+
+      if (lastSubmission && now - lastSubmission < RATE_LIMIT_MS) {
+        const waitTime = Math.ceil((RATE_LIMIT_MS - (now - lastSubmission)) / 1000);
+        return res.status(429).json({
+          error: `Aguarde ${waitTime} segundos antes de enviar outra pontuação`,
+        });
+      }
+
+      ipRateLimit.set(clientIp, now);
 
       // Validação básica
       if (!apelido || pontuacao === undefined || tempo_segundos === undefined) {

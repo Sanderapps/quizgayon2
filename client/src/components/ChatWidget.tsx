@@ -273,7 +273,7 @@ export function ChatWidget() {
             }
           }
         }}
-        className="fixed bottom-6 right-6 px-6 py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-white font-bold text-lg animate-gradient relative"
+        className="fixed bottom-6 left-6 px-6 py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-white font-bold text-lg animate-gradient relative"
         title="Chat Global"
         style={{
           animation: "gradient 3s ease infinite",
@@ -309,7 +309,7 @@ export function ChatWidget() {
 
       {/* Janela do chat */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-80 h-[500px] bg-white dark:bg-gray-800 rounded-lg shadow-2xl flex flex-col border-2 border-pink-500" style={{ zIndex: 9998 }}>
+        <div className="fixed bottom-24 left-6 w-80 h-[500px] bg-white dark:bg-gray-800 rounded-lg shadow-2xl flex flex-col border-2 border-pink-500" style={{ zIndex: 9998 }}>
           {/* Header */}
           <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-3 rounded-t-lg flex justify-between items-center">
             <h3 className="text-white font-bold">💬 Chat Global</h3>
