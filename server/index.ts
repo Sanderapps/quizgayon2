@@ -4,7 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { Server } from "socket.io";
 import { pool, initializeDatabase, type Score, type ChatMessage } from "./db.js";
-import { checkAntiSpam } from "./middleware/antiSpam.js";
+import { checkAntiSpam, cleanupOldEvents, cleanupExpiredBans } from "./middleware/antiSpam.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,107 +23,8 @@ const quizTokens = new Map<string, QuizToken>();
 const TOKEN_EXPIRY_MS = 5 * 60 * 1000; // 5 minutos
 
 // ==================== SISTEMA ANTI-SPAM ====================
-
-// 1. Rate limiting por IP: 3 submissões por minuto
-interface RateLimitData {
-  submissions: number[];
-}
-const ipRateLimit = new Map<string, RateLimitData>();
-const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minuto
-const MAX_SUBMISSIONS_PER_WINDOW = 3;
-
-// 2. Cooldown entre submissões: 30 segundos
-const ipCooldown = new Map<string, number>();
-const COOLDOWN_MS = 30 * 1000; // 30 segundos
-
-// 3. Detecção de padrões suspeitos
-interface SubmissionPattern {
-  apelido: string;
-  pontuacao: number;
-  timestamp: number;
-}
-const recentSubmissions = new Map<string, SubmissionPattern[]>();
-const PATTERN_WINDOW_MS = 5 * 60 * 1000; // 5 minutos
-
-// 4. Detecção de prefixo de nome (anti-variação)
-interface PrefixSubmission {
-  fullName: string;
-  timestamp: number;
-}
-const prefixSubmissions = new Map<string, PrefixSubmission[]>();
-const PREFIX_WINDOW_MS = 5 * 60 * 1000; // 5 minutos
-const MAX_PREFIX_SUBMISSIONS = 3; // Máximo 3 submissões com mesmo prefixo em 5 minutos
-
-// 5. Detecção de comportamento idêntico (pontuação + tempo + IP)
-interface BehaviorPattern {
-  pontuacao: number;
-  tempo_segundos: number;
-  timestamp: number;
-  apelido: string;
-}
-const behaviorPatterns = new Map<string, BehaviorPattern[]>();
-const BEHAVIOR_WINDOW_MS = 10 * 60 * 1000; // 10 minutos
-const MAX_IDENTICAL_BEHAVIOR = 2; // Máximo 2 submissões com pontuação+tempo idênticos em 10 min
-
-// 6. Sistema de banimento de IP por 2 horas
-interface IpBan {
-  bannedAt: number;
-  reason: string;
-}
-const bannedIps = new Map<string, IpBan>();
-const BAN_DURATION_MS = 6 * 60 * 60 * 1000; // 6 horas
-
-// Função para extrair prefixo do nome (antes do hífen ou número)
-function extractNamePrefix(apelido: string): string {
-  // Remove números e hífens do final: "Guardian-1234" -> "Guardian"
-  return apelido.replace(/[-_]?\d+$/, '').toLowerCase().trim();
-}
-
-// Função para detectar padrão de nome com variação (Nome-XXXX)
-function isNameVariationPattern(apelido: string): boolean {
-  // Detecta padrões como "Guardian-1234", "Nome_5678", etc.
-  return /^[a-zA-Z]+[-_]\d+$/.test(apelido);
-}
-
-// Função para normalizar nome (remover caracteres especiais e substituições)
-function normalizeNameForPattern(apelido: string): string {
-  return apelido
-    .toLowerCase()
-    .replace(/[0-9@\$\*\!\?]/g, '') // Remove números e símbolos
-    .replace(/[4áàâã]/g, 'a')
-    .replace(/[3éê]/g, 'e')
-    .replace(/[1í]/g, 'i')
-    .replace(/[0óôõ]/g, 'o')
-    .replace(/[ú]/g, 'u')
-    .replace(/[\s\-_]/g, '') // Remove espaços, hífens e underscores
-    .trim();
-}
-
-// Função para verificar se IP está banido
-function isIpBanned(ip: string): { banned: boolean; reason?: string; timeLeft?: number } {
-  const banData = bannedIps.get(ip);
-  if (!banData) return { banned: false };
-  
-  const now = Date.now();
-  const timeElapsed = now - banData.bannedAt;
-  
-  if (timeElapsed >= BAN_DURATION_MS) {
-    bannedIps.delete(ip);
-    return { banned: false };
-  }
-  
-  const timeLeft = Math.ceil((BAN_DURATION_MS - timeElapsed) / 1000 / 60); // minutos
-  return { banned: true, reason: banData.reason, timeLeft };
-}
-
-// Função para banir IP
-function banIp(ip: string, reason: string): void {
-  bannedIps.set(ip, {
-    bannedAt: Date.now(),
-    reason
-  });
-  console.log(`[BAN] IP ${ip} banido por 2 horas. Razão: ${reason}`);
-}
+// O sistema anti-spam agora utiliza persistência PostgreSQL.
+// Veja: server/middleware/antiSpam.ts
 
 // Função para gerar token único
 function generateQuizToken(): string {
@@ -145,7 +46,7 @@ function validateQuizToken(token: string): boolean {
 // Limpar tokens expirados a cada 10 minutos
 setInterval(() => {
   const now = Date.now();
-  for (const [token, data] of quizTokens.entries()) {
+  for (const [token, data] of Array.from(quizTokens.entries())) {
     if (now - data.createdAt > TOKEN_EXPIRY_MS) {
       quizTokens.delete(token);
     }
@@ -175,6 +76,21 @@ async function startServer() {
 
   // Inicializar banco de dados
   await initializeDatabase();
+
+  // ==================== LIMPEZA PERIÓDICA ANTI-SPAM ====================
+  // Limpar eventos antigos a cada 1 hora
+  setInterval(async () => {
+    await cleanupOldEvents();
+  }, 60 * 60 * 1000); // 1 hora
+
+  // Limpar banimentos expirados a cada 30 minutos
+  setInterval(async () => {
+    await cleanupExpiredBans();
+  }, 30 * 60 * 1000); // 30 minutos
+
+  // Executar limpeza inicial
+  await cleanupOldEvents();
+  await cleanupExpiredBans();
 
   // ==================== SOCKET.IO (CHAT) ====================
   
@@ -404,7 +320,7 @@ async function startServer() {
       const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
 
       // Aplicar sistema anti-spam
-      const antiSpamResult = checkAntiSpam(clientIp, apelido, pontuacao, tempo_segundos);
+      const antiSpamResult = await checkAntiSpam(clientIp, apelido, pontuacao, tempo_segundos);
       if (!antiSpamResult.allowed) {
         return res.status(antiSpamResult.statusCode || 429).json({
           error: antiSpamResult.error

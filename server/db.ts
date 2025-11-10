@@ -92,6 +92,61 @@ export async function initializeDatabase() {
       );
     `);
 
+    // ==================== TABELAS ANTI-SPAM ====================
+    
+    // Tabela para armazenar eventos de submissão (rate limiting e detecção de padrões)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS anti_spam_events (
+        id SERIAL PRIMARY KEY,
+        ip VARCHAR(45) NOT NULL,
+        apelido VARCHAR(50) NOT NULL,
+        pontuacao INTEGER NOT NULL,
+        tempo_segundos INTEGER NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Criar índices para otimizar queries de anti-spam
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_anti_spam_events_ip_created 
+      ON anti_spam_events (ip, created_at DESC);
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_anti_spam_events_created 
+      ON anti_spam_events (created_at DESC);
+    `);
+
+    // Tabela para armazenar IPs banidos
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS anti_spam_bans (
+        id SERIAL PRIMARY KEY,
+        ip VARCHAR(45) UNIQUE NOT NULL,
+        reason TEXT NOT NULL,
+        banned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP NOT NULL
+      );
+    `);
+
+    // Criar índices para otimizar verificação de banimento
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_anti_spam_bans_ip_expires 
+      ON anti_spam_bans (ip, expires_at);
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_anti_spam_bans_expires 
+      ON anti_spam_bans (expires_at);
+    `);
+
+    // Tabela para armazenar cooldowns (última submissão por IP)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS anti_spam_cooldowns (
+        ip VARCHAR(45) PRIMARY KEY,
+        last_submission_at TIMESTAMP NOT NULL
+      );
+    `);
+
     console.log("✅ Banco de dados inicializado com sucesso");
   } catch (error) {
     console.error("❌ Erro ao inicializar banco de dados:", error);
