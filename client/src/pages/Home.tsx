@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { salvarPontuacao, buscarPlacar, pontuacaoParaPercentual } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { RankBadge } from "@/components/RankBadge";i/card";
+import { RankBadge } from "@/components/RankBadge";
 
 interface Question {
   id: number;
