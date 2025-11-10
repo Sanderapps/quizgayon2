@@ -1190,33 +1190,33 @@ export default function Home() {
     const percentage = Math.round((totalPoints / maxPoints) * 100);
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex flex-col items-center justify-center p-4 py-12">
+      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex flex-col items-center p-4 py-8 overflow-y-auto">
         {showConfetti && <CanvasConfetti />}
         
         <div className="w-full max-w-2xl">
           {/* Resultado Principal */}
           <div className="text-center mb-12">
-            <div className="text-6xl mb-6 animate-bounce">{result.emoji}</div>
-            <h1 className="text-5xl font-bold mb-4 text-white drop-shadow-lg">
+            <div className="text-5xl mb-4 animate-bounce">{result.emoji}</div>
+            <h1 className="text-4xl font-bold mb-3 text-white drop-shadow-lg">
               {result.title}
             </h1>
             {result.badge && (
-              <div className="mb-6 inline-block bg-white px-6 py-3 rounded-full font-bold text-purple-600 shadow-lg">
+              <div className="mb-4 inline-block bg-white px-5 py-2 rounded-full font-bold text-purple-600 shadow-lg text-sm">
                 {result.badge}
               </div>
             )}
-            <div className="mb-8">
-              <div className="text-7xl font-bold text-white drop-shadow-lg mb-4">
+            <div className="mb-6">
+              <div className="text-6xl font-bold text-white drop-shadow-lg mb-3">
                 {percentage}%
               </div>
-              <div className="w-full bg-white rounded-full h-6 overflow-hidden shadow-lg">
+              <div className="w-full bg-white rounded-full h-4 overflow-hidden shadow-lg">
                 <div
                   className="bg-gradient-to-r from-pink-500 to-purple-600 h-full transition-all duration-500"
                   style={{ width: `${percentage}%` }}
                 />
               </div>
             </div>
-            <p className="text-white text-xl md:text-2xl leading-relaxed drop-shadow-lg max-w-xl mx-auto px-4 whitespace-normal break-words">
+            <p className="text-white text-lg md:text-xl leading-relaxed drop-shadow-lg max-w-xl mx-auto px-4 whitespace-normal break-words">
               {result.description}
             </p>
           </div>
