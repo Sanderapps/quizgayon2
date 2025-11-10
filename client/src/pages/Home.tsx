@@ -983,6 +983,7 @@ export default function Home() {
 
   if (showLeaderboard) {
     return (
+      <>
       <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex items-center justify-center p-4">
         <Card className="w-full max-w-2xl p-8 bg-white dark:bg-gray-800 shadow-2xl max-h-96 overflow-y-auto">
           <h1 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
@@ -1012,6 +1013,8 @@ export default function Home() {
           </Button>
         </Card>
       </div>
+      <ChatWidget />
+      </>
     );
   }
 
@@ -1040,6 +1043,7 @@ export default function Home() {
           </Button>
         </Card>
       </div>
+      <ChatWidget />
       </>
     );
   }
@@ -1081,6 +1085,7 @@ export default function Home() {
           <Leaderboard leaderboard={leaderboard} maxItems={12} />
         </div>
       </div>
+      <ChatWidget />
       </>
     );
   }
@@ -1166,6 +1171,7 @@ export default function Home() {
           </div>
         </div>
       </div>
+      <ChatWidget />
       </>
     );
   }
@@ -1180,6 +1186,7 @@ export default function Home() {
           <p className="text-gray-600 dark:text-gray-300 text-lg">Carregando perguntas...</p>
         </Card>
       </div>
+      <ChatWidget />
     </>
     );
   }
