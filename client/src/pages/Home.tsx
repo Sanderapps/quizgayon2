@@ -1224,7 +1224,7 @@ export default function Home() {
   }
 
   if (questions.length === 0) {
-  return (
+    return (
     <>
       <ThemeToggle />
       <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex items-center justify-center p-4">
