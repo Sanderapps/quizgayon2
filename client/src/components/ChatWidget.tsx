@@ -36,10 +36,12 @@ export function ChatWidget() {
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [gifCooldown, setGifCooldown] = useState(0);
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const lastReadMessageIdRef = useRef<number>(0);
+  const gifCooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Carregar apelido salvo do LocalStorage
   useEffect(() => {
@@ -177,6 +179,13 @@ export function ChatWidget() {
 
   const handleSendGif = (gifUrl: string) => {
     if (!socketRef.current) return;
+    
+    // Verificar cooldown de 10 segundos
+    if (gifCooldown > 0) {
+      setError(`Aguarde ${gifCooldown}s para enviar outro GIF`);
+      setTimeout(() => setError(""), 2000);
+      return;
+    }
 
     socketRef.current.emit("send_message", {
       apelido,
@@ -186,6 +195,28 @@ export function ChatWidget() {
       tipo: 'gif',
       gif_url: gifUrl,
     });
+    
+    // Iniciar cooldown de 10 segundos
+    setGifCooldown(10);
+    
+    // Limpar timer anterior se existir
+    if (gifCooldownTimerRef.current) {
+      clearInterval(gifCooldownTimerRef.current);
+    }
+    
+    // Decrementar cooldown a cada segundo
+    gifCooldownTimerRef.current = setInterval(() => {
+      setGifCooldown((prev) => {
+        if (prev <= 1) {
+          if (gifCooldownTimerRef.current) {
+            clearInterval(gifCooldownTimerRef.current);
+            gifCooldownTimerRef.current = null;
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -278,7 +309,7 @@ export function ChatWidget() {
 
       {/* Janela do chat */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-80 h-[500px] bg-white dark:bg-gray-800 rounded-lg shadow-2xl flex flex-col border-2 border-pink-500">
+        <div className="fixed bottom-24 right-6 w-80 h-[500px] bg-white dark:bg-gray-800 rounded-lg shadow-2xl flex flex-col border-2 border-pink-500" style={{ zIndex: 9998 }}>
           {/* Header */}
           <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-3 rounded-t-lg flex justify-between items-center">
             <h3 className="text-white font-bold">💬 Chat Global</h3>
@@ -445,10 +476,16 @@ export function ChatWidget() {
                 </button>
                 <button
                   onClick={() => setShowGifPicker(true)}
-                  className="text-2xl hover:scale-110 transition-transform"
-                  title="Enviar GIF"
+                  disabled={gifCooldown > 0}
+                  className="text-2xl hover:scale-110 transition-transform relative disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={gifCooldown > 0 ? `Aguarde ${gifCooldown}s` : "Enviar GIF"}
                 >
                   🎬
+                  {gifCooldown > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {gifCooldown}
+                    </span>
+                  )}
                 </button>
                 <textarea
                   value={inputMessage}
