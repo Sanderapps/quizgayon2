@@ -551,42 +551,6 @@ const AnimatedEmoji = ({ emoji }: { emoji: string }) => {
   );
 };
 
-// Gerador de música 8-bits
-const play8BitMusic = () => {
-  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-  const notes = [262, 294, 330, 349, 392, 440, 494, 523];
-
-  const playNote = (freq: number, duration: number, time: number) => {
-    const osc = audioContext.createOscillator();
-    const gain = audioContext.createGain();
-
-    osc.connect(gain);
-    gain.connect(audioContext.destination);
-
-    osc.frequency.value = freq;
-    osc.type = "square";
-
-    gain.gain.setValueAtTime(0.3, time);
-    gain.gain.exponentialRampToValueAtTime(0.01, time + duration);
-
-    osc.start(time);
-    osc.stop(time + duration);
-  };
-
-  const now = audioContext.currentTime;
-  const noteLength = 0.1;
-
-  const melody = [
-    notes[0], notes[2], notes[4], notes[5],
-    notes[4], notes[5], notes[7], notes[5],
-    notes[4], notes[2], notes[0], notes[2],
-  ];
-
-  melody.forEach((note, index) => {
-    playNote(note, noteLength, now + index * noteLength);
-  });
-};
-
 export default function Home() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [totalPoints, setTotalPoints] = useState(0);
@@ -602,6 +566,20 @@ export default function Home() {
   const [playerName, setPlayerName] = useState("");
   const [showNameInput, setShowNameInput] = useState(false);
   const [startTime, setStartTime] = useState<number>(0); // NOVO: Rastrear tempo de início
+
+  // AudioContext global reutilizável (corrige problema mobile de limite de contextos)
+  const audioContextRef = React.useRef<AudioContext | null>(null);
+  
+  const getAudioContext = () => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+    // Resume context se estiver suspenso (necessário para mobile)
+    if (audioContextRef.current.state === 'suspended') {
+      audioContextRef.current.resume();
+    }
+    return audioContextRef.current;
+  };
 
   // Função auxiliar para obter o resultado baseado na porcentagem
   const getResultByPercentage = (percentage: number): Result => {
@@ -658,7 +636,7 @@ export default function Home() {
   // Função para gerar um som de clique/resposta 8-bit
   const playSound = () => {
     if (!audioEnabled) return;
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const audioContext = getAudioContext(); // Usar contexto reutilizável
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
 
@@ -678,7 +656,7 @@ export default function Home() {
   // Função para gerar um som de sucesso (fim do quiz)
   const playSuccessSound = () => {
     if (!audioEnabled) return;
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const audioContext = getAudioContext(); // Usar contexto reutilizável
     const now = audioContext.currentTime;
     const noteLength = 0.1;
     const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6 (Acorde de C maior)
@@ -698,6 +676,43 @@ export default function Home() {
 
       osc.start(now + index * 0.05);
       osc.stop(now + index * 0.05 + noteLength);
+    });
+  };
+
+  // Gerador de música 8-bits (toca ao iniciar quiz)
+  const play8BitMusic = () => {
+    if (!audioEnabled) return;
+    const audioContext = getAudioContext(); // Usar contexto reutilizável
+    const notes = [262, 294, 330, 349, 392, 440, 494, 523];
+
+    const playNote = (freq: number, duration: number, time: number) => {
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+
+      osc.connect(gain);
+      gain.connect(audioContext.destination);
+
+      osc.frequency.value = freq;
+      osc.type = "square";
+
+      gain.gain.setValueAtTime(0.3, time);
+      gain.gain.exponentialRampToValueAtTime(0.01, time + duration);
+
+      osc.start(time);
+      osc.stop(time + duration);
+    };
+
+    const now = audioContext.currentTime;
+    const noteLength = 0.1;
+
+    const melody = [
+      notes[0], notes[2], notes[4], notes[5],
+      notes[4], notes[5], notes[7], notes[5],
+      notes[4], notes[2], notes[0], notes[2],
+    ];
+
+    melody.forEach((note, index) => {
+      playNote(note, noteLength, now + index * noteLength);
     });
   };
 
