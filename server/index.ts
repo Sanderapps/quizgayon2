@@ -838,6 +838,39 @@ async function startServer() {
     }
   });
 
+  // DELETE /api/debug/reset-leaderboard - Resetar completamente o placar (ADMIN)
+  app.delete("/api/debug/reset-leaderboard", async (req, res) => {
+    try {
+      const adminPassword = req.headers["x-admin-password"];
+
+      // Verificar senha de admin
+      if (adminPassword !== ADMIN_PASSWORD) {
+        return res.status(401).json({
+          error: "Senha de administrador incorreta",
+        });
+      }
+
+      // Deletar TODAS as entradas do placar
+      const result = await pool.query(`
+        DELETE FROM scores 
+        RETURNING *
+      `);
+
+      res.json({
+        success: true,
+        message: "Placar resetado completamente",
+        deleted_count: result.rowCount,
+        deleted_entries: result.rows
+      });
+    } catch (error) {
+      console.error("Erro ao resetar placar:", error);
+      res.status(500).json({
+        error: "Erro ao resetar placar",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   // GET /api/debug/scores - Ver dados brutos do banco (DEBUG)
   app.get("/api/debug/scores", async (req, res) => {
     try {
