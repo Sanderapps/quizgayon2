@@ -284,7 +284,7 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
       <div className="grid grid-cols-2 gap-2 sm:gap-4 md:gap-6">
         {/* Top Divas */}
         <div className="min-h-[200px]">
-          <h3 className="text-base sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4 text-center text-pink-300 drop-shadow-lg">
+          <h3 className="text-base sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4 text-center text-pink-600 drop-shadow-lg">
             👑 Top Divas
           </h3>
           <div className="space-y-2">
