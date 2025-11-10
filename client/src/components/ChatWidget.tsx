@@ -273,7 +273,7 @@ export function ChatWidget() {
             }
           }
         }}
-        className="fixed bottom-6 right-6 px-6 py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-white font-bold text-lg animate-gradient relative"
+        className="fixed bottom-6 left-6 px-6 py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-white font-bold text-lg animate-gradient relative"
         title="Chat Global"
         style={{
           animation: "gradient 3s ease infinite",
