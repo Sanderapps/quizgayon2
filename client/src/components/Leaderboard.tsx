@@ -350,11 +350,11 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
       {/* Grid 2 colunas SEMPRE (mobile e desktop) */}
       <div className="grid grid-cols-2 gap-2 sm:gap-4 md:gap-6">
         {/* Top Divas */}
-        <div className="min-h-[200px]">
+        <div className="flex flex-col">
           <h3 className="text-base sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4 text-center text-pink-600 drop-shadow-lg">
             👑 Top Divas
           </h3>
-          <div className="space-y-2">
+          <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-pink-500 scrollbar-track-transparent">
             {divas.length > 0 ? (
               divas.map((entry, index) => renderEntry(entry, index, 'divas'))
             ) : (
@@ -364,11 +364,11 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
         </div>
 
         {/* Top Alfas */}
-        <div className="min-h-[200px]">
+        <div className="flex flex-col">
           <h3 className="text-base sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4 text-center text-black drop-shadow-lg">
             💪 Top Alpha
           </h3>
-          <div className="space-y-2">
+          <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
             {alfas.length > 0 ? (
               alfas.map((entry, index) => renderEntry(entry, index, 'alfas'))
             ) : (

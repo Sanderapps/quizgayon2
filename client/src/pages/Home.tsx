@@ -811,7 +811,7 @@ export default function Home() {
 
   // Função para carregar o placar do banco de dados
   const loadLeaderboard = async () => {
-    const placar = await buscarPlacar(50); // Top 50
+    const placar = await buscarPlacar(100); // Top 100
     
     // Converter formato do banco para formato do frontend
     const entries: LeaderEntry[] = placar.map(score => {
