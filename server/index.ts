@@ -232,6 +232,30 @@ async function startServer() {
         });
       }
 
+      // Validações de segurança
+      const MAX_PONTUACAO = 60; // 15 perguntas * 4 pontos cada
+      const MIN_TEMPO = 5; // Mínimo 5 segundos para completar o quiz
+      const MAX_TEMPO = 3600; // Máximo 1 hora
+      const MAX_APELIDO_LENGTH = 20;
+
+      if (typeof pontuacao !== 'number' || pontuacao < 0 || pontuacao > MAX_PONTUACAO) {
+        return res.status(400).json({
+          error: `Pontuação inválida. Deve estar entre 0 e ${MAX_PONTUACAO}`,
+        });
+      }
+
+      if (typeof tempo_segundos !== 'number' || tempo_segundos < MIN_TEMPO || tempo_segundos > MAX_TEMPO) {
+        return res.status(400).json({
+          error: `Tempo inválido. Deve estar entre ${MIN_TEMPO} e ${MAX_TEMPO} segundos`,
+        });
+      }
+
+      if (typeof apelido !== 'string' || apelido.length === 0 || apelido.length > MAX_APELIDO_LENGTH) {
+        return res.status(400).json({
+          error: `Apelido inválido. Deve ter entre 1 e ${MAX_APELIDO_LENGTH} caracteres`,
+        });
+      }
+
       // Inserir pontuação no banco de dados
       const result = await pool.query(
         `INSERT INTO scores (apelido, pontuacao, tempo_segundos) 
@@ -402,6 +426,39 @@ async function startServer() {
       console.error("Erro ao deletar mensagem:", error);
       res.status(500).json({
         error: "Erro ao deletar mensagem",
+      });
+    }
+  });
+
+  // DELETE /api/debug/cleanup-fake - Deletar entradas fake (pontuação > 60 ou tempo = 0)
+  app.delete("/api/debug/cleanup-fake", async (req, res) => {
+    try {
+      const adminPassword = req.headers["x-admin-password"];
+
+      // Verificar senha de admin
+      if (adminPassword !== ADMIN_PASSWORD) {
+        return res.status(401).json({
+          error: "Senha de administrador incorreta",
+        });
+      }
+
+      // Deletar entradas com pontuação > 60 ou tempo = 0
+      const result = await pool.query(`
+        DELETE FROM scores 
+        WHERE pontuacao > 60 OR tempo_segundos < 5
+        RETURNING *
+      `);
+
+      res.json({
+        success: true,
+        deleted_count: result.rowCount,
+        deleted_entries: result.rows
+      });
+    } catch (error) {
+      console.error("Erro ao limpar entradas fake:", error);
+      res.status(500).json({
+        error: "Erro ao limpar entradas fake",
+        details: error instanceof Error ? error.message : String(error)
       });
     }
   });
