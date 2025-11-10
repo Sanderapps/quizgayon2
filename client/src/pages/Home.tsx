@@ -1244,11 +1244,12 @@ export default function Home() {
   return (
     <>
       <ThemeToggle />
-      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center justify-center p-4">ard
-        className={`w-full max-w-2xl p-8 bg-white shadow-2xl transition-all duration-300 ${
-          fadeOut ? "opacity-50 scale-95" : "opacity-100 scale-100"
-        }`}
-      >
+      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center justify-center p-4">
+        <Card
+          className={`w-full max-w-2xl p-8 bg-white shadow-2xl transition-all duration-300 ${
+            fadeOut ? "opacity-50 scale-95" : "opacity-100 scale-100"
+          }`}
+        >
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
@@ -1289,7 +1290,8 @@ export default function Home() {
         <p className="text-center text-gray-500 text-sm mt-8">
           Pergunta {currentQuestion + 1}/{questions.length}
         </p>
-      </Card>
-    </div>
+        </Card>
+      </div>
+    </>
   );
 }
