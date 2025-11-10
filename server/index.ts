@@ -44,6 +44,27 @@ interface SubmissionPattern {
 const recentSubmissions = new Map<string, SubmissionPattern[]>();
 const PATTERN_WINDOW_MS = 5 * 60 * 1000; // 5 minutos
 
+// 4. Detecção de prefixo de nome (anti-variação)
+interface PrefixSubmission {
+  fullName: string;
+  timestamp: number;
+}
+const prefixSubmissions = new Map<string, PrefixSubmission[]>();
+const PREFIX_WINDOW_MS = 5 * 60 * 1000; // 5 minutos
+const MAX_PREFIX_SUBMISSIONS = 3; // Máximo 3 submissões com mesmo prefixo em 5 minutos
+
+// Função para extrair prefixo do nome (antes do hífen ou número)
+function extractNamePrefix(apelido: string): string {
+  // Remove números e hífens do final: "Guardian-1234" -> "Guardian"
+  return apelido.replace(/[-_]?\d+$/, '').toLowerCase().trim();
+}
+
+// Função para detectar padrão de nome com variação (Nome-XXXX)
+function isNameVariationPattern(apelido: string): boolean {
+  // Detecta padrões como "Guardian-1234", "Nome_5678", etc.
+  return /^[a-zA-Z]+[-_]\d+$/.test(apelido);
+}
+
 // Função para gerar token único
 function generateQuizToken(): string {
   return Math.random().toString(36).substring(2) + Date.now().toString(36);
@@ -396,10 +417,38 @@ async function startServer() {
         });
       }
 
+      // ========== REGRA 4: Validação de variação de nome (Nome-XXXX) ==========
+      if (isNameVariationPattern(apelido)) {
+        return res.status(400).json({
+          error: "Padrão de nome suspeito detectado. Use um apelido sem números aleatórios no final.",
+        });
+      }
+
+      // ========== REGRA 1 (Avançada): Detecção de prefixo - 3 submissões com mesmo prefixo em 5 minutos ==========
+      const namePrefix = extractNamePrefix(apelido);
+      let prefixData = prefixSubmissions.get(namePrefix);
+      if (!prefixData) {
+        prefixData = [];
+        prefixSubmissions.set(namePrefix, prefixData);
+      }
+
+      // Remover submissões antigas do prefixo
+      prefixData = prefixData.filter(
+        submission => now - submission.timestamp < PREFIX_WINDOW_MS
+      );
+      prefixSubmissions.set(namePrefix, prefixData);
+
+      if (prefixData.length >= MAX_PREFIX_SUBMISSIONS) {
+        return res.status(429).json({
+          error: `Limite de submissões para nomes similares a "${namePrefix}" atingido. Aguarde 5 minutos ou use um nome diferente.`,
+        });
+      }
+
       // Registrar submissão atual
       rateLimitData.submissions.push(now);
       ipCooldown.set(clientIp, now);
       userPatterns.push({ apelido, pontuacao, timestamp: now });
+      prefixData.push({ fullName: apelido, timestamp: now });
 
       // Validação básica
       if (!apelido || pontuacao === undefined || tempo_segundos === undefined) {
@@ -477,6 +526,40 @@ async function startServer() {
       console.error("Erro ao buscar placar:", error);
       res.status(500).json({
         error: "Erro ao buscar placar de líderes",
+      });
+    }
+  });
+
+  // DELETE /api/debug/cleanup-fake - Limpar entradas de spam (ADMIN)
+  app.delete("/api/debug/cleanup-fake", async (req, res) => {
+    try {
+      const adminPassword = req.headers['x-admin-password'];
+
+      // Verificar senha de admin
+      if (adminPassword !== ADMIN_PASSWORD) {
+        return res.status(403).json({
+          error: "Senha de administrador incorreta",
+        });
+      }
+
+      // Deletar todas as entradas do Guardian e entradas com tempo suspeito
+      const deleteResult = await pool.query(
+        `DELETE FROM scores 
+         WHERE apelido ILIKE 'Guardian%' OR tempo_segundos < 10
+         RETURNING id, apelido, pontuacao, tempo_segundos`
+      );
+
+      console.log(`🗑️ LIMPEZA: ${deleteResult.rows.length} entradas de spam deletadas`);
+
+      res.json({
+        success: true,
+        message: `${deleteResult.rows.length} entradas de spam deletadas com sucesso`,
+        deleted: deleteResult.rows,
+      });
+    } catch (error) {
+      console.error("Erro ao limpar spam:", error);
+      res.status(500).json({
+        error: "Erro ao limpar entradas de spam",
       });
     }
   });
