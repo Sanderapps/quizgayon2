@@ -65,7 +65,11 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
 
   // Dividir em Divas (>=50%) e Alfas (<50%)
   const divas = leaderboard.filter(entry => entry.percentage >= 50).slice(0, maxItems);
-  const alfas = leaderboard.filter(entry => entry.percentage < 50).slice(0, maxItems);
+  // Alfas ordenados de forma CRESCENTE (menores % primeiro = mais héteros)
+  const alfas = leaderboard
+    .filter(entry => entry.percentage < 50)
+    .sort((a, b) => a.percentage - b.percentage)
+    .slice(0, maxItems);
 
   const renderEntry = (entry: LeaderEntry, index: number, category: 'divas' | 'alfas') => {
     const rank = index + 1;
