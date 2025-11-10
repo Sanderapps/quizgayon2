@@ -1,5 +1,43 @@
 import { RankBadge } from "./RankBadge";
 
+// Função que retorna classes Tailwind baseadas na porcentagem (34 categorias)
+function getCategoryBadgeColor(percentage: number): string {
+  if (percentage >= 99) return 'bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white animate-pulse';
+  if (percentage >= 96) return 'bg-gradient-to-r from-pink-600 to-rose-600 text-white';
+  if (percentage >= 93) return 'bg-gradient-to-r from-purple-500 to-blue-500 text-white';
+  if (percentage >= 90) return 'bg-gradient-to-r from-pink-500 to-purple-500 text-white';
+  if (percentage >= 87) return 'bg-pink-700 text-white';
+  if (percentage >= 84) return 'bg-red-500 text-white';
+  if (percentage >= 81) return 'bg-rose-600 text-white';
+  if (percentage >= 78) return 'bg-pink-600 text-white';
+  if (percentage >= 75) return 'bg-fuchsia-500 text-white';
+  if (percentage >= 72) return 'bg-purple-500 text-white';
+  if (percentage >= 69) return 'bg-indigo-500 text-white';
+  if (percentage >= 66) return 'bg-blue-500 text-white';
+  if (percentage >= 63) return 'bg-sky-500 text-white';
+  if (percentage >= 60) return 'bg-cyan-500 text-gray-900';
+  if (percentage >= 57) return 'bg-teal-500 text-white';
+  if (percentage >= 54) return 'bg-green-500 text-white';
+  if (percentage >= 51) return 'bg-lime-500 text-gray-900';
+  if (percentage >= 48) return 'bg-yellow-500 text-gray-900';
+  if (percentage >= 45) return 'bg-amber-500 text-white';
+  if (percentage >= 42) return 'bg-orange-500 text-white';
+  if (percentage >= 39) return 'bg-pink-400 text-gray-900';
+  if (percentage >= 36) return 'bg-pink-500 text-white';
+  if (percentage >= 33) return 'bg-pink-600 text-white';
+  if (percentage >= 30) return 'bg-purple-500 text-white';
+  if (percentage >= 27) return 'bg-purple-600 text-white';
+  if (percentage >= 24) return 'bg-indigo-600 text-white';
+  if (percentage >= 21) return 'bg-blue-600 text-white';
+  if (percentage >= 18) return 'bg-blue-800 text-white';
+  if (percentage >= 15) return 'bg-blue-900 text-white';
+  if (percentage >= 12) return 'bg-gray-600 text-white';
+  if (percentage >= 9) return 'bg-gray-700 text-white';
+  if (percentage >= 6) return 'bg-gray-800 text-white';
+  if (percentage >= 3) return 'bg-gray-900 text-white';
+  return 'bg-black text-white'; // 0%
+}
+
 interface LeaderEntry {
   name: string;
   percentage: number;
@@ -80,7 +118,7 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
           </div>
           <div className="flex-1 min-w-0">
             <p className={`font-bold text-sm sm:text-base ${nameColor} truncate`}>{entry.name}</p>
-            <p className={`text-xs px-2 py-0.5 rounded-full inline-block ${badgeBg} text-gray-700 font-medium truncate max-w-full`}>{entry.result}</p>
+            <p className={`text-xs px-2 py-0.5 rounded-full inline-block ${getCategoryBadgeColor(entry.percentage)} font-medium truncate max-w-full`}>{entry.result}</p>
             <p className="text-xs text-gray-600">{entry.date} {entry.tempo_segundos && rank <= 3 ? <span className="font-bold text-purple-600">({entry.tempo_segundos.toFixed(2)}s)</span> : entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}</p>
           </div>
         </div>
