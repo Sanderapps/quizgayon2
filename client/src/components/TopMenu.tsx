@@ -64,7 +64,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="fixed top-20 left-1/2 z-[60] w-[90%] max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden" style={{animation: 'dropdown 0.3s ease-out', transform: 'translateX(-50%)'}}>
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden dropdown-menu">
           {/* Seção: Menu de Navegação */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 text-center">
@@ -103,9 +103,8 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
                     {entry.version}
                   </span>
                   <p
-                    className="text-xs font-medium truncate flex-1"
+                    className="text-xs font-medium flex-1"
                     style={{ color: entry.color }}
-                    title={entry.text}
                   >
                     {entry.text}
                   </p>
@@ -136,12 +135,15 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
         @keyframes dropdown {
           from {
             opacity: 0;
-            transform: translateY(-20px);
+            transform: translate(-50%, -20px);
           }
           to {
             opacity: 1;
-            transform: translateY(0);
+            transform: translate(-50%, 0);
           }
+        }
+        .dropdown-menu {
+          animation: dropdown 0.3s ease-out;
         }
       `}</style>
     </>

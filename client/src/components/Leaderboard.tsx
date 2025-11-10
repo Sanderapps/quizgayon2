@@ -136,18 +136,86 @@ interface RankBadgeProps {
 }
 
 const RankBadge = ({ rank, category }: RankBadgeProps) => {
-  if (rank === 1) {
-    return <span className="text-3xl">⭐</span>;
+  // Top 1 Divas - Coroa Rainbow
+  if (rank === 1 && category === 'divas') {
+    return (
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="rainbow1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style={{stopColor: '#FF6B9D', stopOpacity: 1}} />
+            <stop offset="50%" style={{stopColor: '#C44EFF', stopOpacity: 1}} />
+            <stop offset="100%" style={{stopColor: '#4ECAFF', stopOpacity: 1}} />
+          </linearGradient>
+        </defs>
+        <path d="M16 4 L18 12 L26 10 L20 16 L28 20 L18 20 L16 28 L14 20 L4 20 L12 16 L6 10 L14 12 Z" fill="url(#rainbow1)" stroke="#FFD700" strokeWidth="1.5"/>
+        <circle cx="16" cy="16" r="3" fill="#FFD700"/>
+      </svg>
+    );
   }
-  if (rank === 2) {
-    return <span className="text-2xl">⭐</span>;
+  
+  // Top 1 Alfas - Escudo Dourado
+  if (rank === 1 && category === 'alfas') {
+    return (
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="gold1" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style={{stopColor: '#FFD700', stopOpacity: 1}} />
+            <stop offset="100%" style={{stopColor: '#FFA500', stopOpacity: 1}} />
+          </linearGradient>
+        </defs>
+        <path d="M16 4 L28 10 L28 18 C28 24 16 28 16 28 C16 28 4 24 4 18 L4 10 Z" fill="url(#gold1)" stroke="#B8860B" strokeWidth="1.5"/>
+        <text x="16" y="20" fontSize="14" fontWeight="bold" fill="#8B4513" textAnchor="middle">1</text>
+      </svg>
+    );
   }
-  if (rank === 3) {
-    return <span className="text-2xl">🥉</span>;
+  
+  // Top 2 Divas - Estrela Rosa
+  if (rank === 2 && category === 'divas') {
+    return (
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 4 L19 13 L28 13 L21 19 L24 28 L16 22 L8 28 L11 19 L4 13 L13 13 Z" fill="#FF69B4" stroke="#FF1493" strokeWidth="1.5"/>
+        <circle cx="16" cy="16" r="2" fill="#FFD700"/>
+      </svg>
+    );
   }
+  
+  // Top 2 Alfas - Medalha Prata
+  if (rank === 2 && category === 'alfas') {
+    return (
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="18" r="10" fill="#C0C0C0" stroke="#A9A9A9" strokeWidth="1.5"/>
+        <circle cx="16" cy="18" r="7" fill="#E8E8E8" stroke="#B0B0B0" strokeWidth="1"/>
+        <text x="16" y="22" fontSize="10" fontWeight="bold" fill="#696969" textAnchor="middle">2</text>
+      </svg>
+    );
+  }
+  
+  // Top 3 Divas - Diamante Rosa
+  if (rank === 3 && category === 'divas') {
+    return (
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 4 L22 12 L16 28 L10 12 Z" fill="#FFB6C1" stroke="#FF69B4" strokeWidth="1.5"/>
+        <path d="M10 12 L16 12 L22 12 L16 20 Z" fill="#FFC0CB" opacity="0.8"/>
+      </svg>
+    );
+  }
+  
+  // Top 3 Alfas - Medalha Bronze
+  if (rank === 3 && category === 'alfas') {
+    return (
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="18" r="10" fill="#CD7F32" stroke="#8B4513" strokeWidth="1.5"/>
+        <circle cx="16" cy="18" r="7" fill="#E9967A" stroke="#A0522D" strokeWidth="1"/>
+        <text x="16" y="22" fontSize="10" fontWeight="bold" fill="#654321" textAnchor="middle">3</text>
+      </svg>
+    );
+  }
+  
+  // Ranks 4-6: estrela pequena
   if (rank <= 6) {
     return <span className="text-xl">⭐</span>;
   }
+  
   return null;
 };
 
