@@ -38,6 +38,44 @@ function getCategoryBadgeColor(percentage: number): string {
   return 'bg-black text-white'; // 0%
 }
 
+// Função que retorna cor do texto (nome) baseada na porcentagem
+function getCategoryTextColor(percentage: number): string {
+  if (percentage >= 99) return 'text-pink-600 font-bold';
+  if (percentage >= 96) return 'text-rose-700 font-bold';
+  if (percentage >= 93) return 'text-purple-600 font-bold';
+  if (percentage >= 90) return 'text-pink-600 font-bold';
+  if (percentage >= 87) return 'text-pink-800';
+  if (percentage >= 84) return 'text-red-600';
+  if (percentage >= 81) return 'text-rose-700';
+  if (percentage >= 78) return 'text-pink-700';
+  if (percentage >= 75) return 'text-fuchsia-600';
+  if (percentage >= 72) return 'text-purple-600';
+  if (percentage >= 69) return 'text-indigo-600';
+  if (percentage >= 66) return 'text-blue-600';
+  if (percentage >= 63) return 'text-sky-600';
+  if (percentage >= 60) return 'text-cyan-700';
+  if (percentage >= 57) return 'text-teal-600';
+  if (percentage >= 54) return 'text-green-600';
+  if (percentage >= 51) return 'text-lime-700';
+  if (percentage >= 48) return 'text-yellow-700';
+  if (percentage >= 45) return 'text-amber-700';
+  if (percentage >= 42) return 'text-orange-700';
+  if (percentage >= 39) return 'text-pink-600';
+  if (percentage >= 36) return 'text-pink-700';
+  if (percentage >= 33) return 'text-pink-700';
+  if (percentage >= 30) return 'text-purple-700';
+  if (percentage >= 27) return 'text-purple-700';
+  if (percentage >= 24) return 'text-indigo-700';
+  if (percentage >= 21) return 'text-blue-700';
+  if (percentage >= 18) return 'text-blue-800';
+  if (percentage >= 15) return 'text-blue-900';
+  if (percentage >= 12) return 'text-gray-700';
+  if (percentage >= 9) return 'text-gray-800';
+  if (percentage >= 6) return 'text-gray-900';
+  if (percentage >= 3) return 'text-gray-900';
+  return 'text-black font-bold'; // 0%
+}
+
 interface LeaderEntry {
   name: string;
   percentage: number;
@@ -75,55 +113,50 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
     const rank = index + 1;
     
     // Estilos personalizados por colocação
-    let bgGradient, borderClass, glowClass, nameColor, badgeBg, rankColor;
+    let bgGradient, borderClass, glowClass, rankColor;
     
     if (rank === 1) {
       bgGradient = 'from-yellow-100 via-yellow-50 to-amber-100';
       borderClass = 'border-4 border-yellow-400';
       glowClass = 'shadow-[0_0_25px_rgba(255,215,0,0.9)] animate-pulse';
-      nameColor = 'text-yellow-700';
-      badgeBg = 'bg-yellow-200';
+
       rankColor = 'text-yellow-600';
     } else if (rank === 2) {
       bgGradient = 'from-gray-100 via-gray-50 to-slate-100';
       borderClass = 'border-3 border-gray-300';
       glowClass = 'shadow-[0_0_20px_rgba(229,231,235,0.9)] animate-pulse';
-      nameColor = 'text-gray-700';
-      badgeBg = 'bg-gray-200';
+
       rankColor = 'text-gray-600';
     } else if (rank === 3) {
       bgGradient = 'from-orange-100 via-orange-50 to-amber-100';
       borderClass = 'border-3 border-orange-400';
       glowClass = 'shadow-[0_0_20px_rgba(205,127,50,0.8)]';
-      nameColor = 'text-orange-700';
-      badgeBg = 'bg-orange-200';
+
       rankColor = 'text-orange-600';
     } else if (rank <= 6) {
       bgGradient = 'from-pink-200 via-purple-200 to-blue-200';
       borderClass = 'border-2 border-purple-300';
       glowClass = 'shadow-md';
-      nameColor = 'text-purple-800';
-      badgeBg = 'bg-purple-100';
+
       rankColor = 'text-purple-600';
     } else {
       bgGradient = 'from-pink-100 to-purple-100';
       borderClass = 'border border-purple-200';
       glowClass = 'shadow-sm';
-      nameColor = 'text-gray-800';
-      badgeBg = 'bg-purple-50';
+
       rankColor = 'text-purple-500';
     }
     
     return (
-      <div key={`${category}-${index}`} className={`flex justify-between items-center p-2 bg-gradient-to-r ${bgGradient} rounded-lg hover:scale-[1.01] transition-all duration-300 ${borderClass} ${glowClass}`}>
-        <div className="flex items-center gap-2 sm:gap-3 flex-1">
+      <div key={`${category}-${index}`} className={`flex justify-between items-center p-1 sm:p-2 bg-gradient-to-r ${bgGradient} rounded-lg hover:scale-[1.01] transition-all duration-300 ${borderClass} ${glowClass}`}>
+        <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-1">
           <div className="flex flex-col items-center">
             <span className={`text-xs sm:text-sm font-bold ${rankColor}`}>#{rank}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className={`font-bold text-sm sm:text-base ${nameColor} truncate`}>{entry.name}</p>
-            <p className={`text-xs px-2 py-0.5 rounded-full inline-block ${getCategoryBadgeColor(entry.percentage)} font-medium truncate max-w-full`}>{entry.result}</p>
-            <p className="text-xs text-gray-600">{entry.date} {entry.tempo_segundos && rank <= 3 ? <span className="font-bold text-purple-600">({entry.tempo_segundos.toFixed(2)}s)</span> : entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}</p>
+            <p className={`font-bold text-xs sm:text-sm md:text-base ${getCategoryTextColor(entry.percentage)} truncate`}>{entry.name}</p>
+            <p className={`text-[10px] sm:text-xs px-1 sm:px-2 py-0.5 rounded-full inline-block ${getCategoryBadgeColor(entry.percentage)} font-medium truncate max-w-full`}>{entry.result}</p>
+            <p className="text-[9px] sm:text-xs text-gray-600 hidden sm:block">{entry.date} {entry.tempo_segundos && rank <= 3 ? <span className="font-bold text-purple-600">({entry.tempo_segundos.toFixed(2)}s)</span> : entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}</p>
           </div>
         </div>
         <div className="flex flex-col items-center gap-0.5">
@@ -140,12 +173,11 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
         🏆 Placar de Líderes 🏆
       </h2>
       
-      {/* Layout Mobile: Flex vertical (empilha sempre) */}
-      {/* Layout Desktop: Grid 2 colunas */}
-      <div className="flex flex-col md:grid md:grid-cols-2 gap-4 sm:gap-6">
+      {/* Grid 2 colunas SEMPRE (mobile e desktop) */}
+      <div className="grid grid-cols-2 gap-2 sm:gap-4 md:gap-6">
         {/* Top Divas */}
         <div className="min-h-[200px]">
-          <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-center text-pink-300 drop-shadow-lg">
+          <h3 className="text-base sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4 text-center text-pink-300 drop-shadow-lg">
             👑 Top Divas
           </h3>
           <div className="space-y-2">
@@ -159,7 +191,7 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
 
         {/* Top Alfas */}
         <div className="min-h-[200px]">
-          <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-center text-blue-300 drop-shadow-lg">
+          <h3 className="text-base sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4 text-center text-blue-300 drop-shadow-lg">
             💪 Top Alfas
           </h3>
           <div className="space-y-2">
