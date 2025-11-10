@@ -29,20 +29,42 @@ export const RankBadge = ({ rank }: RankBadgeProps) => {
     );
   }
 
-  // 2º lugar - Estrela Prateada
+  // 2º lugar - Estrela Prateada com Brilho
   if (rank === 2) {
     return (
       <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
         <defs>
           <linearGradient id="silver" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style={{ stopColor: '#E8E8E8' }} />
-            <stop offset="50%" style={{ stopColor: '#C0C0C0' }} />
-            <stop offset="100%" style={{ stopColor: '#A8A8A8' }} />
+            <stop offset="0%" style={{ stopColor: '#F0F0F0' }} />
+            <stop offset="30%" style={{ stopColor: '#E0E0E0' }} />
+            <stop offset="60%" style={{ stopColor: '#C0C0C0' }} />
+            <stop offset="100%" style={{ stopColor: '#B0B0B0' }} />
           </linearGradient>
+          <radialGradient id="silverGlow">
+            <stop offset="0%" style={{ stopColor: '#FFF', stopOpacity: 0.8 }} />
+            <stop offset="100%" style={{ stopColor: '#C0C0C0', stopOpacity: 0 }} />
+          </radialGradient>
+          <filter id="silverShadow">
+            <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
         </defs>
-        <path d="M20 8 L22 16 L30 16 L24 21 L26 29 L20 24 L14 29 L16 21 L10 16 L18 16 Z" 
-              fill="url(#silver)" stroke="#808080" strokeWidth="1"/>
-        <circle cx="20" cy="20" r="3" fill="#FFF" opacity="0.6"/>
+        {/* Glow de fundo */}
+        <circle cx="20" cy="20" r="18" fill="url(#silverGlow)" opacity="0.3"/>
+        {/* Estrela principal */}
+        <path d="M20 6 L23 15 L32 15 L25 21 L28 30 L20 24 L12 30 L15 21 L8 15 L17 15 Z" 
+              fill="url(#silver)" stroke="#909090" strokeWidth="1.5" filter="url(#silverShadow)"/>
+        {/* Brilhos internos */}
+        <circle cx="20" cy="18" r="4" fill="#FFF" opacity="0.6"/>
+        <circle cx="18" cy="16" r="2" fill="#FFF" opacity="0.8"/>
+        <circle cx="22" cy="19" r="1.5" fill="#FFF" opacity="0.9"/>
+        {/* Detalhes de cristal */}
+        <path d="M20 10 L21 14 L20 18 L19 14 Z" fill="#FFF" opacity="0.4"/>
+        <path d="M14 18 L18 19 L20 20 L16 21 Z" fill="#FFF" opacity="0.3"/>
+        <path d="M26 18 L22 19 L20 20 L24 21 Z" fill="#FFF" opacity="0.3"/>
       </svg>
     );
   }
@@ -155,6 +177,28 @@ export const RankBadge = ({ rank }: RankBadgeProps) => {
         <circle cx="15" cy="20" r="3" fill="#FCD34D" stroke="#F59E0B" strokeWidth="1"/>
         <circle cx="10" cy="15" r="3" fill="#FCD34D" stroke="#F59E0B" strokeWidth="1"/>
         <circle cx="15" cy="15" r="2.5" fill="#F59E0B"/>
+      </svg>
+    );
+  }
+
+  // 11º lugar - Lua
+  if (rank === 11) {
+    return (
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <path d="M15 5 C10 5 6 9 6 14 C6 19 10 23 15 23 C13 23 11 21 11 18 C11 13 13 8 15 5 Z" 
+              fill="#A78BFA" stroke="#8B5CF6" strokeWidth="1"/>
+        <circle cx="13" cy="12" r="1.5" fill="#E9D5FF"/>
+        <circle cx="11" cy="16" r="1" fill="#E9D5FF"/>
+      </svg>
+    );
+  }
+
+  // 12º lugar - Estrela Simples
+  if (rank === 12) {
+    return (
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <path d="M15 8 L17 14 L23 14 L18 18 L20 24 L15 20 L10 24 L12 18 L7 14 L13 14 Z" 
+              fill="#FDE047" stroke="#FACC15" strokeWidth="1"/>
       </svg>
     );
   }

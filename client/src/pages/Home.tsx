@@ -824,7 +824,7 @@ export default function Home() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(true);
-  const [nsfw, setNsfw] = useState(false);
+
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [leaderboard, setLeaderboard] = useState<LeaderEntry[]>([]);
   const [playerName, setPlayerName] = useState("");
@@ -881,7 +881,7 @@ export default function Home() {
       setQuestions(questionsWithShuffledAnswers);
       play8BitMusic();
     }
-  }, [quizStarted, questions.length, nsfw]);
+  }, [quizStarted, questions.length]);
 
   // Função para gerar um som de clique/resposta 8-bit
   const playSound = () => {
@@ -1113,13 +1113,7 @@ export default function Home() {
 	          >
 	            Começar Quiz! 🚀
 	          </Button>
-          <Button
-            onClick={() => setNsfw(!nsfw)}
-            variant="outline"
-            className="w-full mb-3"
-          >
-            {nsfw ? "Modo Normal" : "Modo NSFW 🔞"}
-          </Button>
+
           <Button
             onClick={() => setAudioEnabled(!audioEnabled)}
             variant="outline"
@@ -1194,8 +1188,8 @@ export default function Home() {
             {leaderboard.length === 0 ? (
               <p className="text-center text-gray-600 text-lg">Nenhum resultado ainda. Seja o primeiro!</p>
             ) : (
-              <div className="space-y-3 max-h-80 overflow-y-auto">
-                {leaderboard.slice(0, 10).map((entry, index) => {
+              <div className="space-y-2">
+                {leaderboard.slice(0, 12).map((entry, index) => {
                   const rank = index + 1;
                   
                   // Estilos personalizados por colocação
@@ -1239,20 +1233,20 @@ export default function Home() {
                   }
                   
                   return (
-	                  <div key={index} className={`flex justify-between items-center p-4 bg-gradient-to-r ${bgGradient} rounded-lg hover:scale-[1.02] transition-all duration-300 ${borderClass} ${glowClass}`}>
+	                  <div key={index} className={`flex justify-between items-center p-2 bg-gradient-to-r ${bgGradient} rounded-lg hover:scale-[1.01] transition-all duration-300 ${borderClass} ${glowClass}`}>
 	                    <div className="flex items-center gap-3 flex-1">
                       <div className="flex flex-col items-center">
                         <span className={`text-sm font-bold ${rankColor}`}>#{rank}</span>
                       </div>
 	                      <div className="flex-1">
-	                        <p className={`font-bold text-lg ${nameColor}`}>{entry.name}</p>
+	                        <p className={`font-bold text-base ${nameColor}`}>{entry.name}</p>
 	                        <p className={`text-xs px-2 py-0.5 rounded-full inline-block ${badgeBg} text-gray-700 font-medium`}>{entry.result}</p>
-	                        <p className="text-xs text-gray-600 mt-1">{entry.date} {entry.tempo_segundos && rank <= 3 ? <span className="font-bold text-purple-600">({entry.tempo_segundos.toFixed(2)}s)</span> : entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}</p>
+	                        <p className="text-xs text-gray-600">{entry.date} {entry.tempo_segundos && rank <= 3 ? <span className="font-bold text-purple-600">({entry.tempo_segundos.toFixed(2)}s)</span> : entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}</p>
 	                      </div>
 	                    </div>
-                    <div className="flex flex-col items-center gap-1">
+                    <div className="flex flex-col items-center gap-0.5">
                       <RankBadge rank={rank} />
-                      <p className={`font-bold text-lg ${rankColor}`}>{entry.percentage}%</p>
+                      <p className={`font-bold text-base ${rankColor}`}>{entry.percentage}%</p>
                     </div>
                   </div>
                   );
