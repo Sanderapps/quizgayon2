@@ -661,86 +661,40 @@ const QUESTIONS_POOL: Question[] = [
 ];
 
 const RESULTS: Result[] = [
-  {
-    percentage: 0,
-    title: "Hétero Confirmado ✅",
-    description:
-      "Você é tão hétero que até a bússola fica confusa! Mas hey, tudo bem ser você mesmo. Volte em 5 anos para fazer o teste novamente! 😄",
-    emoji: "🎯",
-    badge: "Hétero Puro",
-  },
-  {
-    percentage: 5,
-    title: "Hétero com Pitadas",
-    description:
-      "Você é principalmente hétero, mas tem aquele amigo que... você sabe. Nada de errado com isso! Você é um aliado de coração!",
-    emoji: "🤝",
-    badge: "Aliado",
-  },
-  {
-    percentage: 15,
-    title: "Hétero Questionador",
-    description:
-      "Algo está acontecendo aqui... Talvez você esteja apenas explorando seus sentimentos. E tudo bem! A vida é uma jornada.",
-    emoji: "🛤️",
-    badge: "Explorador",
-  },
-  {
-    percentage: 25,
-    title: "Bi-Curious",
-    description:
-      "Você está claramente curioso! Talvez não seja 100% hétero, mas também não é 100% gay. Bem-vindo ao espectro!",
-    emoji: "🌊",
-    badge: "Curioso",
-  },
-  {
-    percentage: 35,
-    title: "Bi Confirmado",
-    description:
-      "Você gosta de homens E mulheres? Parabéns! Você tem o dobro de opções de crush. Que privilégio!",
-    emoji: "💜",
-    badge: "Bi Lindo",
-  },
-  {
-    percentage: 45,
-    title: "Bem no Meio",
-    description:
-      "Você é tão equilibrado que poderia ser acrobata! Homens e mulheres têm a mesma chance com você. Você é a definição de 50/50!",
-    emoji: "⚖️",
-    badge: "Equilibrado",
-  },
-  {
-    percentage: 55,
-    title: "Mais para Gay",
-    description:
-      "Você está claramente mais para o lado gay da força! Mas ainda tem espaço para apreciar a beleza de todos.",
-    emoji: "🌟",
-    badge: "Meio Gay",
-  },
-  {
-    percentage: 65,
-    title: "Gay Assumido",
-    description:
-      "Você é gay! E sabe o que? Isso é INCRÍVEL! Você sabe quem você é e não tem medo de mostrar. Rainha/Rei!",
-    emoji: "👑",
-    badge: "Gay Assumido",
-  },
-  {
-    percentage: 75,
-    title: "Super Gay",
-    description:
-      "Você é tão gay que até o arco-íris fica com inveja! Você é a personificação da comunidade LGBTQ+. Lendário!",
-    emoji: "🔥",
-    badge: "Super Gay",
-  },
-  {
-    percentage: 85,
-    title: "Mega Ultra Gay",
-    description:
-      "Você é tão gay que as outras letras da sigla LGBTQ+ estão com ciúmes! Você é uma lenda viva, um ícone, uma RAINHA/REI! O universo se inclina perante você!",
-    emoji: "✨",
-    badge: "Rainha do Drama",
-  },
+  { percentage: 0, title: "Homão da Porra", description: "Você é tão macho que até o Chuck Norris pede dicas! Testosterona pura correndo nas veias. Respeito máximo, guerreiro!", emoji: "💪", badge: "Machão Raiz" },
+  { percentage: 3, title: "Machão Raiz", description: "Hétero clássico, sem frescura. Você é do tipo que não tem dúvidas sobre quem você é. Segue o jogo, campeão!", emoji: "🦁", badge: "Hétero Top" },
+  { percentage: 6, title: "Hétero Padrão", description: "Você é hétero e tá tudo bem! Nada de errado em ser você mesmo. Continue sendo autêntico!", emoji: "😎", badge: "Hétero Confirmado" },
+  { percentage: 9, title: "Hétero Nutella", description: "Hétero moderno, mente aberta. Você respeita todo mundo e não tem preconceito. Aliado de verdade!", emoji: "🍫", badge: "Aliado" },
+  { percentage: 12, title: "Hétero Curioso", description: "Hmm... algo tá acontecendo aqui. Talvez você esteja começando a questionar algumas coisas. Explorar é natural!", emoji: "👀", badge: "Questionador" },
+  { percentage: 15, title: "Bi-Curioso de Armário", description: "Você tem curiosidade, mas ainda não assumiu nem pra si mesmo. Tá tudo bem, cada um tem seu tempo!", emoji: "🚪", badge: "No Armário" },
+  { percentage: 18, title: "Morango do Nordeste", description: "Doce por fora, mas com um toque especial por dentro! Você tem aquele charme único que ninguém explica.", emoji: "🍓", badge: "Moranguinho" },
+  { percentage: 21, title: "Pabllo Vittar Feelings", description: "Você sente aquela vibe da Pabllo! Não se define totalmente, mas curte a liberdade de ser quem quiser.", emoji: "🎤", badge: "Pabllo Vibe" },
+  { percentage: 24, title: "Luan Santana Vibe", description: "Romântico e sensível, você aprecia beleza em todas as formas. Seu coração é grande demais!", emoji: "🎸", badge: "Romântico" },
+  { percentage: 27, title: "Anitta Mode", description: "Poderosa, confiante e sem medo de experimentar! Você é do tipo que manda ver sem se importar com julgamentos.", emoji: "🔥", badge: "Poderosa" },
+  { percentage: 30, title: "Ludmilla Energy", description: "Energia pura! Você tem aquela pegada forte e autêntica. Nada te para!", emoji: "⚡", badge: "Autêntica" },
+  { percentage: 33, title: "Glória Groove Style", description: "Estilo único e personalidade marcante! Você sabe quem é e não tem medo de mostrar.", emoji: "💅", badge: "Estilosa" },
+  { percentage: 36, title: "Pocah Vibes", description: "Gostosa, confiante e sem neura! Você curte a vida e aprecia beleza em todos os gêneros.", emoji: "💖", badge: "Gostosa" },
+  { percentage: 39, title: "Juliette Confusa", description: "Tá meio perdida ainda, mas com muito carisma! Você tá descobrindo quem é e tá tudo bem.", emoji: "🤷", badge: "Descobrindo" },
+  { percentage: 42, title: "Preta Gil Equilibrado", description: "Equilíbrio perfeito! Você aprecia homens e mulheres igualmente. Sorte a sua ter tantas opções!", emoji: "⚖️", badge: "Equilibrada" },
+  { percentage: 45, title: "Daniela Mercury", description: "Livre como o vento! Você não se prende a rótulos e curte a vida com intensidade.", emoji: "🌈", badge: "Livre" },
+  { percentage: 48, title: "Cassia Eller", description: "Autêntica e sem frescura! Você é quem é, sem máscaras. Respeito total!", emoji: "🎵", badge: "Autêntica" },
+  { percentage: 51, title: "Elton John Brasileiro", description: "Talento e personalidade! Você tem aquele brilho especial que ilumina qualquer ambiente.", emoji: "🎹", badge: "Brilhante" },
+  { percentage: 54, title: "Ney Matogrosso", description: "Único, inconfundível! Você é uma obra de arte viva, impossível de categorizar.", emoji: "🦚", badge: "Único" },
+  { percentage: 57, title: "Quase Inês Brasil", description: "Você tá quase lá! Falta pouco pra você assumir toda sua essência. Vai com tudo!", emoji: "💃", badge: "Quase Lá" },
+  { percentage: 60, title: "Inês Brasil Iniciante", description: "Começando a soltar a franga! Você tá descobrindo seu lado mais livre e tá adorando.", emoji: "👑", badge: "Soltando" },
+  { percentage: 63, title: "Robocop Gay", description: "Forte, determinado e orgulhoso! Você é gay e não tem medo de nada. Respeita!", emoji: "🤖", badge: "Robocop" },
+  { percentage: 66, title: "Pablo Marçal Pink", description: "Empreendedor do amor! Você investe em todas as possibilidades, mas prefere o mesmo time.", emoji: "💗", badge: "Empreendedor" },
+  { percentage: 69, title: "Jean Wyllys Nice", description: "Ativista do coração! Você é gay, assume e ainda luta pelos direitos de todo mundo. Lindo!", emoji: "😏", badge: "Ativista" },
+  { percentage: 72, title: "Pabllo Vittar Confirmado", description: "Confirmadíssimo! Você é gay e arrasa por onde passa. Sua presença ilumina!", emoji: "✨", badge: "Confirmado" },
+  { percentage: 75, title: "Drag Queen Raiz", description: "Fabulosa e sem medo! Você é pura arte, glamour e atitude. Rainha!", emoji: "👠", badge: "Fabulosa" },
+  { percentage: 78, title: "Madonna Brasileira", description: "Ícone pop! Você é referência, trendsetter e arrasa em tudo que faz. Diva suprema!", emoji: "💅", badge: "Diva" },
+  { percentage: 81, title: "Lady Gaga Tupiniquim", description: "Excêntrica e talentosa! Você não tem medo de ser diferente e isso te torna incrível.", emoji: "🎭", badge: "Excêntrica" },
+  { percentage: 84, title: "Bicha Má Lacração", description: "Lacrou! Você é a bicha má que todo mundo respeita. Sua presença é marcante!", emoji: "😈", badge: "Lacrador" },
+  { percentage: 87, title: "RuPaul Brazuca", description: "Lendária! Você é referência absoluta, um ícone vivo da comunidade. Reverência!", emoji: "👸", badge: "Lendária" },
+  { percentage: 90, title: "Cher Tropical", description: "Eterna e fabulosa! Você transcende gerações e continua arrasando. Imortal!", emoji: "🦄", badge: "Imortal" },
+  { percentage: 93, title: "Elton John Supremo", description: "Supremo em todos os sentidos! Você é a realeza gay, o topo da cadeia. Majestade!", emoji: "🎩", badge: "Supremo" },
+  { percentage: 96, title: "Freddie Mercury Reencarnado", description: "Você é tão gay que deve ser a reencarnação do Freddie! Lendário, icônico, IMORTAL!", emoji: "🎤", badge: "Freddie" },
+  { percentage: 99, title: "Viado Divino Transcendental", description: "Você atingiu o nível máximo! Você não é apenas gay, você É a essência gay do universo. Os anjos se curvam perante você!", emoji: "😇", badge: "Divino" },
 ];
 
 // Função para embaralhar array
