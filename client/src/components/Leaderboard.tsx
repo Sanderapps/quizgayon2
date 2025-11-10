@@ -154,7 +154,7 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
             <span className={`text-xs sm:text-sm font-bold ${rankColor}`}>#{rank}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className={`font-bold text-xs sm:text-sm md:text-base ${getCategoryTextColor(entry.percentage)} truncate`}>{entry.name}</p>
+            <p className={`font-bold text-sm sm:text-base md:text-lg ${getCategoryTextColor(entry.percentage)} truncate`}>{entry.name}</p>
             <p className={`text-[10px] sm:text-xs px-1 sm:px-2 py-0.5 rounded-full inline-block ${getCategoryBadgeColor(entry.percentage)} font-medium truncate max-w-full`}>{entry.result}</p>
             <p className="text-[9px] sm:text-xs text-gray-600 hidden sm:block">{entry.date} {entry.tempo_segundos && rank <= 3 ? <span className="font-bold text-purple-600">({entry.tempo_segundos.toFixed(2)}s)</span> : entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}</p>
           </div>
@@ -191,8 +191,8 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
 
         {/* Top Alfas */}
         <div className="min-h-[200px]">
-          <h3 className="text-base sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4 text-center text-blue-300 drop-shadow-lg">
-            💪 Top Alfas
+          <h3 className="text-base sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4 text-center text-black drop-shadow-lg">
+            💪 Top Alpha
           </h3>
           <div className="space-y-2">
             {alfas.length > 0 ? (
