@@ -986,6 +986,7 @@ export default function Home() {
         setCurrentQuestion(currentQuestion + 1);
         setFadeOut(false);
       } else {
+        playSuccessSound(); // NOVO: Toca som de sucesso
         setShowConfetti(true);
         setShowNameInput(true);
       }
@@ -1020,17 +1021,12 @@ export default function Home() {
 
     if (saved) {
       console.log("✅ Pontuação salva no banco de dados:", saved);
-      playSuccessSound(); // NOVO: Toca som de sucesso após salvar
       
       // Atualizar placar local
       await loadLeaderboard();
     } else {
       console.error("❌ Erro ao salvar pontuação");
-    }
-
-    setShowNameInput(false);
-    setShowResult(true);
-  };
+      // Fallback: manter lógica antiga de localStorage (opcional, mas bom para robustez)
       const result = getResult();
       const maxPoints = questions.length * 3;
       const percentage = Math.round((totalPoints / maxPoints) * 100);
