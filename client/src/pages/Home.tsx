@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { RankBadge } from "@/components/RankBadge";
 import { Leaderboard } from "@/components/Leaderboard";
-import { ThemeToggle } from "@/components/ThemeToggle";
+
 import { ChatWidget } from "@/components/ChatWidget";
-import { SuggestionButton } from "@/components/SuggestionButton";
+
 import { RadioPlayer } from "@/components/RadioPlayer";
 import { TopMenu } from "@/components/TopMenu";
 import { WelcomeAnimation } from "@/components/WelcomeAnimation";
@@ -1057,7 +1057,7 @@ export default function Home() {
       <>
       <TopMenu />
       <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex items-center justify-center p-4 pt-20 pb-28">
-        <Card className="w-full max-w-2xl p-8 bg-white dark:bg-gray-800 shadow-2xl max-h-96 overflow-y-auto">
+        <Card className="w-full max-w-2xl p-8 pb-32 bg-white dark:bg-gray-800 shadow-2xl max-h-96 overflow-y-auto">
           <h1 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
             🏆 Placar de Líderes 🏆
           </h1>
@@ -1086,7 +1086,7 @@ export default function Home() {
         </Card>
       </div>
       <ChatWidget />
-      <SuggestionButton />
+
       <RadioPlayer />
       <LeaderboardEasterEgg onReachEnd={handleLeaderboardEnd} />
       </>
@@ -1097,7 +1097,7 @@ export default function Home() {
     return (
       <>
         <TopMenu />
-        <ThemeToggle />
+  
         <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex items-center justify-center p-4 pt-20 pb-28">
         <Card className="w-full max-w-md p-8 text-center bg-white dark:bg-gray-800 shadow-2xl">
           <div className="text-6xl mb-6 animate-bounce">🎉</div>
@@ -1120,7 +1120,7 @@ export default function Home() {
         </Card>
       </div>
       <ChatWidget />
-      <SuggestionButton />
+
       <RadioPlayer />
       <HomeEasterEggs
         playerName={playerName}
@@ -1136,7 +1136,7 @@ export default function Home() {
     return (
       <>
         <TopMenu />
-        <ThemeToggle />
+  
         <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center p-4 pt-20 py-8 overflow-y-auto">
         <div className="w-full max-w-2xl">
           <Card className="w-full p-8 text-center bg-white dark:bg-gray-800 shadow-2xl mb-8">
@@ -1171,7 +1171,7 @@ export default function Home() {
         </div>
       </div>
       <ChatWidget />
-      <SuggestionButton />
+
       <RadioPlayer />
       <LeaderboardEasterEgg onReachEnd={handleLeaderboardEnd} />
       <HomeEasterEggs
@@ -1192,7 +1192,7 @@ export default function Home() {
     return (
       <>
         <TopMenu />
-        <ThemeToggle />
+  
         <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center p-4 pt-20 py-8 overflow-y-auto">
         {showConfetti && <CanvasConfetti />}
         
@@ -1267,7 +1267,7 @@ export default function Home() {
         </div>
       </div>
       <ChatWidget />
-      <SuggestionButton />
+
       <RadioPlayer />
       <LeaderboardEasterEgg onReachEnd={handleLeaderboardEnd} />
       <HomeEasterEggs
@@ -1285,12 +1285,12 @@ export default function Home() {
     <>
       <WelcomeAnimation />
       <TopMenu />
-      <ThemeToggle />
+
       <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex items-center justify-center p-4 pt-20 pb-28">
         <CardSkeleton />
       </div>
       <ChatWidget />
-      <SuggestionButton />
+
       <RadioPlayer />
     </>
     );
@@ -1302,7 +1302,7 @@ export default function Home() {
   return (
     <>
       <TopMenu />
-      <ThemeToggle />
+
       <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center justify-center p-4 pt-20 pb-28">
         <Card
           className={`w-full max-w-2xl p-8 bg-white dark:bg-gray-800 shadow-2xl transition-all duration-300 ${
@@ -1352,7 +1352,7 @@ export default function Home() {
         </Card>
       </div>
       <ChatWidget />
-      <SuggestionButton />
+
       <RadioPlayer />
     </>
   );

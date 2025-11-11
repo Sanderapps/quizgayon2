@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { changelog } from "@/data/changelog";
 
 interface TopMenuProps {
@@ -7,6 +7,26 @@ interface TopMenuProps {
 
 export function TopMenu({ onNavigate }: TopMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    const saved = localStorage.getItem("theme");
+    return saved === "dark";
+  });
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [message, setMessage] = useState("");
+  const [apelido, setApelido] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  // Theme toggle effect
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [isDark]);
 
   const menuItems = [
     { icon: "🏠", page: "home", label: "Início" },
@@ -40,19 +60,97 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
     setIsOpen(false);
   };
 
+  const handleSubmitSuggestion = async () => {
+    if (!message.trim() || !apelido.trim()) {
+      setFeedback({ type: 'error', text: 'Preencha todos os campos!' });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setFeedback(null);
+
+    try {
+      const response = await fetch('/api/suggestions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          apelido: apelido.trim(),
+          mensagem: message.trim(),
+        }),
+      });
+
+      if (response.ok) {
+        setFeedback({ type: 'success', text: 'Sugestão enviada com sucesso! Obrigado! 💖' });
+        setMessage("");
+        setApelido("");
+        setTimeout(() => {
+          setShowSuggestions(false);
+          setFeedback(null);
+        }, 2000);
+      } else {
+        const error = await response.json();
+        setFeedback({ type: 'error', text: error.error || 'Erro ao enviar sugestão' });
+      }
+    } catch (error) {
+      setFeedback({ type: 'error', text: 'Erro de conexão. Tente novamente!' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && e.ctrlKey) {
+      handleSubmitSuggestion();
+    }
+  };
+
   return (
     <>
-      {/* Botão circular no topo central */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] w-14 h-14 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center text-2xl border-2 border-white/50 dark:border-gray-700"
-        aria-label="Menu"
-        title="Menu"
-      >
-        <span className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-          {isOpen ? '✕' : '☰'}
-        </span>
-      </button>
+      {/* Barra Superior Fixa */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          {/* Botão Menu (Esquerda) */}
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md transition-all hover:scale-110 active:scale-95 flex items-center justify-center text-white text-xl shadow-md"
+            aria-label="Menu"
+            title="Menu"
+          >
+            {isOpen ? '✕' : '☰'}
+          </button>
+
+          {/* Logo/Título (Centro) */}
+          <h1 className="text-white font-bold text-lg sm:text-xl flex items-center gap-2">
+            <span>🌈</span>
+            <span className="hidden sm:inline">QuizGayon</span>
+          </h1>
+
+          {/* Botões de Ação (Direita) */}
+          <div className="flex items-center gap-2">
+            {/* Botão Sugestões */}
+            <button
+              onClick={() => setShowSuggestions(true)}
+              className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md transition-all hover:scale-110 active:scale-95 flex items-center justify-center text-white text-xl shadow-md"
+              aria-label="Sugestões"
+              title="Enviar sugestão"
+            >
+              💡
+            </button>
+
+            {/* Botão Tema */}
+            <button
+              onClick={() => setIsDark(!isDark)}
+              className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md transition-all hover:scale-110 active:scale-95 flex items-center justify-center text-white text-xl shadow-md"
+              aria-label="Alternar tema"
+              title={isDark ? "Modo claro" : "Modo escuro"}
+            >
+              {isDark ? "☀️" : "🌙"}
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Overlay */}
       {isOpen && (
@@ -64,7 +162,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden dropdown-menu">
+        <div className="fixed top-16 left-4 z-[60] w-[90%] max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden dropdown-menu">
           {/* Seção: Menu de Navegação */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 text-center">
@@ -122,7 +220,100 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
         </div>
       )}
 
-      {/* Animação CSS */}
+      {/* Modal de Sugestões */}
+      {showSuggestions && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 animate-scale-in">
+            {/* Header */}
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                <span>💡</span>
+                <span>Sugestões</span>
+              </h2>
+              <button
+                onClick={() => setShowSuggestions(false)}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl transition-colors"
+                aria-label="Fechar"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Descrição */}
+            <p className="text-gray-600 dark:text-gray-300 text-sm">
+              Manda aquela sua idéia louca pra nós!
+            </p>
+
+            {/* Form */}
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Seu nome/apelido
+                </label>
+                <input
+                  type="text"
+                  value={apelido}
+                  onChange={(e) => setApelido(e.target.value)}
+                  placeholder="Como quer ser chamado?"
+                  maxLength={30}
+                  className="w-full px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none transition-colors"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Sua sugestão
+                </label>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder="Escreva sua sugestão ou feedback aqui... (Ctrl+Enter para enviar)"
+                  rows={5}
+                  maxLength={500}
+                  className="w-full px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none transition-colors resize-none"
+                  disabled={isSubmitting}
+                />
+                <div className="text-xs text-gray-500 dark:text-gray-400 text-right mt-1">
+                  {message.length}/500
+                </div>
+              </div>
+            </div>
+
+            {/* Feedback */}
+            {feedback && (
+              <div className={`p-3 rounded-lg text-sm font-medium ${
+                feedback.type === 'success' 
+                  ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200' 
+                  : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200'
+              }`}>
+                {feedback.text}
+              </div>
+            )}
+
+            {/* Botões */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowSuggestions(false)}
+                className="flex-1 px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-medium"
+                disabled={isSubmitting}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSubmitSuggestion}
+                disabled={isSubmitting || !message.trim() || !apelido.trim()}
+                className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                {isSubmitting ? 'Enviando...' : 'Enviar 💖'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Animações CSS */}
       <style>{`
         @keyframes dropdown {
           from {
@@ -136,6 +327,20 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
         }
         .dropdown-menu {
           animation: dropdown 0.3s ease-out;
+        }
+        
+        @keyframes scale-in {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        .animate-scale-in {
+          animation: scale-in 0.2s ease-out;
         }
       `}</style>
     </>
