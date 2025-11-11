@@ -593,7 +593,6 @@ export const gayQuestions: Question[] = [
       { texto: "Amo demais", emoji: "🔥", pontos: 4 },
     ],
   },
-];
   {
     id: 50,
     pergunta: "Final do quiz:",
