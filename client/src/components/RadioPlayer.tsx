@@ -160,18 +160,22 @@ export function RadioPlayer({
             </div>
           )}
 
-          {/* Botão Chat */}
+          {/* Botão Chat - Grande e Chamativo */}
           <button
             onClick={() => {
               // Disparar evento para abrir o chat
               window.dispatchEvent(new CustomEvent('toggleChat'));
             }}
-            className="text-white hover:scale-110 transition-transform p-2 bg-white/10 hover:bg-white/20 rounded-full"
-            title="Abrir Chat"
+            className="px-5 py-2.5 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-white font-bold text-base animate-pulse-slow relative overflow-hidden"
+            title="Chat Global"
+            style={{
+              animation: "gradient-shift 3s ease infinite, pulse-glow 2s ease-in-out infinite",
+              backgroundSize: "200% 200%",
+              boxShadow: "0 0 20px rgba(236, 72, 153, 0.6), 0 0 30px rgba(168, 85, 247, 0.4)"
+            }}
           >
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" />
-            </svg>
+            <span className="text-xl">💬</span>
+            <span className="hidden sm:inline">Chat</span>
           </button>
         </div>
       </div>
@@ -195,6 +199,24 @@ export function RadioPlayer({
           </div>
         </div>
       )}
+
+      {/* Animações CSS Customizadas */}
+      <style>{`
+        @keyframes gradient-shift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes pulse-glow {
+          0%, 100% {
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.6), 0 0 30px rgba(168, 85, 247, 0.4);
+          }
+          50% {
+            box-shadow: 0 0 30px rgba(236, 72, 153, 0.9), 0 0 50px rgba(168, 85, 247, 0.6);
+          }
+        }
+      `}</style>
     </div>
   );
 }
