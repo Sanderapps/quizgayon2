@@ -15,6 +15,55 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: "v3.2",
+    date: "2025-01-10",
+    emoji: "🎵",
+    color: "#FF1493",
+    text: "Rádio ao vivo integrada na barra inferior com autoplay"
+  },
+  {
+    version: "v3.1",
+    date: "2025-01-10",
+    emoji: "🗿",
+    color: "#8B4513",
+    text: "Ícones temáticos alpha (Moai, Haltere, Bíceps) no Top 3 Alpha"
+  },
+  {
+    version: "v3.0",
+    date: "2025-01-10",
+    emoji: "👮",
+    color: "#FF4500",
+    text: "Dashboard admin expandida com gestão de chat, placar, banimentos e anti-spam"
+  },
+  {
+    version: "v2.9",
+    date: "2025-01-10",
+    emoji: "💬",
+    color: "#9D4EDD",
+    text: "Botão de chat integrado na barra de rádio com gradiente animado"
+  },
+  {
+    version: "v2.8",
+    date: "2025-01-10",
+    emoji: "🎭",
+    color: "#06FFA5",
+    text: "Seletor de GIF corrigido no mobile (z-index ajustado)"
+  },
+  {
+    version: "v2.7",
+    date: "2025-01-10",
+    emoji: "🌈",
+    color: "#FFD700",
+    text: "Menu redesenhado com tema e sugestões integrados"
+  },
+  {
+    version: "v2.6",
+    date: "2025-01-10",
+    emoji: "🛡️",
+    color: "#00D9FF",
+    text: "Sistema anti-spam persistência em PostgreSQL"
+  },
+  {
     version: "v2.5",
     date: "2025-01-10",
     emoji: "🛡️",

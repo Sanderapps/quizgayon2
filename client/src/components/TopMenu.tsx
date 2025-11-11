@@ -108,49 +108,17 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
 
   return (
     <>
-      {/* Barra Superior Fixa */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          {/* Botão Menu (Esquerda) */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md transition-all hover:scale-110 active:scale-95 flex items-center justify-center text-white text-xl shadow-md"
-            aria-label="Menu"
-            title="Menu"
-          >
-            {isOpen ? '✕' : '☰'}
-          </button>
-
-          {/* Logo/Título (Centro) */}
-          <h1 className="text-white font-bold text-lg sm:text-xl flex items-center gap-2">
-            <span>🌈</span>
-            <span className="hidden sm:inline">QuizGayon</span>
-          </h1>
-
-          {/* Botões de Ação (Direita) */}
-          <div className="flex items-center gap-2">
-            {/* Botão Sugestões */}
-            <button
-              onClick={() => setShowSuggestions(true)}
-              className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md transition-all hover:scale-110 active:scale-95 flex items-center justify-center text-white text-xl shadow-md"
-              aria-label="Sugestões"
-              title="Enviar sugestão"
-            >
-              💡
-            </button>
-
-            {/* Botão Tema */}
-            <button
-              onClick={() => setIsDark(!isDark)}
-              className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md transition-all hover:scale-110 active:scale-95 flex items-center justify-center text-white text-xl shadow-md"
-              aria-label="Alternar tema"
-              title={isDark ? "Modo claro" : "Modo escuro"}
-            >
-              {isDark ? "☀️" : "🌙"}
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Botão circular no topo central */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] w-14 h-14 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center text-2xl border-2 border-white/50 dark:border-gray-700"
+        aria-label="Menu"
+        title="Menu"
+      >
+        <span className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+          {isOpen ? '✕' : '☰'}
+        </span>
+      </button>
 
       {/* Overlay */}
       {isOpen && (
@@ -162,7 +130,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="fixed top-16 left-4 z-[60] w-[90%] max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden dropdown-menu">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden dropdown-menu">
           {/* Seção: Menu de Navegação */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 text-center">
@@ -181,6 +149,36 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
                   </span>
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Seção: Ações Rápidas (Tema e Sugestões) */}
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 className="text-sm font-bold text-gray-800 dark:text-white mb-3 flex items-center gap-2">
+              <span>⚡</span>
+              <span>Ações Rápidas</span>
+            </h3>
+            <div className="flex gap-3">
+              {/* Botão Sugestões */}
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  setShowSuggestions(true);
+                }}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold hover:scale-105 active:scale-95 transition-all shadow-md"
+              >
+                <span className="text-xl">💡</span>
+                <span>Sugestões</span>
+              </button>
+
+              {/* Botão Tema */}
+              <button
+                onClick={() => setIsDark(!isDark)}
+                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white font-bold hover:scale-105 active:scale-95 transition-all shadow-md"
+                title={isDark ? "Modo claro" : "Modo escuro"}
+              >
+                <span className="text-2xl">{isDark ? "☀️" : "🌙"}</span>
+              </button>
             </div>
           </div>
 
