@@ -16,18 +16,32 @@ const ALPHA_TITLES = [
   { min: 50, max: 54, title: "Brother Aliado", emoji: "🤝" },
 ];
 
-// Frases engraçadas por faixa
-const ALPHA_PHRASES: Record<string, string[]> = {
-  "95-100": ["Nunca vi uma flor", "Churrasco é vida", "Só bebe cerveja gelada", "Camisa de time é roupa social"],
-  "90-94": ["Só usa sabonete 3 em 1", "Cerveja é vitamina", "Academia 6x por semana", "Proteína no café da manhã"],
-  "85-89": ["Camisa de time é roupa social", "Futebol todo domingo", "Churrasco sagrado", "Barba sempre por fazer"],
-  "80-84": ["Brother firmeza", "Sempre no churrasco", "Cerveja gelada obrigatória", "Futebol é religião"],
-  "75-79": ["Macho alfa confirmado", "Carne mal passada", "Treino pesado", "Só ouve sertanejo"],
-  "70-74": ["Pescoço grosso", "Carne é vida", "Academia é templo", "Whey todo dia"],
-  "65-69": ["Lenhador nas horas vagas", "Barba de respeito", "Machado afiado", "Madeira não se corta sozinha"],
-  "60-64": ["Modão no talo", "Bota, chapéu e viola", "Roça é raiz", "Sertanejo universitário"],
-  "55-59": ["Churrasqueiro oficial", "Fogo alto sempre", "Picanha é sagrada", "Cerveja nunca falta"],
-  "50-54": ["Aliado confiável", "Respeita as mina", "Brother gente boa", "Tá junto sempre"],
+// Frases por RANK (posição no placar) - Alpha
+const ALPHA_PHRASES_BY_RANK: Record<number, string> = {
+  1: "Nunca vi uma flor",
+  2: "Só usa sabonete 3 em 1",
+  3: "Churrasco todo domingo",
+  4: "Cerveja é vitamina",
+  5: "Camisa de time é roupa social",
+  6: "Academia 6x por semana",
+  7: "Futebol é religião",
+  8: "Carne mal passada sempre",
+  9: "Brother firmeza",
+  10: "Respeita as mina",
+};
+
+// Frases por RANK (posição no placar) - Divas
+const DIVA_PHRASES_BY_RANK: Record<number, string> = {
+  1: "Rainha absoluta, periodt",
+  2: "Lacrou demais, mana",
+  3: "Diva certified",
+  4: "Arrasa sempre",
+  5: "Glamour é o mínimo",
+  6: "Slay queen energy",
+  7: "Fabulosa por natureza",
+  8: "Brilha mais que glitter",
+  9: "Diva em construção",
+  10: "Quase lá, querida",
 };
 
 // Badges especiais
@@ -51,13 +65,12 @@ function getAlphaTitle(percentage: number): { title: string; emoji: string } {
   return found || { title: "Brother Aliado", emoji: "🤝" };
 }
 
-function getAlphaPhrase(percentage: number): string {
-  const key = ALPHA_TITLES.find(t => percentage >= t.min && percentage <= t.max);
-  if (!key) return "Brother gente boa";
-  
-  const rangeKey = `${key.min}-${key.max}`;
-  const phrases = ALPHA_PHRASES[rangeKey] || ["Brother gente boa"];
-  return phrases[Math.floor(Math.random() * phrases.length)];
+function getAlphaPhrase(rank: number): string {
+  return ALPHA_PHRASES_BY_RANK[rank] || "Brother gente boa";
+}
+
+function getDivaPhrase(rank: number): string {
+  return DIVA_PHRASES_BY_RANK[rank] || "Diva em ascensão";
 }
 
 function getAlphaBadges(percentage: number, time?: number): Badge[] {
@@ -317,16 +330,20 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
     // Para Top Alpha, inverter a porcentagem visualmente (0% vira 100%, 100% vira 0%)
     const displayPercentage = category === 'alfas' ? 100 - entry.percentage : entry.percentage;
     
-    // ==================== LÓGICA ALPHA ====================
-    let alphaTitle = "";
-    let alphaPhrase = "";
+    // ==================== LÓGICA ALPHA E DIVAS ====================
+    let customTitle = "";
+    let customPhrase = "";
     let alphaBadges: Badge[] = [];
     
     if (category === 'alfas') {
       const titleData = getAlphaTitle(displayPercentage);
-      alphaTitle = titleData.title;
-      alphaPhrase = getAlphaPhrase(displayPercentage);
+      customTitle = titleData.title;
+      customPhrase = getAlphaPhrase(rank); // Usa RANK, não percentage
       alphaBadges = getAlphaBadges(entry.percentage, entry.tempo_segundos);
+    } else {
+      // Divas usam o resultado padrão como título
+      customTitle = entry.result;
+      customPhrase = getDivaPhrase(rank); // Usa RANK
     }
     
     // Estilos personalizados por colocação
@@ -407,16 +424,14 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
                 </span>
               )}
             </p>
-            {/* Título Alpha customizado ou resultado padrão */}
+            {/* Título customizado (Alpha ou Diva) */}
             <p className={`text-[10px] sm:text-xs px-1 sm:px-2 py-0.5 rounded-full inline-block ${getCategoryBadgeColor(entry.percentage)} font-medium truncate max-w-full`}>
-              {category === 'alfas' ? alphaTitle : entry.result}
+              {customTitle}
             </p>
-            {/* Frase engraçada Alpha (TEXTO PEQUENO) */}
-            {category === 'alfas' && (
-              <p className="text-[9px] sm:text-[10px] text-gray-600 dark:text-gray-400 italic truncate">
-                "{alphaPhrase}"
-              </p>
-            )}
+            {/* Frase engraçada (Alpha e Divas) - TEXTO PEQUENO */}
+            <p className="text-[9px] sm:text-[10px] text-gray-600 dark:text-gray-400 italic truncate">
+              "{customPhrase}"
+            </p>
             <p className="text-[9px] sm:text-xs text-gray-600 hidden sm:block">
               {entry.date} {entry.tempo_segundos && rank <= 3 ? <span className="font-bold text-purple-600">({entry.tempo_segundos.toFixed(2)}s)</span> : entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}
             </p>
