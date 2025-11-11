@@ -1,15 +1,16 @@
 import { Quiz } from "./types";
 import { gayQuiz } from "./gayQuiz";
 import { politicoQuiz } from "./politicoQuiz";
-import { personalidadeQuiz } from "./personalidadeQuiz";
+import { regionalQuiz } from "./regionalQuiz";
 
 /**
  * Lista de todos os quizzes disponíveis
+ * Sistema Multi-Quiz: gay, político, regional
  */
 export const allQuizzes: Quiz[] = [
-  gayQuiz,
-  politicoQuiz,  // ✅ Ativado!
-  // personalidadeQuiz,  // Descomentar quando estiver pronto
+  gayQuiz,        // ✅ Completo (50 perguntas, 33 títulos)
+  politicoQuiz,   // ✅ Completo (50 perguntas, 34 títulos)
+  regionalQuiz,   // ✅ Completo (50 perguntas, 34 títulos)
 ];
 
 /**
@@ -20,7 +21,7 @@ export function getQuizById(idOrSlug: string): Quiz | undefined {
 }
 
 /**
- * Busca o quiz padrão (primeiro da lista)
+ * Busca o quiz padrão (primeiro da lista = gay)
  */
 export function getDefaultQuiz(): Quiz {
   return allQuizzes[0];
@@ -28,4 +29,4 @@ export function getDefaultQuiz(): Quiz {
 
 // Exportar tipos e quizzes individuais
 export * from "./types";
-export { gayQuiz, politicoQuiz, personalidadeQuiz };
+export { gayQuiz, politicoQuiz, regionalQuiz };
