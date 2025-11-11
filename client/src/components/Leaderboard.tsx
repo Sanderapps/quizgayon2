@@ -234,6 +234,9 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
   const renderEntry = (entry: LeaderEntry, index: number, category: 'divas' | 'alfas') => {
     const rank = index + 1;
     
+    // Para Top Alpha, inverter a porcentagem visualmente (0% vira 100%, 100% vira 0%)
+    const displayPercentage = category === 'alfas' ? 100 - entry.percentage : entry.percentage;
+    
     // Estilos personalizados por colocação
     let bgGradient, borderClass, glowClass, rankColor, specialAnimation = null, cardAnimation = '';
     
@@ -312,7 +315,7 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
         </div>
         <div className="flex flex-col items-center gap-0.5">
           <RankBadge rank={rank} category={category} />
-          <span className="text-lg sm:text-xl md:text-2xl font-bold text-purple-600 dark:text-purple-300">{entry.percentage}%</span>
+          <span className="text-lg sm:text-xl md:text-2xl font-bold text-purple-600 dark:text-purple-300">{displayPercentage}%</span>
         </div>
       </div>
     );

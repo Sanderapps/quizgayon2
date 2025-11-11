@@ -1160,9 +1160,10 @@ export default function Home() {
             <Button
               onClick={() => setAudioEnabled(!audioEnabled)}
               variant="outline"
-              className="w-full"
+              className="w-full flex items-center justify-center gap-2"
+              title={audioEnabled ? "Som Ativado" : "Som Desativado"}
             >
-              {audioEnabled ? "🔊 Som Ativado" : "🔇 Som Desativado"}
+              <span className="text-2xl">{audioEnabled ? "🔊" : "🔇"}</span>
             </Button>
           </Card>
 
@@ -1315,7 +1316,7 @@ export default function Home() {
             <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">
               Pergunta {currentQuestion + 1} de {questions.length}
             </span>
-            <span className="text-sm font-semibold text-purple-600">
+            <span className="text-base md:text-lg font-bold text-purple-600">
               {Math.round(progress)}%
             </span>
           </div>

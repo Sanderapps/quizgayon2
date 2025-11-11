@@ -34,10 +34,13 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
     { icon: "🏆", page: "leaderboard", label: "Placar" },
     { icon: "💬", page: "chat", label: "Chat" },
     { icon: "👮", page: "admin", label: "Admin" },
+    { icon: "💡", page: "suggestions", label: "Sugestões" },
+    { icon: isDark ? "☀️" : "🌙", page: "theme", label: isDark ? "Claro" : "Escuro" },
   ];
 
   const handleItemClick = (page: string) => {
     if (page === "chat") {
+      window.dispatchEvent(new CustomEvent('toggleChat'));
       setIsOpen(false);
       return;
     }
@@ -51,6 +54,17 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
     if (page === "home") {
       window.location.href = "/";
       setIsOpen(false);
+      return;
+    }
+
+    if (page === "suggestions") {
+      setIsOpen(false);
+      setShowSuggestions(true);
+      return;
+    }
+
+    if (page === "theme") {
+      setIsDark(!isDark);
       return;
     }
     
@@ -131,12 +145,13 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
       {/* Dropdown Menu */}
       {isOpen && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden dropdown-menu">
-          {/* Seção: Menu de Navegação */}
+          {/* Seção: Menu de Navegação - 7 colunas integradas */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 text-center">
               🌈 Navegação
             </h3>
-            <div className="grid grid-cols-5 gap-3">
+            {/* Grid responsivo: 4 colunas em mobile, 7 em desktop */}
+            <div className="grid grid-cols-4 sm:grid-cols-7 gap-3">
               {menuItems.map((item) => (
                 <button
                   key={item.page}
@@ -147,38 +162,12 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
                   <span className="text-3xl group-hover:scale-125 transition-transform">
                     {item.icon}
                   </span>
+                  {/* Label opcional em telas maiores */}
+                  <span className="hidden sm:block text-[10px] mt-1 text-gray-600 dark:text-gray-400 font-medium">
+                    {item.label}
+                  </span>
                 </button>
               ))}
-            </div>
-          </div>
-
-          {/* Seção: Ações Rápidas (Tema e Sugestões) */}
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-sm font-bold text-gray-800 dark:text-white mb-3 flex items-center gap-2">
-              <span>⚡</span>
-              <span>Ações Rápidas</span>
-            </h3>
-            <div className="flex gap-3">
-              {/* Botão Sugestões */}
-              <button
-                onClick={() => {
-                  setIsOpen(false);
-                  setShowSuggestions(true);
-                }}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold hover:scale-105 active:scale-95 transition-all shadow-md"
-              >
-                <span className="text-xl">💡</span>
-                <span>Sugestões</span>
-              </button>
-
-              {/* Botão Tema */}
-              <button
-                onClick={() => setIsDark(!isDark)}
-                className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white font-bold hover:scale-105 active:scale-95 transition-all shadow-md"
-                title={isDark ? "Modo claro" : "Modo escuro"}
-              >
-                <span className="text-2xl">{isDark ? "☀️" : "🌙"}</span>
-              </button>
             </div>
           </div>
 
@@ -199,7 +188,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
                     {entry.version}
                   </span>
                   <p
-                    className="text-xs font-medium flex-1"
+                    className="text-xs md:text-[13px] font-medium flex-1"
                     style={{ color: entry.color }}
                   >
                     {entry.text}

@@ -94,55 +94,56 @@ export function RadioPlayer({
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[9997] bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 shadow-2xl border-t-2 border-white/20">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      {/* Container principal com padding reduzido em mobile */}
+      <div className="max-w-7xl mx-auto px-4 py-2 md:py-3 flex items-center justify-between gap-4 relative">
         {/* Lado Esquerdo: Play/Pause + Nome */}
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          {/* Botão Play/Pause */}
+        <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
+          {/* Botão Play/Pause - menor em mobile */}
           <button
             onClick={handlePlayPause}
             disabled={isLoading}
-            className="w-12 h-12 rounded-full bg-white/90 hover:bg-white shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 hover:bg-white shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
             title={isPlaying ? "Pausar" : "Reproduzir"}
           >
             {isLoading ? (
-              <div className="w-5 h-5 border-3 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-4 h-4 md:w-5 md:h-5 border-3 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
             ) : isPlaying ? (
-              <svg className="w-6 h-6 text-purple-500" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 md:w-6 md:h-6 text-purple-500" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
               </svg>
             ) : (
-              <svg className="w-6 h-6 text-purple-500 ml-1" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 md:w-6 md:h-6 text-purple-500 ml-1" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z" />
               </svg>
             )}
           </button>
 
-          {/* Nome da Rádio */}
+          {/* Nome da Rádio - texto menor em mobile */}
           <div className="flex-1 min-w-0">
-            <p className="text-white font-bold text-lg truncate flex items-center gap-2">
+            <p className="text-white font-bold text-base md:text-lg truncate flex items-center gap-1 md:gap-2">
               {isPlaying && (
                 <span className="inline-flex gap-0.5">
-                  <span className="w-1 h-3 bg-white rounded-full animate-pulse" style={{ animationDelay: "0ms" }}></span>
-                  <span className="w-1 h-4 bg-white rounded-full animate-pulse" style={{ animationDelay: "150ms" }}></span>
-                  <span className="w-1 h-3 bg-white rounded-full animate-pulse" style={{ animationDelay: "300ms" }}></span>
+                  <span className="w-1 h-2 md:h-3 bg-white rounded-full animate-pulse" style={{ animationDelay: "0ms" }}></span>
+                  <span className="w-1 h-3 md:h-4 bg-white rounded-full animate-pulse" style={{ animationDelay: "150ms" }}></span>
+                  <span className="w-1 h-2 md:h-3 bg-white rounded-full animate-pulse" style={{ animationDelay: "300ms" }}></span>
                 </span>
               )}
               {stationName}
             </p>
-            <p className="text-white/80 text-sm">
+            <p className="text-white/80 text-xs md:text-sm">
               {isPlaying ? "Ao vivo" : "Parado"}
             </p>
           </div>
         </div>
 
-        {/* Lado Direito: Botão Chat GRANDE e Chamativo */}
-        <div className="flex items-center">
+        {/* Lado Direito: Botão Chat FLUTUANTE */}
+        <div className="absolute right-4 bottom-0 translate-y-1/2">
           <button
             onClick={() => {
               // Disparar evento para abrir o chat
               window.dispatchEvent(new CustomEvent('toggleChat'));
             }}
-            className="px-8 py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-2xl shadow-2xl hover:shadow-[0_0_40px_rgba(236,72,153,0.8)] hover:scale-110 active:scale-95 transition-all flex items-center gap-3 text-white font-black text-xl relative overflow-hidden"
+            className="px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-2xl shadow-2xl hover:shadow-[0_0_40px_rgba(236,72,153,0.8)] hover:scale-110 active:scale-95 transition-all flex items-center gap-2 md:gap-3 text-white font-black text-lg md:text-xl relative overflow-hidden"
             title="Chat Global"
             style={{
               animation: "gradient-shift 3s ease infinite, pulse-glow 2s ease-in-out infinite, bounce-subtle 1.5s ease-in-out infinite",
@@ -150,13 +151,14 @@ export function RadioPlayer({
               boxShadow: "0 0 30px rgba(236, 72, 153, 0.8), 0 0 50px rgba(168, 85, 247, 0.6), 0 10px 30px rgba(0,0,0,0.3)"
             }}
           >
-            <span className="text-3xl animate-pulse">💬</span>
-            <span className="hidden sm:inline text-xl">Chat</span>
+            <span className="text-2xl md:text-3xl animate-pulse">💬</span>
+            <span className="text-base md:text-xl">Chat</span>
           </button>
         </div>
       </div>
 
-
+      {/* Espaçamento extra para compensar o botão flutuante */}
+      <div className="h-6 md:h-8"></div>
 
       {/* Animações CSS Customizadas */}
       <style>{`
