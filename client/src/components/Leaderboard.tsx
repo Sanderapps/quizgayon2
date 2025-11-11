@@ -1,6 +1,79 @@
-import React from "react";
+import React from 'react';
 
-// Estilos CSS para animações customizadas
+// ==================== ESTRUTURA DE DADOS ====================
+
+// Títulos por faixa de % Alpha (invertida: 0% quiz = 100% alpha)
+const ALPHA_TITLES = [
+  { min: 95, max: 100, title: "Chad Supremo", emoji: "🗿" },
+  { min: 90, max: 94, title: "Machão Raiz", emoji: "💪" },
+  { min: 85, max: 89, title: "Hetero Top", emoji: "🏋️" },
+  { min: 80, max: 84, title: "Brother Firmeza", emoji: "🍺" },
+  { min: 75, max: 79, title: "Macho Alfa", emoji: "🦁" },
+  { min: 70, max: 74, title: "Carne de Pescoço", emoji: "🥩" },
+  { min: 65, max: 69, title: "Barba de Lenhador", emoji: "🪓" },
+  { min: 60, max: 64, title: "Sertanejo Universitário", emoji: "🤠" },
+  { min: 55, max: 59, title: "Tiozão do Churrasco", emoji: "🔥" },
+  { min: 50, max: 54, title: "Brother Aliado", emoji: "🤝" },
+];
+
+// Frases engraçadas por faixa
+const ALPHA_PHRASES: Record<string, string[]> = {
+  "95-100": ["Nunca vi uma flor", "Churrasco é vida", "Só bebe cerveja gelada", "Camisa de time é roupa social"],
+  "90-94": ["Só usa sabonete 3 em 1", "Cerveja é vitamina", "Academia 6x por semana", "Proteína no café da manhã"],
+  "85-89": ["Camisa de time é roupa social", "Futebol todo domingo", "Churrasco sagrado", "Barba sempre por fazer"],
+  "80-84": ["Brother firmeza", "Sempre no churrasco", "Cerveja gelada obrigatória", "Futebol é religião"],
+  "75-79": ["Macho alfa confirmado", "Carne mal passada", "Treino pesado", "Só ouve sertanejo"],
+  "70-74": ["Pescoço grosso", "Carne é vida", "Academia é templo", "Whey todo dia"],
+  "65-69": ["Lenhador nas horas vagas", "Barba de respeito", "Machado afiado", "Madeira não se corta sozinha"],
+  "60-64": ["Modão no talo", "Bota, chapéu e viola", "Roça é raiz", "Sertanejo universitário"],
+  "55-59": ["Churrasqueiro oficial", "Fogo alto sempre", "Picanha é sagrada", "Cerveja nunca falta"],
+  "50-54": ["Aliado confiável", "Respeita as mina", "Brother gente boa", "Tá junto sempre"],
+};
+
+// Badges especiais
+interface Badge {
+  icon: string;
+  title: string;
+  condition: (percentage: number, time?: number) => boolean;
+}
+
+const ALPHA_BADGES: Badge[] = [
+  { icon: "🏆", title: "Hetero Raiz", condition: (p) => p < 5 },
+  { icon: "💪", title: "Machão Confirmado", condition: (p) => p < 10 },
+  { icon: "⚡", title: "Speedrun Alpha", condition: (p, t) => t !== undefined && t < 30 },
+  { icon: "🤝", title: "Aliado Confiável", condition: (p) => p >= 40 && p < 50 },
+];
+
+// ==================== FUNÇÕES AUXILIARES ====================
+
+function getAlphaTitle(percentage: number): { title: string; emoji: string } {
+  const found = ALPHA_TITLES.find(t => percentage >= t.min && percentage <= t.max);
+  return found || { title: "Brother Aliado", emoji: "🤝" };
+}
+
+function getAlphaPhrase(percentage: number): string {
+  const key = ALPHA_TITLES.find(t => percentage >= t.min && percentage <= t.max);
+  if (!key) return "Brother gente boa";
+  
+  const rangeKey = `${key.min}-${key.max}`;
+  const phrases = ALPHA_PHRASES[rangeKey] || ["Brother gente boa"];
+  return phrases[Math.floor(Math.random() * phrases.length)];
+}
+
+function getAlphaBadges(percentage: number, time?: number): Badge[] {
+  return ALPHA_BADGES.filter(badge => badge.condition(percentage, time));
+}
+
+function getAlphaIcon(position: number): string {
+  if (position === 1) return "🗿"; // Chad
+  if (position === 2) return "🍺"; // Cerveja
+  if (position === 3) return "🔧"; // Chave de boca
+  if (position <= 6) return "💪"; // Bíceps
+  return "⭐"; // Estrela
+}
+
+// ==================== ESTILOS CSS ====================
+
 const animationStyles = `
   @keyframes rotate-gradient {
     0% { background-position: 0% 50%; }
@@ -48,34 +121,34 @@ function getCategoryBadgeColor(percentage: number): string {
   if (percentage >= 93) return 'bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white';
   if (percentage >= 90) return 'bg-pink-700 text-white';
   if (percentage >= 87) return 'bg-pink-600 text-white';
-  if (percentage >= 84) return 'bg-pink-500 text-white';
-  if (percentage >= 81) return 'bg-rose-500 text-white';
+  if (percentage >= 84) return 'bg-pink-600 text-white';
+  if (percentage >= 81) return 'bg-rose-600 text-white';
   if (percentage >= 78) return 'bg-red-500 text-white';
   if (percentage >= 75) return 'bg-red-600 text-white';
   if (percentage >= 72) return 'bg-fuchsia-600 text-white';
   if (percentage >= 69) return 'bg-purple-700 text-white';
   if (percentage >= 66) return 'bg-purple-600 text-white';
   if (percentage >= 63) return 'bg-purple-500 text-white';
-  if (percentage >= 60) return 'bg-violet-500 text-white';
-  if (percentage >= 57) return 'bg-violet-400 text-white';
-  if (percentage >= 54) return 'bg-blue-400 text-gray-900';
-  if (percentage >= 51) return 'bg-sky-500 text-white';
-  if (percentage >= 48) return 'bg-sky-400 text-gray-900';
-  if (percentage >= 45) return 'bg-cyan-500 text-white';
-  if (percentage >= 42) return 'bg-teal-500 text-white';
+  if (percentage >= 60) return 'bg-violet-600 text-white';
+  if (percentage >= 57) return 'bg-violet-600 text-white';
+  if (percentage >= 54) return 'bg-blue-500 text-white';
+  if (percentage >= 51) return 'bg-sky-600 text-white';
+  if (percentage >= 48) return 'bg-sky-600 text-white';
+  if (percentage >= 45) return 'bg-cyan-600 text-white';
+  if (percentage >= 42) return 'bg-teal-600 text-white';
   if (percentage >= 39) return 'bg-teal-600 text-white';
   if (percentage >= 36) return 'bg-emerald-600 text-white';
   if (percentage >= 33) return 'bg-emerald-700 text-white';
   if (percentage >= 30) return 'bg-emerald-800 text-white';
   if (percentage >= 27) return 'bg-blue-700 text-white';
   if (percentage >= 24) return 'bg-blue-800 text-white';
-  if (percentage >= 21) return 'bg-blue-900 text-white';
+  if (percentage >= 21) return 'bg-blue-800 text-white';
   if (percentage >= 18) return 'bg-stone-600 text-white';
   if (percentage >= 15) return 'bg-stone-700 text-white';
   if (percentage >= 12) return 'bg-gray-600 text-white';
   if (percentage >= 9) return 'bg-gray-700 text-white';
   if (percentage >= 6) return 'bg-gray-800 text-white';
-  if (percentage >= 3) return 'bg-gray-900 text-white';
+  if (percentage >= 3) return 'bg-gray-800 text-white';
   return 'bg-black text-white'; // 0%
 }
 
@@ -153,9 +226,9 @@ const RankBadge = ({ rank, category }: RankBadgeProps) => {
     );
   }
   
-  // Top 1 Alfas - Moai (Chad Supremo)
+  // Top 1 Alfas - Chad (Moai) - TAMANHO PADRONIZADO
   if (rank === 1 && category === 'alfas') {
-    return <span className="text-3xl" title="Chad Supremo">🗿</span>;
+    return <span className="text-2xl" title="Chad Supremo">🗿</span>;
   }
   
   // Top 2 Divas - Estrela Rosa
@@ -168,9 +241,9 @@ const RankBadge = ({ rank, category }: RankBadgeProps) => {
     );
   }
   
-  // Top 2 Alfas - Haltere (Força e Dedicação)
+  // Top 2 Alfas - Cerveja - TAMANHO PADRONIZADO
   if (rank === 2 && category === 'alfas') {
-    return <span className="text-2xl" title="Força e Dedicação">🏋️</span>;
+    return <span className="text-2xl" title="Cerveja Gelada">🍺</span>;
   }
   
   // Top 3 Divas - Diamante Rosa
@@ -183,17 +256,23 @@ const RankBadge = ({ rank, category }: RankBadgeProps) => {
     );
   }
   
-  // Top 3 Alfas - Bíceps (Potência)
+  // Top 3 Alfas - Chave de Boca - TAMANHO PADRONIZADO
   if (rank === 3 && category === 'alfas') {
-    return <span className="text-2xl" title="Potência">💪</span>;
+    return <span className="text-2xl" title="Chave de Boca">🔧</span>;
   }
   
-  // Ranks 4-6: estrela pequena
-  if (rank <= 6) {
+  // Ranks 4-6 Alfas - Bíceps
+  if (rank <= 6 && category === 'alfas') {
+    return <span className="text-xl" title="Força">💪</span>;
+  }
+  
+  // Ranks 4-6 Divas - Estrela
+  if (rank <= 6 && category === 'divas') {
     return <span className="text-xl">⭐</span>;
   }
   
-  return null;
+  // Ranks 7-10 - Estrela pequena
+  return <span className="text-lg">⭐</span>;
 };
 
 export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) => {
@@ -207,6 +286,7 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
       document.head.appendChild(style);
     }
   }, []);
+  
   if (leaderboard.length === 0) {
     return (
       <div className="bg-white/20 dark:bg-black/30 backdrop-blur-md rounded-lg shadow-2xl p-4 sm:p-8 border-2 border-white/30 dark:border-gray-700">
@@ -236,6 +316,18 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
     
     // Para Top Alpha, inverter a porcentagem visualmente (0% vira 100%, 100% vira 0%)
     const displayPercentage = category === 'alfas' ? 100 - entry.percentage : entry.percentage;
+    
+    // ==================== LÓGICA ALPHA ====================
+    let alphaTitle = "";
+    let alphaPhrase = "";
+    let alphaBadges: Badge[] = [];
+    
+    if (category === 'alfas') {
+      const titleData = getAlphaTitle(displayPercentage);
+      alphaTitle = titleData.title;
+      alphaPhrase = getAlphaPhrase(displayPercentage);
+      alphaBadges = getAlphaBadges(entry.percentage, entry.tempo_segundos);
+    }
     
     // Estilos personalizados por colocação
     let bgGradient, borderClass, glowClass, rankColor, specialAnimation = null, cardAnimation = '';
@@ -277,26 +369,22 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
     } else if (rank === 2) {
       bgGradient = 'from-gray-100 via-gray-50 to-slate-100 dark:from-gray-700 dark:via-gray-800 dark:to-gray-700';
       borderClass = 'border-3 border-gray-300';
-      glowClass = 'shadow-[0_0_25px_rgba(255,215,0,0.9)]';
-
+      glowClass = 'shadow-[0_0_20px_rgba(192,192,192,0.8)]';
       rankColor = 'text-gray-600 dark:text-gray-300';
     } else if (rank === 3) {
       bgGradient = 'from-orange-100 via-orange-50 to-amber-100 dark:from-gray-700 dark:via-gray-800 dark:to-gray-700';
       borderClass = 'border-3 border-orange-400';
       glowClass = 'shadow-[0_0_20px_rgba(205,127,50,0.8)]';
-
       rankColor = 'text-orange-600 dark:text-orange-300';
     } else if (rank <= 6) {
       bgGradient = 'from-pink-200 via-purple-200 to-blue-200 dark:from-gray-700 dark:via-gray-800 dark:to-gray-700';
       borderClass = 'border-2 border-purple-300';
       glowClass = 'shadow-md';
-
       rankColor = 'text-purple-600 dark:text-purple-300';
     } else {
       bgGradient = 'from-pink-100 to-purple-100 dark:from-gray-800 dark:to-gray-900';
       borderClass = 'border border-purple-200';
       glowClass = 'shadow-sm';
-
       rankColor = 'text-purple-500 dark:text-purple-300';
     }
     
@@ -308,9 +396,30 @@ export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) =>
             <span className={`text-xs sm:text-sm font-bold ${rankColor}`}>#{rank}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className={`font-bold text-sm sm:text-base md:text-lg ${getCategoryTextColor(entry.percentage)} ${entry.percentage >= 90 ? 'dark:text-pink-400' : 'dark:text-gray-100'} truncate`}>{entry.name}</p>
-            <p className={`text-[10px] sm:text-xs px-1 sm:px-2 py-0.5 rounded-full inline-block ${getCategoryBadgeColor(entry.percentage)} font-medium truncate max-w-full`}>{entry.result}</p>
-            <p className="text-[9px] sm:text-xs text-gray-600 hidden sm:block">{entry.date} {entry.tempo_segundos && rank <= 3 ? <span className="font-bold text-purple-600">({entry.tempo_segundos.toFixed(2)}s)</span> : entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}</p>
+            <p className={`font-bold text-sm sm:text-base md:text-lg ${getCategoryTextColor(entry.percentage)} ${entry.percentage >= 90 ? 'dark:text-pink-400' : 'dark:text-gray-100'} truncate`}>
+              {entry.name}
+              {/* Badges Alpha */}
+              {category === 'alfas' && alphaBadges.length > 0 && (
+                <span className="ml-1">
+                  {alphaBadges.map((badge, i) => (
+                    <span key={i} className="text-xs" title={badge.title}>{badge.icon}</span>
+                  ))}
+                </span>
+              )}
+            </p>
+            {/* Título Alpha customizado ou resultado padrão */}
+            <p className={`text-[10px] sm:text-xs px-1 sm:px-2 py-0.5 rounded-full inline-block ${getCategoryBadgeColor(entry.percentage)} font-medium truncate max-w-full`}>
+              {category === 'alfas' ? alphaTitle : entry.result}
+            </p>
+            {/* Frase engraçada Alpha (TEXTO PEQUENO) */}
+            {category === 'alfas' && (
+              <p className="text-[9px] sm:text-[10px] text-gray-600 dark:text-gray-400 italic truncate">
+                "{alphaPhrase}"
+              </p>
+            )}
+            <p className="text-[9px] sm:text-xs text-gray-600 hidden sm:block">
+              {entry.date} {entry.tempo_segundos && rank <= 3 ? <span className="font-bold text-purple-600">({entry.tempo_segundos.toFixed(2)}s)</span> : entry.tempo_segundos ? `(${entry.tempo_segundos.toFixed(2)}s)` : ""}
+            </p>
           </div>
         </div>
         <div className="flex flex-col items-center gap-0.5">
