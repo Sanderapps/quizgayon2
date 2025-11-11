@@ -6,8 +6,8 @@ interface RadioPlayerProps {
 }
 
 export function RadioPlayer({ 
-  streamUrl = "https://stream.zeno.fm/f3wvbbqmdg8uv", // Exemplo: rádio LGBTQ+ (substituir pela URL desejada)
-  stationName = "Rádio QuizGayon 🌈"
+  streamUrl = "https://relay.rainwave.cc/all.mp3",
+  stationName = "🎮 Rainwave - Game Music"
 }: RadioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(70);
