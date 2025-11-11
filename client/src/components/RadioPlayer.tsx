@@ -160,19 +160,17 @@ export function RadioPlayer({
             </div>
           )}
 
-          {/* Botão Fechar (opcional) */}
+          {/* Botão Chat */}
           <button
             onClick={() => {
-              if (audioRef.current) {
-                audioRef.current.pause();
-                setIsPlaying(false);
-              }
+              // Disparar evento para abrir o chat
+              window.dispatchEvent(new CustomEvent('toggleChat'));
             }}
-            className="text-white/70 hover:text-white hover:scale-110 transition-transform p-2 hidden md:block"
-            title="Fechar player"
+            className="text-white hover:scale-110 transition-transform p-2 bg-white/10 hover:bg-white/20 rounded-full"
+            title="Abrir Chat"
           >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" />
             </svg>
           </button>
         </div>

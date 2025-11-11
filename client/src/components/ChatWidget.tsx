@@ -59,6 +59,16 @@ export function ChatWidget() {
     if (savedEmoji) {
       setSelectedEmoji(savedEmoji);
     }
+
+    // Listener para abrir chat via evento da barra de rádio
+    const handleToggleChat = () => {
+      setIsOpen(true);
+    };
+    window.addEventListener('toggleChat', handleToggleChat);
+    
+    return () => {
+      window.removeEventListener('toggleChat', handleToggleChat);
+    };
   }, []);
 
   // Scroll automático para última mensagem
@@ -261,38 +271,7 @@ export function ChatWidget() {
 
   return (
     <>
-      {/* Botão flutuante retangular chamativo */}
-      <button
-        onClick={() => {
-          setIsOpen(!isOpen);
-          if (!isOpen) {
-            // Ao abrir, zera contador e salva última mensagem
-            setUnreadCount(0);
-            if (messages.length > 0) {
-              lastReadMessageIdRef.current = messages[messages.length - 1].id;
-            }
-          }
-        }}
-        className="px-6 py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-white font-bold text-lg animate-gradient relative"
-        title={unreadCount > 0 ? `Chat Global (${unreadCount} novas mensagens)` : "Chat Global"}
-        style={{
-          animation: "gradient 3s ease infinite",
-          backgroundSize: "200% 200%",
-          boxShadow: "0 0 20px rgba(236, 72, 153, 0.6), 0 0 40px rgba(168, 85, 247, 0.4)",
-          zIndex: 99999,
-          position: "fixed",
-          bottom: "1.5rem",
-          right: "1.5rem"
-        }}
-      >
-        <span className="text-2xl">💬</span>
-        <span>Chat</span>
-        {unreadCount > 0 && !isOpen && (
-          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center animate-pulse">
-            {unreadCount > 99 ? '99+' : unreadCount}
-          </span>
-        )}
-      </button>
+      {/* Botão flutuante removido - agora está na barra de rádio */}
 
       <style>{`
         @keyframes gradient {
@@ -312,7 +291,7 @@ export function ChatWidget() {
 
       {/* Janela do chat */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-80 h-[500px] bg-white dark:bg-gray-800 rounded-lg shadow-2xl flex flex-col border-2 border-pink-500" style={{ zIndex: 9998 }}>
+        <div className="fixed bottom-28 right-6 w-80 h-[500px] bg-white dark:bg-gray-800 rounded-lg shadow-2xl flex flex-col border-2 border-pink-500" style={{ zIndex: 9998 }}>
           {/* Header */}
           <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-3 rounded-t-lg flex justify-between items-center">
             <h3 className="text-white font-bold">💬 Chat Global</h3>

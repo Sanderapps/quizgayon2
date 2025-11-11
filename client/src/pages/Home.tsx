@@ -1056,7 +1056,7 @@ export default function Home() {
     return (
       <>
       <TopMenu />
-      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex items-center justify-center p-4 pt-20">
+      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex items-center justify-center p-4 pt-20 pb-28">
         <Card className="w-full max-w-2xl p-8 bg-white dark:bg-gray-800 shadow-2xl max-h-96 overflow-y-auto">
           <h1 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
             🏆 Placar de Líderes 🏆
@@ -1098,7 +1098,7 @@ export default function Home() {
       <>
         <TopMenu />
         <ThemeToggle />
-        <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex items-center justify-center p-4 pt-20">
+        <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex items-center justify-center p-4 pt-20 pb-28">
         <Card className="w-full max-w-md p-8 text-center bg-white dark:bg-gray-800 shadow-2xl">
           <div className="text-6xl mb-6 animate-bounce">🎉</div>
           <h1 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Parabéns!</h1>
@@ -1286,7 +1286,7 @@ export default function Home() {
       <WelcomeAnimation />
       <TopMenu />
       <ThemeToggle />
-      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex items-center justify-center p-4 pt-20">
+      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex items-center justify-center p-4 pt-20 pb-28">
         <CardSkeleton />
       </div>
       <ChatWidget />
@@ -1303,7 +1303,7 @@ export default function Home() {
     <>
       <TopMenu />
       <ThemeToggle />
-      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center justify-center p-4 pt-20">
+      <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 dark:from-gray-900 dark:via-purple-900 dark:to-black flex flex-col items-center justify-center p-4 pt-20 pb-28">
         <Card
           className={`w-full max-w-2xl p-8 bg-white dark:bg-gray-800 shadow-2xl transition-all duration-300 ${
             fadeOut ? "opacity-50 scale-95" : "opacity-100 scale-100"
