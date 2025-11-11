@@ -426,3 +426,71 @@ export async function getAdminStats(req: Request, res: Response) {
     });
   }
 }
+
+/**
+ * Reseta completamente o placar (deleta todas as pontuações)
+ * DELETE /api/debug/reset-leaderboard
+ */
+export async function resetLeaderboard(req: Request, res: Response) {
+  try {
+    // Deletar TODAS as entradas do placar
+    const result = await pool.query(`
+      DELETE FROM scores 
+      RETURNING *
+    `);
+
+    res.json({
+      success: true,
+      message: "Placar resetado completamente",
+      deleted_count: result.rowCount,
+      deleted_entries: result.rows
+    });
+  } catch (error) {
+    console.error("Erro ao resetar placar:", error);
+    res.status(500).json({
+      error: "Erro ao resetar placar",
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+}
+
+/**
+ * Adiciona uma entrada no changelog
+ * POST /api/admin/changelog
+ */
+export async function addChangelogEntry(req: Request, res: Response) {
+  try {
+    const { version, description, emoji } = req.body;
+    
+    const result = await pool.query(
+      `INSERT INTO changelog (version, description, emoji) 
+       VALUES ($1, $2, $3) 
+       RETURNING *`,
+      [version, description, emoji || "✨"]
+    );
+
+    res.json({ success: true, entry: result.rows[0] });
+  } catch (error) {
+    console.error("Erro ao adicionar changelog:", error);
+    res.status(500).json({ error: "Erro ao adicionar changelog" });
+  }
+}
+
+/**
+ * Busca o changelog
+ * GET /api/changelog
+ */
+export async function getChangelog(req: Request, res: Response) {
+  try {
+    const result = await pool.query(
+      `SELECT * FROM changelog 
+       ORDER BY created_at DESC 
+       LIMIT 10`
+    );
+    
+    res.json({ success: true, changelog: result.rows });
+  } catch (error) {
+    console.error("Erro ao buscar changelog:", error);
+    res.status(500).json({ error: "Erro ao buscar changelog" });
+  }
+}

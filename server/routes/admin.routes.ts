@@ -15,7 +15,10 @@ import {
   deleteBulkScores,
   getAntiSpamConfig,
   updateAntiSpamConfig,
-  getAdminStats
+  getAdminStats,
+  resetLeaderboard,
+  addChangelogEntry,
+  getChangelog
 } from "../controllers/admin.controller.js";
 
 const router = Router();
@@ -92,6 +95,17 @@ router.delete("/api/debug/cleanup-fake", checkAdminPassword, cleanupFakeScores);
 
 // GET /api/debug/scores - Ver dados brutos do banco (DEBUG)
 router.get("/api/debug/scores", debugScores);
+
+// DELETE /api/debug/reset-leaderboard - Resetar completamente o placar (ADMIN)
+router.delete("/api/debug/reset-leaderboard", checkAdminPassword, resetLeaderboard);
+
+// ==================== ROTAS DE CHANGELOG ====================
+
+// POST /api/admin/changelog - Adicionar entrada no changelog (ADMIN)
+router.post("/api/admin/changelog", checkAdminPassword, addChangelogEntry);
+
+// GET /api/changelog - Buscar changelog (PÚBLICO)
+router.get("/api/changelog", getChangelog);
 
 // ==================== ROTAS DE SUGESTÕES ====================
 
