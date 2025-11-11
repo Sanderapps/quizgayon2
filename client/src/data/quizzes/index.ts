@@ -8,7 +8,7 @@ import { personalidadeQuiz } from "./personalidadeQuiz";
  */
 export const allQuizzes: Quiz[] = [
   gayQuiz,
-  // politicoQuiz,  // Descomentarquando estiver pronto
+  politicoQuiz,  // ✅ Ativado!
   // personalidadeQuiz,  // Descomentar quando estiver pronto
 ];
 

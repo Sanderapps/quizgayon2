@@ -1,0 +1,15 @@
+=== ANÁLISE DE SCHEMA vs CÓDIGO ===
+
+1. TABELA SCORES
+   Schema no db.ts:
+   - id, apelido, pontuacao, tempo_segundos, data_registro
+   
+   Query no código (scoreService.ts):
+   - WHERE quiz_id = $1  ❌ COLUNA NÃO EXISTE
+   - INSERT com quiz_id   ❌ COLUNA NÃO EXISTE
+
+2. TABELA CHAT_REPORTS
+   Verificando...
+
+3. TABELA ANTI_SPAM_BANS
+   Verificando...

@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import { useParams } from "wouter";
+import { getQuizById, getDefaultQuiz } from "@/data/quizzes";
 import { salvarPontuacao, buscarPlacar, pontuacaoParaPercentual } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -720,6 +722,15 @@ const AnimatedEmoji = ({ emoji }: { emoji: string }) => {
 };
 
 export default function Home() {
+  // Pegar quizId da URL (ex: /quiz/politico)
+  const params = useParams<{ quizId?: string }>();
+  const quizId = params.quizId || "gay"; // Default: quiz gay
+  
+  // Carregar quiz baseado no ID
+  const currentQuiz = getQuizById(quizId) || getDefaultQuiz();
+  
+  // Log para debug
+  console.log("Quiz atual:", currentQuiz.id, currentQuiz.title);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [totalPoints, setTotalPoints] = useState(0);
   const [showResult, setShowResult] = useState(false);
@@ -839,7 +850,13 @@ export default function Home() {
   // Embaralhar perguntas ao iniciar
   useEffect(() => {
     if (quizStarted && questions.length === 0) {
-      const shuffled = shuffleArray(QUESTIONS_POOL).slice(0, 15);
+      // Usar perguntas do quiz atual (gay ou político)
+      const quizQuestions = currentQuiz.questions.map(q => ({
+        id: q.id,
+        text: q.pergunta,
+        answers: q.opcoes.map(o => ({ text: `${o.emoji} ${o.texto}`, points: o.pontos }))
+      }));
+      const shuffled = shuffleArray(quizQuestions).slice(0, 15);
       // Embaralhar as respostas de cada pergunta
       const questionsWithShuffledAnswers = shuffled.map(q => ({
         ...q,

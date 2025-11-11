@@ -1,0 +1,53 @@
+=== ROTAS QUE O FRONTEND CHAMA ===
+1. GET /api/chat/reports
+2. GET /api/chat/recent
+3. GET /api/leaderboard
+4. GET /api/admin/bans
+5. GET /api/admin/antispam/config
+6. GET /api/admin/stats
+7. DELETE /api/chat/messages/:id
+8. DELETE /api/admin/chat/clear-all
+9. POST /api/admin/chat/ban-user
+10. DELETE /api/admin/chat/user/:apelido
+11. PUT /api/admin/scores/:id
+12. DELETE /api/admin/scores/bulk
+13. DELETE /api/admin/bans/:ip
+14. POST /api/admin/bans
+15. PUT /api/admin/antispam/config
+
+=== ROTAS QUE EXISTEM NO BACKEND ===
+
+Em admin.routes.ts:
+- DELETE /api/scores/:id
+- DELETE /api/chat/messages/:id ✅
+- DELETE /api/debug/cleanup-fake
+- GET /api/debug/scores
+- POST /api/suggestions
+
+Em chat.routes.ts:
+- GET /api/chat/recent ✅
+- GET /api/chat/reports ✅
+
+Em scores.routes.ts:
+- POST /api/scores
+- GET /api/leaderboard ✅
+
+Em index.ts (não modularizadas):
+- DELETE /api/debug/reset-leaderboard
+- POST /api/admin/changelog
+- GET /api/changelog
+- GET /api/admin/config
+- PUT /api/admin/config
+- GET /api/admin/stats ✅
+
+=== ROTAS FALTANDO (causando os problemas) ===
+❌ GET /api/admin/bans
+❌ GET /api/admin/antispam/config
+❌ DELETE /api/admin/chat/clear-all
+❌ POST /api/admin/chat/ban-user
+❌ DELETE /api/admin/chat/user/:apelido
+❌ PUT /api/admin/scores/:id
+❌ DELETE /api/admin/scores/bulk
+❌ DELETE /api/admin/bans/:ip
+❌ POST /api/admin/bans
+❌ PUT /api/admin/antispam/config

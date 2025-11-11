@@ -21,7 +21,7 @@ export async function submitScore(req: Request, res: Response) {
       });
     }
 
-    const { apelido, pontuacao, tempo_segundos, quiz_token } = validationResult.data;
+    const { apelido, pontuacao, tempo_segundos, quiz_token, quiz_id = "gay" } = validationResult.data;
 
     // Validação de token de sessão
     if (!validateQuizToken(quiz_token)) {
@@ -48,7 +48,7 @@ export async function submitScore(req: Request, res: Response) {
       apelido,
       pontuacao,
       tempo_segundos,
-      quiz_id: "gay" // Por enquanto fixo, será dinâmico no multi-quiz
+      quiz_id // Agora dinâmico! 🎉
     });
 
     res.status(201).json({

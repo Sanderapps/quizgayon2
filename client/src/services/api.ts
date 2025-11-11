@@ -31,7 +31,8 @@ const API_BASE_URL = "/api";
 export async function salvarPontuacao(
   apelido: string,
   pontuacao: number,
-  tempoSegundos: number
+  tempoSegundos: number,
+  quizId: string = "gay"
 ): Promise<Score | null> {
   try {
     // Recuperar token de sessão
@@ -52,6 +53,7 @@ export async function salvarPontuacao(
         apelido,
         pontuacao,
         tempo_segundos: tempoSegundos,
+        quiz_id: quizId,
         quiz_token: quizToken,
       }),
     });
@@ -74,10 +76,11 @@ export async function salvarPontuacao(
  * Busca o placar de líderes global
  */
 export async function buscarPlacar(
-  limit: number = 100
+  limit: number = 100,
+  quizId: string = "gay"
 ): Promise<LeaderboardEntry[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/leaderboard?limit=${limit}`);
+    const response = await fetch(`${API_BASE_URL}/leaderboard?limit=${limit}&quiz_id=${quizId}`);
 
     if (!response.ok) {
       console.error("Erro ao buscar placar");
