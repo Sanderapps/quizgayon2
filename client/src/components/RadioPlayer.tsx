@@ -7,7 +7,7 @@ interface RadioPlayerProps {
 
 export function RadioPlayer({ 
   streamUrl = "https://relay.rainwave.cc/all.mp3",
-  stationName = "🎮 Rainwave - Game Music"
+  stationName = "Rádio QuiZoeiras"
 }: RadioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(70);
