@@ -95,7 +95,7 @@ export function RadioPlayer({
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[9997] bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 shadow-2xl border-t-2 border-white/20">
       {/* Container principal com padding reduzido em mobile */}
-      <div className="max-w-7xl mx-auto px-4 py-2 md:py-3 flex items-center justify-between gap-4 relative">
+      <div className="max-w-7xl mx-auto px-4 py-1.5 md:py-2 flex items-center justify-between gap-4 relative">
         {/* Lado Esquerdo: Play/Pause + Nome */}
         <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
           {/* Botão Play/Pause - menor em mobile */}
@@ -136,8 +136,8 @@ export function RadioPlayer({
           </div>
         </div>
 
-        {/* Lado Direito: Botão Chat FLUTUANTE */}
-        <div className="absolute right-4 bottom-0 translate-y-1/2">
+        {/* Lado Direito: Botão Chat FLUTUANTE PRA CIMA */}
+        <div className="absolute right-4 top-0 -translate-y-1/2">
           <button
             onClick={() => {
               // Disparar evento para abrir o chat
@@ -156,9 +156,6 @@ export function RadioPlayer({
           </button>
         </div>
       </div>
-
-      {/* Espaçamento extra para compensar o botão flutuante */}
-      <div className="h-6 md:h-8"></div>
 
       {/* Animações CSS Customizadas */}
       <style>{`
