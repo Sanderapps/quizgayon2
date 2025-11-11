@@ -27,10 +27,29 @@ export async function initializeDatabase() {
       );
     `);
 
+    // Adicionar coluna quiz_id se não existir (migração para multi-quiz)
+    await pool.query(`
+      ALTER TABLE scores 
+      ADD COLUMN IF NOT EXISTS quiz_id TEXT DEFAULT 'gay';
+    `);
+
+    // Atualizar registros existentes sem quiz_id
+    await pool.query(`
+      UPDATE scores 
+      SET quiz_id = 'gay' 
+      WHERE quiz_id IS NULL;
+    `);
+
     // Criar índice para otimizar a ordenação do placar
     await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_scores_ranking 
       ON scores (pontuacao DESC, tempo_segundos ASC);
+    `);
+
+    // Criar índice para otimizar filtro por quiz_id
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_scores_quiz_id 
+      ON scores (quiz_id);
     `);
 
     // Criar tabela de mensagens do chat se não existir
