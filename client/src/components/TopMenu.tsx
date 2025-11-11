@@ -156,12 +156,15 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
                 <button
                   key={item.page}
                   onClick={() => handleItemClick(item.page)}
-                  className="flex flex-col items-center justify-center p-3 rounded-xl hover:bg-pink-100 dark:hover:bg-gray-700 transition-all group"
+                  className="flex flex-col items-center justify-center transition-all group"
                   title={item.label}
                 >
-                  <span className="text-3xl group-hover:scale-125 transition-transform">
-                    {item.icon}
-                  </span>
+                  {/* Fundo quadrado arredondado com emoji */}
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-pink-100 to-purple-100 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center shadow-md hover:shadow-xl hover:scale-110 transition-all">
+                    <span className="text-2xl sm:text-3xl">
+                      {item.icon}
+                    </span>
+                  </div>
                   {/* Label opcional em telas maiores */}
                   <span className="hidden sm:block text-[10px] mt-1 text-gray-600 dark:text-gray-400 font-medium">
                     {item.label}
