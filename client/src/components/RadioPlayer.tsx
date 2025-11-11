@@ -45,6 +45,20 @@ export function RadioPlayer({
       alert("Erro ao carregar a rádio. Verifique a conexão.");
     });
 
+    // Autoplay ao carregar
+    const attemptAutoplay = async () => {
+      try {
+        setIsLoading(true);
+        await audioRef.current?.play();
+      } catch (error) {
+        // Autoplay bloqueado pelo navegador - usuário precisa interagir primeiro
+        console.log("Autoplay bloqueado. Clique no botão play para iniciar.");
+        setIsLoading(false);
+      }
+    };
+    
+    attemptAutoplay();
+
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
