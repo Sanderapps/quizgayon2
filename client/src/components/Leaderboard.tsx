@@ -153,20 +153,9 @@ const RankBadge = ({ rank, category }: RankBadgeProps) => {
     );
   }
   
-  // Top 1 Alfas - Escudo Dourado
+  // Top 1 Alfas - Moai (Chad Supremo)
   if (rank === 1 && category === 'alfas') {
-    return (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="gold1" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" style={{stopColor: '#FFD700', stopOpacity: 1}} />
-            <stop offset="100%" style={{stopColor: '#FFA500', stopOpacity: 1}} />
-          </linearGradient>
-        </defs>
-        <path d="M16 4 L28 10 L28 18 C28 24 16 28 16 28 C16 28 4 24 4 18 L4 10 Z" fill="url(#gold1)" stroke="#B8860B" strokeWidth="1.5"/>
-        <text x="16" y="20" fontSize="14" fontWeight="bold" fill="#8B4513" textAnchor="middle">1</text>
-      </svg>
-    );
+    return <span className="text-3xl" title="Chad Supremo">🗿</span>;
   }
   
   // Top 2 Divas - Estrela Rosa
@@ -179,15 +168,9 @@ const RankBadge = ({ rank, category }: RankBadgeProps) => {
     );
   }
   
-  // Top 2 Alfas - Medalha Prata
+  // Top 2 Alfas - Haltere (Força e Dedicação)
   if (rank === 2 && category === 'alfas') {
-    return (
-      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="16" cy="18" r="10" fill="#C0C0C0" stroke="#A9A9A9" strokeWidth="1.5"/>
-        <circle cx="16" cy="18" r="7" fill="#E8E8E8" stroke="#B0B0B0" strokeWidth="1"/>
-        <text x="16" y="22" fontSize="10" fontWeight="bold" fill="#696969" textAnchor="middle">2</text>
-      </svg>
-    );
+    return <span className="text-2xl" title="Força e Dedicação">🏋️</span>;
   }
   
   // Top 3 Divas - Diamante Rosa
@@ -200,15 +183,9 @@ const RankBadge = ({ rank, category }: RankBadgeProps) => {
     );
   }
   
-  // Top 3 Alfas - Medalha Bronze
+  // Top 3 Alfas - Bíceps (Potência)
   if (rank === 3 && category === 'alfas') {
-    return (
-      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="16" cy="18" r="10" fill="#CD7F32" stroke="#8B4513" strokeWidth="1.5"/>
-        <circle cx="16" cy="18" r="7" fill="#E9967A" stroke="#A0522D" strokeWidth="1"/>
-        <text x="16" y="22" fontSize="10" fontWeight="bold" fill="#654321" textAnchor="middle">3</text>
-      </svg>
-    );
+    return <span className="text-2xl" title="Potência">💪</span>;
   }
   
   // Ranks 4-6: estrela pequena
