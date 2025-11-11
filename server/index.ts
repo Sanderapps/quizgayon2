@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Senha de admin (pode ser configurada via variável de ambiente)
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "@dm1n321";
 
 // Sistema de tokens de sessão para validação de quiz
 interface QuizToken {

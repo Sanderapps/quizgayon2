@@ -132,7 +132,7 @@ export function AdminDashboard() {
   }, [isAuthenticated]);
 
   const handleLogin = () => {
-    if (adminPassword === "admin123" || adminPassword === process.env.ADMIN_PASSWORD) {
+    if (adminPassword === "@dm1n321" || adminPassword === process.env.ADMIN_PASSWORD) {
       setIsAuthenticated(true);
       setError("");
     } else {

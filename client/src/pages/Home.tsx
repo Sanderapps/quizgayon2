@@ -7,6 +7,7 @@ import { Leaderboard } from "@/components/Leaderboard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ChatWidget } from "@/components/ChatWidget";
 import { SuggestionButton } from "@/components/SuggestionButton";
+import { RadioPlayer } from "@/components/RadioPlayer";
 import { TopMenu } from "@/components/TopMenu";
 import { WelcomeAnimation } from "@/components/WelcomeAnimation";
 import { LoadingSkeleton, CardSkeleton } from "@/components/LoadingSkeleton";
@@ -1086,6 +1087,7 @@ export default function Home() {
       </div>
       <ChatWidget />
       <SuggestionButton />
+      <RadioPlayer />
       <LeaderboardEasterEgg onReachEnd={handleLeaderboardEnd} />
       </>
     );
@@ -1119,6 +1121,7 @@ export default function Home() {
       </div>
       <ChatWidget />
       <SuggestionButton />
+      <RadioPlayer />
       <HomeEasterEggs
         playerName={playerName}
         totalPoints={totalPoints}
@@ -1169,6 +1172,7 @@ export default function Home() {
       </div>
       <ChatWidget />
       <SuggestionButton />
+      <RadioPlayer />
       <LeaderboardEasterEgg onReachEnd={handleLeaderboardEnd} />
       <HomeEasterEggs
         playerName={playerName}
@@ -1264,6 +1268,7 @@ export default function Home() {
       </div>
       <ChatWidget />
       <SuggestionButton />
+      <RadioPlayer />
       <LeaderboardEasterEgg onReachEnd={handleLeaderboardEnd} />
       <HomeEasterEggs
         playerName={playerName}
@@ -1286,6 +1291,7 @@ export default function Home() {
       </div>
       <ChatWidget />
       <SuggestionButton />
+      <RadioPlayer />
     </>
     );
   }
@@ -1347,6 +1353,7 @@ export default function Home() {
       </div>
       <ChatWidget />
       <SuggestionButton />
+      <RadioPlayer />
     </>
   );
 }
