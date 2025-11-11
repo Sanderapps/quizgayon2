@@ -730,6 +730,31 @@ async function startServer() {
     }
   });
 
+  // DELETE /api/admin/chat/user/:apelido - Deletar todas mensagens de um usuário
+  app.delete("/api/admin/chat/user/:apelido", async (req, res) => {
+    try {
+      const adminPassword = req.headers["x-admin-password"];
+      if (adminPassword !== ADMIN_PASSWORD) {
+        return res.status(401).json({ error: "Senha de administrador incorreta" });
+      }
+
+      const { apelido } = req.params;
+      const result = await pool.query(
+        'DELETE FROM chat_messages WHERE apelido = $1 RETURNING *',
+        [apelido]
+      );
+
+      res.json({ 
+        success: true, 
+        deleted_count: result.rowCount,
+        message: `${result.rowCount} mensagens de ${apelido} deletadas` 
+      });
+    } catch (error) {
+      console.error("Erro ao deletar mensagens do usuário:", error);
+      res.status(500).json({ error: "Erro ao deletar mensagens do usuário" });
+    }
+  });
+
   // POST /api/admin/chat/ban-user - Banir apelido
   app.post("/api/admin/chat/ban-user", async (req, res) => {
     try {

@@ -189,6 +189,29 @@ export function AdminDashboard() {
     }
   };
 
+  const handleDeleteUserMessages = async (apelido: string, messageCount: number) => {
+    if (!confirm(`Deletar TODAS as ${messageCount} mensagens de ${apelido}?`)) return;
+    if (!confirm("Tem certeza? Esta ação não pode ser desfeita!")) return;
+
+    try {
+      const response = await fetch(`/api/admin/chat/user/${encodeURIComponent(apelido)}`, {
+        method: "DELETE",
+        headers: { "X-Admin-Password": adminPassword }
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        alert(data.message);
+        loadRecentMessages();
+        loadStats();
+      } else {
+        alert("Erro ao deletar mensagens");
+      }
+    } catch (error) {
+      alert("Erro ao deletar mensagens do usuário");
+    }
+  };
+
   const handleEditScore = async () => {
     if (!editingScore) return;
 
@@ -381,13 +404,20 @@ export function AdminDashboard() {
               </h2>
               <div className="space-y-2">
                 {stats.topChatters.map((chatter: any, index: number) => (
-                  <div key={index} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <span className="font-bold text-gray-800 dark:text-white">
+                  <div key={index} className="flex justify-between items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <span className="font-bold text-gray-800 dark:text-white flex-shrink-0">
                       {index + 1}. {chatter.apelido}
                     </span>
-                    <span className="text-purple-500 font-bold">
+                    <span className="text-purple-500 font-bold flex-1">
                       {chatter.message_count} mensagens
                     </span>
+                    <button
+                      onClick={() => handleDeleteUserMessages(chatter.apelido, chatter.message_count)}
+                      className="text-red-500 hover:text-red-700 hover:scale-110 transition-transform p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+                      title={`Deletar todas mensagens de ${chatter.apelido}`}
+                    >
+                      🗑️
+                    </button>
                   </div>
                 ))}
               </div>
