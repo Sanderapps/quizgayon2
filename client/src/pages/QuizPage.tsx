@@ -32,7 +32,26 @@ export default function QuizPage() {
   const quizId = params.quizId;
   
   // Carregar quiz baseado no ID
-  const currentQuiz = getQuizById(quizId) || getDefaultQuiz();
+  const currentQuiz = getQuizById(quizId);
+  
+  // Validar se o quiz existe e tem perguntas
+  if (!currentQuiz || !currentQuiz.questions || currentQuiz.questions.length === 0) {
+    return (
+      <>
+        <TopMenu />
+        <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-red-500 to-blue-500">
+          <Card className="p-8 text-center max-w-md">
+            <div className="text-6xl mb-4">❌</div>
+            <h1 className="text-3xl font-bold mb-4">Quiz não encontrado</h1>
+            <p className="text-gray-600 mb-6">O quiz "{quizId}" não existe ou está sem perguntas.</p>
+            <Button onClick={() => setLocation("/")} className="w-full">
+              Voltar ao Início
+            </Button>
+          </Card>
+        </div>
+      </>
+    );
+  }
   
   // Estados
   const [currentQuestion, setCurrentQuestion] = useState(0);
