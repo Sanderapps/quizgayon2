@@ -5,10 +5,11 @@ import { allQuizzes } from "@/data/quizzes";
 import { TopMenu } from "@/components/TopMenu";
 import { ChatWidget } from "@/components/ChatWidget";
 import { RadioPlayer } from "@/components/RadioPlayer";
+import { motion } from "framer-motion";
 
 /**
  * Página inicial com seletor de quizzes
- * Exibe cards para os 3 quizzes disponíveis
+ * Design mobile-first, moderno e compacto
  */
 export default function QuizSelector() {
   return (
@@ -22,93 +23,118 @@ export default function QuizSelector() {
       <ChatWidget />
       <RadioPlayer />
       
-      <div className="container mx-auto px-4 py-16">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-6xl font-bold text-white mb-4 drop-shadow-lg">
-            🎮 Escolha seu Quiz! 🎮
+      <div className="container mx-auto px-4 py-8 md:py-16 max-w-4xl">
+        {/* Header - Mais compacto */}
+        <motion.div 
+          className="text-center mb-8 md:mb-12"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-3 drop-shadow-lg">
+            Escolha seu Quiz
           </h1>
-          <p className="text-xl text-white/90 max-w-2xl mx-auto">
-            Selecione um dos nossos quizzes divertidos e descubra mais sobre você!
+          <p className="text-base md:text-lg text-white/80 max-w-xl mx-auto">
+            Descubra mais sobre você com nossos quizzes divertidos
           </p>
-        </div>
+        </motion.div>
 
-        {/* Quiz Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {allQuizzes.map((quiz) => (
-            <Card 
+        {/* Quiz Cards - Design compacto e moderno */}
+        <div className="space-y-4 md:space-y-6">
+          {allQuizzes.map((quiz, index) => (
+            <motion.div
               key={quiz.id}
-              className="relative overflow-hidden bg-white/10 backdrop-blur-md border-white/20 hover:scale-105 transition-transform duration-300"
-              style={{
-                background: `linear-gradient(135deg, ${quiz.theme.primaryColor}20, ${quiz.theme.secondaryColor}20)`
-              }}
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <div className="p-8 text-center space-y-6">
-                {/* Emoji */}
-                <div 
-                  className="text-8xl mb-4 animate-bounce"
-                  style={{
-                    filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.5))'
-                  }}
-                >
-                  {quiz.emoji}
-                </div>
-
-                {/* Título */}
-                <h2 
-                  className="text-3xl font-bold mb-2"
-                  style={{
-                    background: quiz.theme.gradient,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text'
-                  }}
-                >
-                  {quiz.title}
-                </h2>
-
-                {/* Descrição */}
-                <p className="text-white/80 text-lg mb-6">
-                  {quiz.description}
-                </p>
-
-                {/* Info */}
-                <div className="flex justify-center gap-4 text-sm text-white/70 mb-6">
-                  <span>📝 50 perguntas</span>
-                  <span>⏱️ ~5 min</span>
-                </div>
-
-                {/* Botão */}
+              <Card 
+                className="relative overflow-hidden bg-white/95 backdrop-blur-md border-0 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+              >
                 <Link href={`/quiz/${quiz.slug}`}>
-                  <Button
-                    size="lg"
-                    className="w-full text-xl py-6 font-bold"
-                    style={{
-                      background: quiz.theme.gradient,
-                      border: 'none'
-                    }}
-                  >
-                    Começar Quiz! 🎉
-                  </Button>
-                </Link>
+                  <div className="flex items-center gap-4 p-4 md:p-6 cursor-pointer">
+                    {/* Ícone/Emoji - Menor e mais discreto */}
+                    <div 
+                      className="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center text-3xl md:text-4xl shadow-lg"
+                      style={{
+                        background: quiz.theme.gradient,
+                      }}
+                    >
+                      {quiz.emoji}
+                    </div>
 
-                {/* Categorias */}
-                <div className="flex justify-between text-sm text-white/60 pt-4 border-t border-white/10">
-                  <span>{quiz.categories.low.emoji} {quiz.categories.low.name}</span>
-                  <span>VS</span>
-                  <span>{quiz.categories.high.emoji} {quiz.categories.high.name}</span>
-                </div>
-              </div>
-            </Card>
+                    {/* Conteúdo */}
+                    <div className="flex-1 min-w-0">
+                      {/* Título */}
+                      <h2 
+                        className="text-xl md:text-2xl font-bold mb-1 truncate"
+                        style={{
+                          background: quiz.theme.gradient,
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          backgroundClip: 'text'
+                        }}
+                      >
+                        {quiz.title}
+                      </h2>
+
+                      {/* Descrição - Mais curta */}
+                      <p className="text-gray-600 text-sm md:text-base line-clamp-2 mb-2">
+                        {quiz.description}
+                      </p>
+
+                      {/* Tags compactas */}
+                      <div className="flex flex-wrap gap-2">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-medium">
+                          50 perguntas
+                        </span>
+                        <span className="inline-flex items-center px-2 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-medium">
+                          ~5 min
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Seta - Indicador visual */}
+                    <div className="flex-shrink-0">
+                      <div 
+                        className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-white shadow-md"
+                        style={{
+                          background: quiz.theme.gradient,
+                        }}
+                      >
+                        <svg 
+                          className="w-5 h-5 md:w-6 md:h-6" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth={2} 
+                            d="M9 5l7 7-7 7" 
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </Card>
+            </motion.div>
           ))}
         </div>
 
-        {/* Footer */}
-        <div className="text-center mt-16">
-          <p className="text-white/70 text-sm">
-            🎮 Todos os quizzes são 100% anônimos e divertidos! 🎮
+        {/* Footer - Mais discreto */}
+        <motion.div 
+          className="text-center mt-8 md:mt-12"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <p className="text-white/60 text-xs md:text-sm">
+            Todos os quizzes são 100% anônimos e divertidos
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
