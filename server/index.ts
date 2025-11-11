@@ -6,26 +6,13 @@ import { Server } from "socket.io";
 import { pool, initializeDatabase } from "./db.js";
 import { cleanupOldEvents, cleanupExpiredBans } from "./middleware/antiSpam.js";
 import routes from "./routes/index.js";
+import { setupChatSocket } from "./sockets/chat.socket.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Senha de admin (pode ser configurada via variável de ambiente)
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "@dm1n321";
-
-// Lista de palavrões para filtro (básico)
-const BADWORDS = [
-  "porra", "caralho", "puta", "merda", "fdp", "cu", "buceta", "pinto", "pau"
-];
-
-function filterBadWords(text: string): string {
-  let filtered = text;
-  BADWORDS.forEach(word => {
-    const regex = new RegExp(word, "gi");
-    filtered = filtered.replace(regex, "*".repeat(word.length));
-  });
-  return filtered;
-}
 
 async function startServer() {
   const app = express();
@@ -60,132 +47,8 @@ async function startServer() {
     },
   });
 
-  // Map para rastrear última mensagem de cada usuário (cooldown)
-  const userLastMessage = new Map<string, number>();
-  const MESSAGE_COOLDOWN_MS = 2000; // 2 segundos
-
-  io.on("connection", (socket) => {
-    console.log("🟢 Novo usuário conectado:", socket.id);
-
-    // Enviar mensagens recentes ao conectar
-    pool.query(
-      `SELECT * FROM chat_messages 
-       ORDER BY data_envio DESC 
-       LIMIT 50`
-    ).then(result => {
-      socket.emit("chat_history", result.rows.reverse());
-    });
-
-    // Receber nova mensagem
-    socket.on("chat_message", async (data: { apelido: string; mensagem: string; cor: string; emoji_avatar: string; tipo: string; gif_url?: string }) => {
-      try {
-        // Cooldown de mensagens
-        const lastMessageTime = userLastMessage.get(socket.id) || 0;
-        const now = Date.now();
-        
-        if (now - lastMessageTime < MESSAGE_COOLDOWN_MS) {
-          socket.emit("error", "Aguarde um pouco antes de enviar outra mensagem");
-          return;
-        }
-
-        userLastMessage.set(socket.id, now);
-
-        // Filtrar palavrões
-        const filteredMessage = filterBadWords(data.mensagem);
-
-        // Salvar mensagem no banco
-        const result = await pool.query(
-          `INSERT INTO chat_messages (apelido, mensagem, cor, emoji_avatar, tipo, gif_url) 
-           VALUES ($1, $2, $3, $4, $5, $6) 
-           RETURNING *`,
-          [data.apelido, filteredMessage, data.cor, data.emoji_avatar, data.tipo, data.gif_url || null]
-        );
-
-        const newMessage = result.rows[0];
-
-        // Broadcast para todos os clientes
-        io.emit("new_message", newMessage);
-
-        console.log(`💬 ${data.apelido}: ${filteredMessage.substring(0, 50)}...`);
-      } catch (error) {
-        console.error("❌ Erro ao processar mensagem:", error);
-        socket.emit("error", "Erro ao enviar mensagem");
-      }
-    });
-
-    // Deletar mensagem (admin)
-    socket.on("delete_message", async (data: { messageId: number; adminPassword: string }) => {
-      try {
-        const { messageId, adminPassword } = data;
-
-        // Verificar senha de admin
-        if (adminPassword !== ADMIN_PASSWORD) {
-          socket.emit("error", "Senha de administrador incorreta");
-          return;
-        }
-
-        // Deletar mensagem
-        await pool.query(
-          `DELETE FROM chat_messages WHERE id = $1`,
-          [messageId]
-        );
-
-        // Notificar todos os clientes
-        io.emit("message_deleted", messageId);
-
-        console.log(`🗑️ Mensagem ${messageId} deletada por admin`);
-      } catch (error) {
-        console.error("❌ Erro ao deletar mensagem:", error);
-        socket.emit("error", "Erro ao deletar mensagem");
-      }
-    });
-
-    // Reportar mensagem
-    socket.on("report_message", async (data: { messageId: number; reason: string }) => {
-      try {
-        const { messageId, reason } = data;
-
-        // Salvar report no banco com socket_id do reporter
-        await pool.query(
-          `INSERT INTO chat_reports (message_id, reason, reporter_socket_id) 
-           VALUES ($1, $2, $3)`,
-          [messageId, reason, socket.id]
-        );
-
-        console.log(`🚨 Mensagem ${messageId} reportada: ${reason}`);
-
-        // AUTO-MODERAÇÃO: Verificar quantos reports únicos a mensagem tem
-        const reportCount = await pool.query(
-          `SELECT COUNT(DISTINCT reporter_socket_id) as count 
-           FROM chat_reports 
-           WHERE message_id = $1`,
-          [messageId]
-        );
-
-        const uniqueReports = parseInt(reportCount.rows[0].count);
-
-        // Se 3 ou mais pessoas diferentes reportaram, deletar automaticamente
-        if (uniqueReports >= 3) {
-          await pool.query(
-            `DELETE FROM chat_messages WHERE id = $1`,
-            [messageId]
-          );
-
-          // Notificar todos os clientes
-          io.emit("message_deleted", messageId);
-
-          console.log(`🛡️ AUTO-MODERAÇÃO: Mensagem ${messageId} deletada automaticamente (${uniqueReports} reports)`);
-        }
-      } catch (error) {
-        console.error("❌ Erro ao reportar mensagem:", error);
-      }
-    });
-
-    socket.on("disconnect", () => {
-      console.log("🔴 Usuário desconectado:", socket.id);
-      userLastMessage.delete(socket.id);
-    });
-  });
+  // Configurar socket do chat
+  setupChatSocket(io);
 
   // ==================== ROTAS DE API ====================
   
@@ -222,29 +85,6 @@ async function startServer() {
       console.error("Erro ao resetar placar:", error);
       res.status(500).json({
         error: "Erro ao resetar placar",
-        details: error instanceof Error ? error.message : String(error)
-      });
-    }
-  });
-
-  // GET /api/debug/scores - Ver dados brutos do banco (DEBUG)
-  app.get("/api/debug/scores", async (req, res) => {
-    try {
-      const result = await pool.query(`
-        SELECT id, apelido, pontuacao, tempo_segundos, data_registro 
-        FROM scores 
-        ORDER BY pontuacao DESC, tempo_segundos ASC 
-        LIMIT 10
-      `);
-      
-      res.json({
-        total: result.rows.length,
-        scores: result.rows
-      });
-    } catch (error) {
-      console.error("Erro ao buscar scores:", error);
-      res.status(500).json({
-        error: "Erro ao buscar scores",
         details: error instanceof Error ? error.message : String(error)
       });
     }
