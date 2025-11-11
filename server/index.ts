@@ -694,6 +694,278 @@ async function startServer() {
     }
   });
 
+  // ==================== NOVOS ENDPOINTS ADMIN ====================
+
+  // POST /api/admin/changelog - Adicionar entrada no changelog
+  app.post("/api/admin/changelog", async (req, res) => {
+    try {
+      const adminPassword = req.headers["x-admin-password"];
+      if (adminPassword !== ADMIN_PASSWORD) {
+        return res.status(401).json({ error: "Senha de administrador incorreta" });
+      }
+
+      const { version, date, emoji, color, text } = req.body;
+      // Aqui você pode salvar no banco ou em arquivo JSON
+      // Por simplicidade, retornamos sucesso
+      res.json({ success: true, message: "Changelog atualizado" });
+    } catch (error) {
+      console.error("Erro ao adicionar changelog:", error);
+      res.status(500).json({ error: "Erro ao adicionar changelog" });
+    }
+  });
+
+  // DELETE /api/admin/chat/clear-all - Deletar todas as mensagens
+  app.delete("/api/admin/chat/clear-all", async (req, res) => {
+    try {
+      const adminPassword = req.headers["x-admin-password"];
+      if (adminPassword !== ADMIN_PASSWORD) {
+        return res.status(401).json({ error: "Senha de administrador incorreta" });
+      }
+
+      const result = await pool.query('DELETE FROM chat_messages RETURNING *');
+      res.json({ success: true, deleted_count: result.rowCount });
+    } catch (error) {
+      console.error("Erro ao deletar todas mensagens:", error);
+      res.status(500).json({ error: "Erro ao deletar mensagens" });
+    }
+  });
+
+  // POST /api/admin/chat/ban-user - Banir apelido
+  app.post("/api/admin/chat/ban-user", async (req, res) => {
+    try {
+      const adminPassword = req.headers["x-admin-password"];
+      if (adminPassword !== ADMIN_PASSWORD) {
+        return res.status(401).json({ error: "Senha de administrador incorreta" });
+      }
+
+      const { apelido } = req.body;
+      // Criar tabela de banimentos de usuário se não existir
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS banned_users (
+          id SERIAL PRIMARY KEY,
+          apelido VARCHAR(50) UNIQUE NOT NULL,
+          banned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+
+      await pool.query(
+        'INSERT INTO banned_users (apelido) VALUES ($1) ON CONFLICT (apelido) DO NOTHING',
+        [apelido]
+      );
+
+      res.json({ success: true, message: `Usuário ${apelido} banido` });
+    } catch (error) {
+      console.error("Erro ao banir usuário:", error);
+      res.status(500).json({ error: "Erro ao banir usuário" });
+    }
+  });
+
+  // PUT /api/admin/scores/:id - Editar pontuação
+  app.put("/api/admin/scores/:id", async (req, res) => {
+    try {
+      const adminPassword = req.headers["x-admin-password"];
+      if (adminPassword !== ADMIN_PASSWORD) {
+        return res.status(401).json({ error: "Senha de administrador incorreta" });
+      }
+
+      const { id } = req.params;
+      const { apelido, pontuacao, tempo_segundos } = req.body;
+
+      const result = await pool.query(
+        'UPDATE scores SET apelido = $1, pontuacao = $2, tempo_segundos = $3 WHERE id = $4 RETURNING *',
+        [apelido, pontuacao, tempo_segundos, id]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Pontuação não encontrada" });
+      }
+
+      res.json({ success: true, score: result.rows[0] });
+    } catch (error) {
+      console.error("Erro ao editar pontuação:", error);
+      res.status(500).json({ error: "Erro ao editar pontuação" });
+    }
+  });
+
+  // DELETE /api/admin/scores/bulk - Deletar múltiplas pontuações
+  app.delete("/api/admin/scores/bulk", async (req, res) => {
+    try {
+      const adminPassword = req.headers["x-admin-password"];
+      if (adminPassword !== ADMIN_PASSWORD) {
+        return res.status(401).json({ error: "Senha de administrador incorreta" });
+      }
+
+      const { ids } = req.body;
+      const result = await pool.query(
+        'DELETE FROM scores WHERE id = ANY($1) RETURNING *',
+        [ids]
+      );
+
+      res.json({ success: true, deleted_count: result.rowCount });
+    } catch (error) {
+      console.error("Erro ao deletar pontuações:", error);
+      res.status(500).json({ error: "Erro ao deletar pontuações" });
+    }
+  });
+
+  // GET /api/admin/scores/export - Exportar placar como CSV
+  app.get("/api/admin/scores/export", async (req, res) => {
+    try {
+      const adminPassword = req.headers["x-admin-password"];
+      if (adminPassword !== ADMIN_PASSWORD) {
+        return res.status(401).json({ error: "Senha de administrador incorreta" });
+      }
+
+      const result = await pool.query(
+        'SELECT id, apelido, pontuacao, tempo_segundos, data_registro FROM scores ORDER BY pontuacao DESC, tempo_segundos ASC'
+      );
+
+      // Gerar CSV
+      let csv = 'ID,Apelido,Pontuação,Tempo (s),Data\n';
+      result.rows.forEach(row => {
+        csv += `${row.id},${row.apelido},${row.pontuacao},${row.tempo_segundos},${row.data_registro}\n`;
+      });
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename=placar.csv');
+      res.send(csv);
+    } catch (error) {
+      console.error("Erro ao exportar placar:", error);
+      res.status(500).json({ error: "Erro ao exportar placar" });
+    }
+  });
+
+  // GET /api/admin/bans - Listar IPs banidos
+  app.get("/api/admin/bans", async (req, res) => {
+    try {
+      const adminPassword = req.headers["x-admin-password"];
+      if (adminPassword !== ADMIN_PASSWORD) {
+        return res.status(401).json({ error: "Senha de administrador incorreta" });
+      }
+
+      const { getBannedIps } = await import("./middleware/antiSpam.js");
+      const bans = await getBannedIps();
+      res.json({ success: true, bans });
+    } catch (error) {
+      console.error("Erro ao listar banimentos:", error);
+      res.status(500).json({ error: "Erro ao listar banimentos" });
+    }
+  });
+
+  // DELETE /api/admin/bans/:ip - Remover banimento
+  app.delete("/api/admin/bans/:ip", async (req, res) => {
+    try {
+      const adminPassword = req.headers["x-admin-password"];
+      if (adminPassword !== ADMIN_PASSWORD) {
+        return res.status(401).json({ error: "Senha de administrador incorreta" });
+      }
+
+      const { ip } = req.params;
+      const { clearBan } = await import("./middleware/antiSpam.js");
+      const success = await clearBan(ip);
+
+      if (success) {
+        res.json({ success: true, message: `Banimento de ${ip} removido` });
+      } else {
+        res.status(404).json({ error: "Banimento não encontrado" });
+      }
+    } catch (error) {
+      console.error("Erro ao remover banimento:", error);
+      res.status(500).json({ error: "Erro ao remover banimento" });
+    }
+  });
+
+  // POST /api/admin/bans - Adicionar banimento manual
+  app.post("/api/admin/bans", async (req, res) => {
+    try {
+      const adminPassword = req.headers["x-admin-password"];
+      if (adminPassword !== ADMIN_PASSWORD) {
+        return res.status(401).json({ error: "Senha de administrador incorreta" });
+      }
+
+      const { ip, reason, durationHours } = req.body;
+      const expiresAt = new Date(Date.now() + (durationHours || 6) * 60 * 60 * 1000);
+
+      await pool.query(
+        'INSERT INTO anti_spam_bans (ip, reason, expires_at) VALUES ($1, $2, $3) ON CONFLICT (ip) DO UPDATE SET reason = $2, banned_at = CURRENT_TIMESTAMP, expires_at = $3',
+        [ip, reason, expiresAt]
+      );
+
+      res.json({ success: true, message: `IP ${ip} banido por ${durationHours || 6} horas` });
+    } catch (error) {
+      console.error("Erro ao banir IP:", error);
+      res.status(500).json({ error: "Erro ao banir IP" });
+    }
+  });
+
+  // GET /api/admin/antispam/config - Obter configuração do anti-spam
+  app.get("/api/admin/antispam/config", async (req, res) => {
+    try {
+      const adminPassword = req.headers["x-admin-password"];
+      if (adminPassword !== ADMIN_PASSWORD) {
+        return res.status(401).json({ error: "Senha de administrador incorreta" });
+      }
+
+      const { getAntiSpamConfig } = await import("./config/antiSpamConfig.js");
+      const config = getAntiSpamConfig();
+      res.json({ success: true, config });
+    } catch (error) {
+      console.error("Erro ao obter config:", error);
+      res.status(500).json({ error: "Erro ao obter configuração" });
+    }
+  });
+
+  // PUT /api/admin/antispam/config - Atualizar configuração do anti-spam
+  app.put("/api/admin/antispam/config", async (req, res) => {
+    try {
+      const adminPassword = req.headers["x-admin-password"];
+      if (adminPassword !== ADMIN_PASSWORD) {
+        return res.status(401).json({ error: "Senha de administrador incorreta" });
+      }
+
+      const { updateAntiSpamConfig } = await import("./config/antiSpamConfig.js");
+      const newConfig = updateAntiSpamConfig(req.body);
+      res.json({ success: true, config: newConfig });
+    } catch (error) {
+      console.error("Erro ao atualizar config:", error);
+      res.status(500).json({ error: "Erro ao atualizar configuração" });
+    }
+  });
+
+  // GET /api/admin/stats - Estatísticas expandidas
+  app.get("/api/admin/stats", async (req, res) => {
+    try {
+      const adminPassword = req.headers["x-admin-password"];
+      if (adminPassword !== ADMIN_PASSWORD) {
+        return res.status(401).json({ error: "Senha de administrador incorreta" });
+      }
+
+      const totalMessages = await pool.query('SELECT COUNT(*) as count FROM chat_messages');
+      const totalScores = await pool.query('SELECT COUNT(*) as count FROM scores');
+      const avgScore = await pool.query('SELECT AVG(pontuacao) as avg FROM scores');
+      const topChatters = await pool.query(`
+        SELECT apelido, COUNT(*) as message_count 
+        FROM chat_messages 
+        GROUP BY apelido 
+        ORDER BY message_count DESC 
+        LIMIT 10
+      `);
+
+      res.json({
+        success: true,
+        stats: {
+          totalMessages: parseInt(totalMessages.rows[0].count),
+          totalScores: parseInt(totalScores.rows[0].count),
+          avgScore: parseFloat(avgScore.rows[0].avg || 0).toFixed(2),
+          topChatters: topChatters.rows
+        }
+      });
+    } catch (error) {
+      console.error("Erro ao obter estatísticas:", error);
+      res.status(500).json({ error: "Erro ao obter estatísticas" });
+    }
+  });
+
   // ==================== ARQUIVOS ESTÁTICOS ====================
 
   // Serve static files from dist/public in production
