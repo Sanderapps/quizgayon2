@@ -486,14 +486,13 @@ export default function Home() {
         <div className="w-full max-w-2xl">
           <Card className="w-full p-8 text-center bg-white dark:bg-gray-800 shadow-2xl mb-8">
             <div className="text-6xl mb-6">
-              <AnimatedEmoji emoji="🌈" />
+              <AnimatedEmoji emoji={currentQuiz.emoji} />
             </div>
             <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
-              Descubra se você é Gay!
+              {currentQuiz.title}
             </h1>
             <p className="text-gray-600 dark:text-gray-300 mb-6 text-lg">
-              Um teste 100% científico (não é) para descobrir seu nível de gayness! 
-              Responda com honestidade e divirta-se! 😄
+              {currentQuiz.description}
             </p>
 	            <Button
 	              onClick={startQuiz}
