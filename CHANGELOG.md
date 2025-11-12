@@ -2,6 +2,20 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
+## [2025-11-12] - Correção de Pedidos de Música e Logs de Debug
+
+### Corrigido
+- **Pedidos de Música**: Tabela `music_requests` agora é criada automaticamente no banco de dados
+- **Sistema de Rankings**: Adicionados logs detalhados para diagnosticar problemas de salvamento
+
+### Adicionado
+- Logs no controller de scores mostrando quiz_id, apelido e quantidade de resultados
+- Logs no salvamento de pontuação para rastrear problemas
+
+### Detalhes Técnicos
+- Arquivos modificados: `db.ts`, `scores.controller.ts`
+- Commit: `d85250f`
+
 ## [2025-11-12] - Correções de UX/UI e Autoplay
 
 ### Corrigido
