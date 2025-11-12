@@ -152,6 +152,14 @@ class RadioStreamSimpleService {
     return this.playlist;
   }
 
+  public playSpecificSong(index: number): void {
+    if (index >= 0 && index < this.playlist.length) {
+      this.currentSongIndex = index;
+      this.startTime = Date.now();
+      console.log(`[RÁDIO ADMIN] ▶️ Tocando: ${this.playlist[index].title}`);
+    }
+  }
+
   public async streamCurrentSong(res: Response): Promise<void> {
     if (this.playlist.length === 0) {
       res.status(503).json({ error: 'Playlist vazia' });

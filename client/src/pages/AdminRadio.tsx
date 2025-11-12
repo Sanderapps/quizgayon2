@@ -2,8 +2,14 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { SkipForward, RotateCcw, Music, Key, Radio } from "lucide-react";
+import { SkipForward, RotateCcw, Music, Key, Radio, Play } from "lucide-react";
 import { TopMenu } from "@/components/TopMenu";
+
+interface Song {
+  file: string;
+  title: string;
+  artist: string;
+}
 
 interface CurrentSong {
   title: string;
@@ -17,6 +23,7 @@ export default function AdminRadio() {
   const [adminKey, setAdminKey] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentSong, setCurrentSong] = useState<CurrentSong | null>(null);
+  const [playlist, setPlaylist] = useState<Song[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -27,6 +34,7 @@ export default function AdminRadio() {
       setAdminKey(savedKey);
       setIsAuthenticated(true);
       loadStats();
+      loadPlaylist();
     }
   }, []);
 
@@ -47,11 +55,26 @@ export default function AdminRadio() {
     }
   };
 
+  const loadPlaylist = async () => {
+    try {
+      const response = await fetch("/api/radio/admin/playlist", {
+        headers: {
+          Authorization: `Bearer ${adminKey}`,
+        },
+      });
+      const data = await response.json();
+      setPlaylist(data.playlist || []);
+    } catch (error) {
+      console.error("Erro ao carregar playlist:", error);
+    }
+  };
+
   const handleAuth = () => {
     if (adminKey.trim()) {
       localStorage.setItem("radio_admin_key", adminKey);
       setIsAuthenticated(true);
       loadStats();
+      loadPlaylist();
       setMessage("✅ Autenticado com sucesso!");
       setTimeout(() => setMessage(""), 3000);
     }
@@ -80,6 +103,36 @@ export default function AdminRadio() {
       }
     } catch (error) {
       setMessage("❌ Erro ao executar ação");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => setMessage(""), 3000);
+    }
+  };
+
+  const handlePlaySong = async (index: number) => {
+    setIsLoading(true);
+    setMessage("");
+
+    try {
+      const response = await fetch(`/api/radio/admin/play/${index}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${adminKey}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage(`✅ Tocando: ${playlist[index].title}`);
+        loadStats();
+      } else {
+        setMessage(`❌ Erro: ${data.error}`);
+      }
+    } catch (error) {
+      setMessage("❌ Erro ao tocar música");
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -180,19 +233,19 @@ export default function AdminRadio() {
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Título:</span>
                   <span className="font-bold text-gray-800">
-                    {currentSong.currentSong?.title || "Carregando..."}
+                    {currentSong?.currentSong?.title || "Carregando..."}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Artista:</span>
                   <span className="font-medium text-gray-700">
-                    {currentSong.currentSong?.artist || "—"}
+                    {currentSong?.currentSong?.artist || "—"}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Total de Músicas:</span>
                   <span className="font-medium text-gray-700">
-                    {currentSong.totalSongs || 0}
+                    {currentSong?.totalSongs || 0}
                   </span>
                 </div>
               </div>
@@ -231,6 +284,40 @@ export default function AdminRadio() {
                 {message}
               </div>
             )}
+          </Card>
+
+          {/* Lista de Músicas */}
+          <Card className="p-6">
+            <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <Music className="w-5 h-5" />
+              Playlist ({playlist.length} músicas)
+            </h2>
+            <div className="space-y-2 max-h-96 overflow-y-auto">
+              {playlist.map((song, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-800 truncate">
+                      {song.title}
+                    </p>
+                    <p className="text-sm text-gray-600 truncate">
+                      {song.artist}
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => handlePlaySong(index)}
+                    disabled={isLoading}
+                    className="ml-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:shadow-md flex-shrink-0"
+                  >
+                    <Play className="w-4 h-4 mr-1" />
+                    Tocar
+                  </Button>
+                </div>
+              ))}
+            </div>
           </Card>
 
           {/* Info */}

@@ -82,6 +82,16 @@ router.get('/admin/playlist', adminAuth, (req: Request, res: Response) => {
   res.json({ playlist });
 });
 
+router.post('/admin/play/:index', adminAuth, (req: Request, res: Response) => {
+  const index = parseInt(req.params.index);
+  if (isNaN(index)) {
+    return res.status(400).json({ error: 'Index inválido' });
+  }
+  radioStreamSimpleService.playSpecificSong(index);
+  const info = radioStreamSimpleService.getCurrentSongInfo();
+  res.json({ success: true, currentSong: info });
+});
+
 // Endpoint de diagnóstico de sistema de arquivos
 router.get('/debug/files', async (req: Request, res: Response) => {
   try {
