@@ -37,10 +37,18 @@ export function RadioProvider({ children }: { children: ReactNode }) {
   // Inicializar o áudio com o stream do servidor
   useEffect(() => {
     // Cria o elemento de áudio apontando para o stream
+    // Adiciona timestamp para evitar cache e sempre pegar o stream ao vivo
     const streamUrl = '/api/radio/stream';
     audioRef.current = new Audio(streamUrl);
     audioRef.current.volume = volume / 100;
     audioRef.current.preload = "none"; // Não pré-carregar, pois é um stream
+    
+    // Desabilita seeking para comportamento de rádio ao vivo
+    audioRef.current.addEventListener('seeking', (e) => {
+      if (audioRef.current) {
+        audioRef.current.currentTime = audioRef.current.duration || 0;
+      }
+    });
 
     // Eventos do áudio
     audioRef.current.addEventListener("playing", () => {
@@ -111,8 +119,15 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     if (!audioRef.current) return;
 
     if (isPlaying) {
+      // Para o stream
       audioRef.current.pause();
+      audioRef.current.src = ""; // Desconecta do stream
     } else {
+      // Reconecta ao stream ao vivo (sempre pega o momento atual)
+      const streamUrl = `/api/radio/stream?t=${Date.now()}`;
+      audioRef.current.src = streamUrl;
+      audioRef.current.load();
+      
       setIsLoading(true);
       audioRef.current.play().catch((error) => {
         console.error("Erro ao reproduzir:", error);

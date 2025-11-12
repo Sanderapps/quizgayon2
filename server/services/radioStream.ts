@@ -170,10 +170,17 @@ class RadioStreamService {
     }
 
     try {
+      // Configuração otimizada para streaming com menor latência
       this.ffmpegProcess = spawn('ffmpeg', [
-        '-re',
-        '-i', musicPath,
-        '-f', 'mp3',
+        '-re',                    // Lê na velocidade nativa
+        '-i', musicPath,          // Arquivo de entrada
+        '-f', 'mp3',              // Formato de saída
+        '-b:a', '128k',           // Bitrate de áudio (menor = mais rápido)
+        '-ar', '44100',           // Sample rate
+        '-ac', '2',               // Canais (stereo)
+        '-bufsize', '64k',        // Buffer menor para menor latência
+        '-flush_packets', '1',    // Flush packets imediatamente
+        '-fflags', '+nobuffer',   // Sem buffer adicional
         '-'
       ]);
 
