@@ -51,38 +51,6 @@ export function Sidebar({ onNavigate }: SidebarProps) {
 
   return (
     <>
-      <style>{`
-        @keyframes slideIn {
-          from {
-            transform: translateX(-100%);
-          }
-          to {
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes slideOut {
-          from {
-            transform: translateX(0);
-          }
-          to {
-            transform: translateX(-100%);
-          }
-        }
-
-        .sidebar-enter {
-          animation: slideIn 0.3s ease-out forwards;
-        }
-
-        .sidebar-exit {
-          animation: slideOut 0.3s ease-in forwards;
-        }
-
-        .sidebar-closed {
-          transform: translateX(-100%);
-        }
-      `}</style>
-
       {/* Header Fixo */}
       <header className="fixed top-0 left-0 right-0 z-40 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 shadow-lg">
         <div className="flex items-center justify-between px-4 py-3">
@@ -114,11 +82,12 @@ export function Sidebar({ onNavigate }: SidebarProps) {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Transform inline SEMPRE aplicado */}
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-2xl z-50 ${
-          isOpen ? "sidebar-enter" : "sidebar-closed"
-        }`}
+        className="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-2xl z-50 transition-transform duration-300 ease-in-out"
+        style={{
+          transform: isOpen ? 'translateX(0)' : 'translateX(-100%)'
+        }}
       >
         {/* Header do Sidebar */}
         <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-4 flex justify-between items-center">
