@@ -8,7 +8,7 @@ import { pool, initializeDatabase } from "./db.js";
 import { cleanupOldEvents, cleanupExpiredBans } from "./middleware/antiSpam.js";
 import routes from "./routes/index.js";
 import { setupChatSocket } from "./sockets/chat.socket.js";
-import { radioStreamService } from "./services/radioStream.js";
+// Radio stream service removido - usando versão simples
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -80,12 +80,8 @@ async function startServer() {
     console.log(`💬 Chat WebSocket ativo`);
     console.log(`🔒 Admin password: ${ADMIN_PASSWORD}`);
     
-    // Iniciar serviço de rádio streaming
-    // Aguarda um pouco para garantir que os arquivos estão acessíveis
-    setTimeout(() => {
-      console.log(`📻 Iniciando serviço de rádio...`);
-      radioStreamService.start();
-    }, 3000); // Aguarda 3s para garantir que tudo está pronto
+    // Serviço de rádio simples é inicializado automaticamente
+    console.log(`📻 Serviço de rádio ativo (versão simples)`);
   });
 }
 

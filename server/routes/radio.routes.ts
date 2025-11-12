@@ -1,23 +1,23 @@
 import { Router, Request, Response } from 'express';
-import { radioStreamService } from '../services/radioStream.js';
+import { radioStreamSimpleService } from '../services/radioStreamSimple.js';
 
 const router = Router();
 
 // Endpoint de streaming de áudio
-router.get('/stream', (req: Request, res: Response) => {
-  radioStreamService.addListener(res);
+router.get('/stream', async (req: Request, res: Response) => {
+  await radioStreamSimpleService.streamCurrentSong(res);
 });
 
 // Endpoint para obter informações da música atual
 router.get('/nowplaying', (req: Request, res: Response) => {
-  const info = radioStreamService.getCurrentSongInfo();
+  const info = radioStreamSimpleService.getCurrentSongInfo();
   res.json(info);
 });
 
 // Endpoint para obter estatísticas da rádio
 router.get('/stats', (req: Request, res: Response) => {
-  const info = radioStreamService.getCurrentSongInfo();
-  const listeners = radioStreamService.getListenerCount();
+  const info = radioStreamSimpleService.getCurrentSongInfo();
+  const listeners = 0; // Não rastreamos mais ouvintes individuais
   
   res.json({
     currentSong: {
