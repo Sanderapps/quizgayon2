@@ -61,60 +61,31 @@ export default function QuizSelector() {
               >
                 <Link href={`/quiz/${quiz.slug}`}>
                   <Card 
-                    className="relative overflow-hidden bg-white/95 backdrop-blur-md border-0 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer h-full"
+                    className="relative overflow-hidden bg-white/95 backdrop-blur-md border-0 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer aspect-square"
                   >
-                    <div className="flex flex-col items-center p-6 text-center space-y-4">
-                      {/* Ícone - Grande e centralizado */}
+                    <div className="flex flex-col items-center justify-center p-3 md:p-4 text-center h-full">
+                      {/* Ícone - Compacto */}
                       <div 
-                        className="w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center shadow-lg"
+                        className="w-16 h-16 md:w-20 md:h-20 rounded-xl md:rounded-2xl flex items-center justify-center shadow-md mb-2 md:mb-3"
                         style={{
                           background: quiz.theme.gradient,
                         }}
                       >
-                        <IconComponent className="w-10 h-10 md:w-12 md:h-12 text-white" />
+                        <IconComponent className="w-8 h-8 md:w-10 md:h-10 text-white" />
                       </div>
 
-                      {/* Conteúdo */}
-                      <div className="flex-1 space-y-2">
-                        {/* Título */}
-                        <h2 
-                          className="text-xl md:text-2xl font-bold"
-                          style={{
-                            background: quiz.theme.gradient,
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            backgroundClip: 'text'
-                          }}
-                        >
-                          {quiz.title.replace(/[^\w\s]/gi, '').trim()}
-                        </h2>
-
-                        {/* Descrição */}
-                        <p className="text-gray-600 text-sm line-clamp-3">
-                          {quiz.description}
-                        </p>
-
-                        {/* Tags compactas */}
-                        <div className="flex flex-wrap justify-center gap-2 pt-2">
-                          <span className="inline-flex items-center px-2 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-medium">
-                            15 perguntas
-                          </span>
-                          <span className="inline-flex items-center px-2 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-medium">
-                            ~1 min
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Botão de ação */}
-                      <div 
-                        className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-white font-bold shadow-md transition-all hover:scale-105"
+                      {/* Título - Menor e compacto */}
+                      <h2 
+                        className="text-sm md:text-base font-bold leading-tight"
                         style={{
                           background: quiz.theme.gradient,
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          backgroundClip: 'text'
                         }}
                       >
-                        <span>Começar</span>
-                        <ArrowRight className="w-5 h-5" />
-                      </div>
+                        {quiz.title.replace(/[^\w\s]/gi, '').trim()}
+                      </h2>
                     </div>
                   </Card>
                 </Link>

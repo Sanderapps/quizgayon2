@@ -8,7 +8,7 @@ import { gayQuestions } from "./gayQuestions";
 export const gayQuiz: Quiz = {
   id: "gay",
   slug: "gay",
-  title: "🌈 Quão Gay Você É?",
+  title: "🌈 Descubra se você é gay",
   description: "Descubra seu nível de gaynice com este quiz divertido! De Hétero Raiz a Viado Divino Transcendental.",
   emoji: "🌈",
   

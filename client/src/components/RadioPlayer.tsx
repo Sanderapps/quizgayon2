@@ -79,33 +79,36 @@ export function RadioPlayer() {
                 📻 QuiZoeira
               </p>
               <p className="text-white/70 text-[10px] md:text-xs truncate leading-tight">
-                {currentSong ? `${currentSong.title} - ${currentSong.artist}` : (isPlaying ? "Ao vivo" : "Parado")}
+                {currentSong ? currentSong.title : (isPlaying ? "Ao vivo" : "Parado")}
               </p>
             </div>
 
-            {/* Contador de Músicas - escondido em telas muito pequenas */}
-            {totalSongs > 0 && (
-              <span className="hidden sm:inline-block text-white/70 text-xs md:text-sm whitespace-nowrap px-2 py-1 bg-white/10 rounded-full flex-shrink-0">
-                {totalSongs} músicas
-              </span>
-            )}
+
           </div>
 
           {/* Lado Direito: Botões FLUTUANTES PRA CIMA */}
-          <div className="absolute right-4 top-0 -translate-y-1/2 flex gap-2">
-            {/* Botão Peça sua Música - escondido em mobile muito pequeno */}
-            <button
-              onClick={() => setShowRequestModal(true)}
-              className="hidden sm:flex px-3 py-2 md:px-4 md:py-2.5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl shadow-2xl hover:shadow-[0_0_40px_rgba(251,191,36,0.8)] hover:scale-110 active:scale-95 transition-all items-center gap-2 text-white font-black text-sm md:text-base"
-              title="Peça sua Música"
-              style={{
-                boxShadow: "0 0 25px rgba(251, 191, 36, 0.7), 0 10px 30px rgba(0,0,0,0.3)"
-              }}
-            >
-              <Music className="w-4 h-4 md:w-5 md:h-5" />
-              <span className="hidden md:inline">Peça sua Música</span>
-              <span className="md:hidden">Música</span>
-            </button>
+          <div className="absolute right-4 top-0 -translate-y-1/2 flex gap-2 items-end">
+            {/* Botão Peça sua Música - visível em mobile */}
+            <div className="flex flex-col items-end gap-1">
+              <button
+                onClick={() => setShowRequestModal(true)}
+                className="flex px-2 py-1.5 md:px-4 md:py-2.5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl shadow-2xl hover:shadow-[0_0_40px_rgba(251,191,36,0.8)] hover:scale-110 active:scale-95 transition-all items-center gap-1 md:gap-2 text-white font-black text-xs md:text-base"
+                title="Peça sua Música"
+                style={{
+                  boxShadow: "0 0 25px rgba(251, 191, 36, 0.7), 0 10px 30px rgba(0,0,0,0.3)"
+                }}
+              >
+                <Music className="w-3 h-3 md:w-5 md:h-5" />
+                <span className="hidden md:inline">Peça sua Música</span>
+                <span className="md:hidden">Música</span>
+              </button>
+              {/* Contador de Músicas - abaixo do botão */}
+              {totalSongs > 0 && (
+                <span className="text-white/60 text-[9px] md:text-xs whitespace-nowrap">
+                  {totalSongs} músicas
+                </span>
+              )}
+            </div>
 
             {/* Botão Chat */}
             <button
