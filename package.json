@@ -10,7 +10,7 @@
     "dev": "vite --host",
     "dev:server": "tsx server/index.ts",
     "dev:full": "concurrently \"vite --host\" \"tsx server/index.ts\"",
-    "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist && node -e \"const fs = require('fs'); const path = require('path'); const src = path.join('client', 'public'); const dest = path.join('dist', 'public'); if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true}); fs.cpSync(src, dest, {recursive: true, force: true}); console.log('✅ Arquivos públicos copiados com sucesso!');\"",
     "start": "NODE_ENV=production node dist/index.js",
     "preview": "vite preview --host",
     "check": "tsc --noEmit",
