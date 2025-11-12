@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { MessageCircle } from "lucide-react";
 
 interface RadioPlayerProps {
   streamUrl?: string;
@@ -6,8 +7,8 @@ interface RadioPlayerProps {
 }
 
 export function RadioPlayer({ 
-  streamUrl = "https://relay.rainwave.cc/all.mp3",
-  stationName = "📻 QuiZoeira"
+  streamUrl = "https://stream.zeno.fm/f3wvbbqmdg8uv",
+  stationName = "🎸 Flashback 90-2000"
 }: RadioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(70);
@@ -45,19 +46,7 @@ export function RadioPlayer({
       alert("Erro ao carregar a rádio. Verifique a conexão.");
     });
 
-    // Autoplay ao carregar
-    const attemptAutoplay = async () => {
-      try {
-        setIsLoading(true);
-        await audioRef.current?.play();
-      } catch (error) {
-        // Autoplay bloqueado pelo navegador - usuário precisa interagir primeiro
-        console.log("Autoplay bloqueado. Clique no botão play para iniciar.");
-        setIsLoading(false);
-      }
-    };
-    
-    attemptAutoplay();
+    // Autoplay removido - usuário precisa clicar para iniciar
 
     return () => {
       if (audioRef.current) {
@@ -94,8 +83,8 @@ export function RadioPlayer({
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[9997] bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 shadow-2xl border-t-2 border-white/20">
-      {/* Container principal com padding reduzido em mobile */}
-      <div className="max-w-7xl mx-auto px-4 py-1.5 md:py-2 flex items-center justify-between gap-4 relative">
+      {/* Container principal com padding reduzido */}
+      <div className="max-w-7xl mx-auto px-4 py-1 md:py-1.5 flex items-center justify-between gap-4 relative">
         {/* Lado Esquerdo: Play/Pause + Nome */}
         <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
           {/* Botão Play/Pause - menor em mobile */}
@@ -143,7 +132,7 @@ export function RadioPlayer({
               // Disparar evento para abrir o chat
               window.dispatchEvent(new CustomEvent('toggleChat'));
             }}
-            className="px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-2xl shadow-2xl hover:shadow-[0_0_40px_rgba(236,72,153,0.8)] hover:scale-110 active:scale-95 transition-all flex items-center gap-2 md:gap-3 text-white font-black text-lg md:text-xl relative overflow-hidden"
+            className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-2xl shadow-2xl hover:shadow-[0_0_40px_rgba(236,72,153,0.8)] hover:scale-110 active:scale-95 transition-all flex items-center gap-2 text-white font-black text-base md:text-lg relative overflow-hidden"
             title="Chat Global"
             style={{
               animation: "gradient-shift 3s ease infinite, pulse-glow 2s ease-in-out infinite, bounce-subtle 1.5s ease-in-out infinite",
@@ -151,8 +140,8 @@ export function RadioPlayer({
               boxShadow: "0 0 30px rgba(236, 72, 153, 0.8), 0 0 50px rgba(168, 85, 247, 0.6), 0 10px 30px rgba(0,0,0,0.3)"
             }}
           >
-            <span className="text-2xl md:text-3xl animate-pulse">💬</span>
-            <span className="text-base md:text-xl">Chat</span>
+            <MessageCircle className="w-5 h-5 md:w-6 md:h-6" />
+            <span className="text-sm md:text-base">Chat</span>
           </button>
         </div>
       </div>

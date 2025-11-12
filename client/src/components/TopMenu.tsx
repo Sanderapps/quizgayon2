@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { changelog } from "@/data/changelog";
+import { Home, Gamepad2, Trophy, MessageCircle, Shield, Lightbulb, Sun, Moon, Menu, X, ClipboardList, Sparkles } from "lucide-react";
 
 interface TopMenuProps {
   onNavigate?: (page: string) => void;
@@ -29,13 +30,13 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
   }, [isDark]);
 
   const menuItems = [
-    { icon: "🏠", page: "home", label: "Início" },
-    { icon: "🎮", page: "quiz", label: "Jogar" },
-    { icon: "🏆", page: "leaderboard", label: "Placar" },
-    { icon: "💬", page: "chat", label: "Chat" },
-    { icon: "👮", page: "admin", label: "Admin" },
-    { icon: "💡", page: "suggestions", label: "Sugestões" },
-    { icon: isDark ? "☀️" : "🌙", page: "theme", label: isDark ? "Claro" : "Escuro" },
+    { icon: Home, page: "home", label: "Início" },
+    { icon: Gamepad2, page: "quiz", label: "Jogar" },
+    { icon: Trophy, page: "leaderboard", label: "Placar" },
+    { icon: MessageCircle, page: "chat", label: "Chat" },
+    { icon: Shield, page: "admin", label: "Admin" },
+    { icon: Lightbulb, page: "suggestions", label: "Sugestões" },
+    { icon: isDark ? Sun : Moon, page: "theme", label: isDark ? "Claro" : "Escuro" },
   ];
 
   const handleItemClick = (page: string) => {
@@ -104,11 +105,17 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
           setFeedback(null);
         }, 2000);
       } else {
-        const error = await response.json();
-        setFeedback({ type: 'error', text: error.error || 'Erro ao enviar sugestão' });
+        const errorData = await response.json();
+        setFeedback({ 
+          type: 'error', 
+          text: errorData.message || 'Erro ao enviar sugestão. Tente novamente.' 
+        });
       }
     } catch (error) {
-      setFeedback({ type: 'error', text: 'Erro de conexão. Tente novamente!' });
+      setFeedback({ 
+        type: 'error', 
+        text: 'Erro de conexão. Verifique sua internet.' 
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -122,22 +129,23 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
 
   return (
     <>
-      {/* Botão circular no topo central */}
+      {/* Botão Menu Hamburger - Fixo no topo direito */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] w-14 h-14 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-lg hover:shadow-xl hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center text-2xl border-2 border-white/50 dark:border-gray-700"
+        className="fixed top-4 right-4 z-[70] w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
         aria-label="Menu"
-        title="Menu"
       >
-        <span className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-          {isOpen ? '✕' : '☰'}
-        </span>
+        {isOpen ? (
+          <X className="w-6 h-6 text-white" />
+        ) : (
+          <Menu className="w-6 h-6 text-white" />
+        )}
       </button>
 
-      {/* Overlay */}
+      {/* Overlay escuro */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-[55] transition-opacity"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[50]"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -147,37 +155,39 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden dropdown-menu">
           {/* Seção: Menu de Navegação - 7 colunas integradas */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 text-center">
-              🌈 Navegação
+            <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 text-center flex items-center justify-center gap-2">
+              <Sparkles className="w-5 h-5" />
+              <span>Navegação</span>
             </h3>
             {/* Grid responsivo: 4 colunas em mobile, 7 em desktop */}
             <div className="grid grid-cols-4 sm:grid-cols-7 gap-3">
-              {menuItems.map((item) => (
-                <button
-                  key={item.page}
-                  onClick={() => handleItemClick(item.page)}
-                  className="flex flex-col items-center justify-center transition-all group"
-                  title={item.label}
-                >
-                  {/* Fundo quadrado arredondado com emoji */}
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-pink-100 to-purple-100 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center shadow-md hover:shadow-xl hover:scale-110 transition-all">
-                    <span className="text-2xl sm:text-3xl">
-                      {item.icon}
+              {menuItems.map((item) => {
+                const IconComponent = item.icon;
+                return (
+                  <button
+                    key={item.page}
+                    onClick={() => handleItemClick(item.page)}
+                    className="flex flex-col items-center justify-center transition-all group"
+                    title={item.label}
+                  >
+                    {/* Fundo quadrado arredondado com ícone */}
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-pink-100 to-purple-100 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center shadow-md hover:shadow-xl hover:scale-110 transition-all">
+                      <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 text-purple-600 dark:text-purple-300" />
+                    </div>
+                    {/* Label opcional em telas maiores */}
+                    <span className="hidden sm:block text-[10px] mt-1 text-gray-600 dark:text-gray-400 font-medium">
+                      {item.label}
                     </span>
-                  </div>
-                  {/* Label opcional em telas maiores */}
-                  <span className="hidden sm:block text-[10px] mt-1 text-gray-600 dark:text-gray-400 font-medium">
-                    {item.label}
-                  </span>
-                </button>
-              ))}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           {/* Seção: Changelog */}
           <div className="p-4 border-b border-gray-200 dark:border-gray-700 max-h-56 overflow-y-auto">
             <h3 className="text-sm font-bold text-gray-800 dark:text-white mb-3 flex items-center gap-2">
-              <span>📋</span>
+              <ClipboardList className="w-4 h-4" />
               <span>Atualizações</span>
             </h3>
             <div className="space-y-1.5">
@@ -217,15 +227,15 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
             {/* Header */}
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                <span>💡</span>
+                <Lightbulb className="w-6 h-6" />
                 <span>Sugestões</span>
               </h2>
               <button
                 onClick={() => setShowSuggestions(false)}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl transition-colors"
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
                 aria-label="Fechar"
               >
-                ✕
+                <X className="w-6 h-6" />
               </button>
             </div>
 
@@ -286,40 +296,44 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowSuggestions(false)}
-                className="flex-1 px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-medium"
+                className="flex-1 px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                 disabled={isSubmitting}
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSubmitSuggestion}
-                disabled={isSubmitting || !message.trim() || !apelido.trim()}
-                className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold hover:from-pink-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSubmitting}
               >
-                {isSubmitting ? 'Enviando...' : 'Enviar 💖'}
+                {isSubmitting ? 'Enviando...' : 'Enviar'}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Animações CSS */}
       <style>{`
-        @keyframes dropdown {
+        .dropdown-menu {
+          animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
           from {
             opacity: 0;
-            transform: translateY(-20px);
+            transform: translate(-50%, -20px);
           }
           to {
             opacity: 1;
-            transform: translateY(0);
+            transform: translate(-50%, 0);
           }
         }
-        .dropdown-menu {
-          animation: dropdown 0.3s ease-out;
+
+        .animate-scale-in {
+          animation: scaleIn 0.2s ease-out;
         }
-        
-        @keyframes scale-in {
+
+        @keyframes scaleIn {
           from {
             opacity: 0;
             transform: scale(0.9);
@@ -328,9 +342,6 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
             opacity: 1;
             transform: scale(1);
           }
-        }
-        .animate-scale-in {
-          animation: scale-in 0.2s ease-out;
         }
       `}</style>
     </>

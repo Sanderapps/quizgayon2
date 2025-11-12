@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RankBadge } from "@/components/RankBadge";
+import { Save, Trophy, RotateCcw } from "lucide-react";
 
 interface QuizResultProps {
   percentage: number;
@@ -15,6 +16,7 @@ interface QuizResultProps {
 
 /**
  * Tela de resultado do quiz
+ * Nota: Mantém o emoji do resultado (parte do sistema de títulos do quiz)
  */
 export function QuizResult({
   percentage,
@@ -56,9 +58,10 @@ export function QuizResult({
             <Button
               onClick={onSaveScore}
               size="lg"
-              className="w-full text-xl py-6 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+              className="w-full text-xl py-6 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 flex items-center justify-center gap-2"
             >
-              💾 Salvar Pontuação
+              <Save className="w-5 h-5" />
+              <span>Salvar Pontuação</span>
             </Button>
           )}
           
@@ -66,18 +69,20 @@ export function QuizResult({
             onClick={onShowLeaderboard}
             size="lg"
             variant="outline"
-            className="w-full text-xl py-6 bg-white/20 hover:bg-white/30 text-white border-2 border-white/30"
+            className="w-full text-xl py-6 bg-white/20 hover:bg-white/30 text-white border-2 border-white/30 flex items-center justify-center gap-2"
           >
-            🏆 Ver Placar
+            <Trophy className="w-5 h-5" />
+            <span>Ver Placar</span>
           </Button>
           
           <Button
             onClick={onRestart}
             size="lg"
             variant="outline"
-            className="w-full text-xl py-6 bg-white/20 hover:bg-white/30 text-white border-2 border-white/30"
+            className="w-full text-xl py-6 bg-white/20 hover:bg-white/30 text-white border-2 border-white/30 flex items-center justify-center gap-2"
           >
-            🔄 Fazer Novamente
+            <RotateCcw className="w-5 h-5" />
+            <span>Fazer Novamente</span>
           </Button>
         </div>
       </Card>
