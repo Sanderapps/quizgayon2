@@ -22,13 +22,17 @@ interface CurrentSongInfo {
 class RadioStreamService {
   private listeners: Response[] = [];
   private ffmpegProcess: ChildProcess | null = null;
-  private playlist: Song[] = [];
-  private currentSongIndex: number = 0;
+  private currentSongIndex = 0;
   private currentSongInfo: CurrentSongInfo = {
     title: 'Rádio Offline',
     artist: 'Aguarde...',
     total: 0
   };
+  
+  // Buffer circular para novos ouvintes começarem rapidamente
+  private recentChunks: Buffer[] = [];
+  private readonly MAX_BUFFER_CHUNKS = 10; // ~10 chunks = início rápido
+  
   private isInitialized: boolean = false;
   private publicPath: string = '';
 
@@ -185,11 +189,18 @@ class RadioStreamService {
       ]);
 
       this.ffmpegProcess.stdout?.on('data', (chunk: Buffer) => {
+        // Adiciona chunk ao buffer circular
+        this.recentChunks.push(chunk);
+        if (this.recentChunks.length > this.MAX_BUFFER_CHUNKS) {
+          this.recentChunks.shift(); // Remove o mais antigo
+        }
+        
+        // Envia para todos os ouvintes conectados
         this.listeners.forEach(res => {
           try {
             res.write(chunk);
           } catch (error) {
-            // Ignora erros de escrita
+            console.error('[RÁDIO] ❌ Erro ao enviar chunk para ouvinte:', error);
           }
         });
       });
@@ -222,16 +233,34 @@ class RadioStreamService {
 
   public addListener(res: Response): void {
     console.log(`[RÁDIO] 👤 Novo ouvinte conectado. Total: ${this.listeners.length + 1}`);
-    this.listeners.push(res);
-
+    
     res.writeHead(200, {
       'Content-Type': 'audio/mpeg',
       'Connection': 'keep-alive',
-      'Cache-Control': 'no-cache',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
       'Transfer-Encoding': 'chunked',
       'Access-Control-Allow-Origin': '*',
-      'Accept-Ranges': 'none'
+      'Accept-Ranges': 'none',
+      'icy-name': 'QuiZoeira Radio',
+      'icy-genre': 'Various',
+      'icy-br': '128'
     });
+    
+    // Envia buffer recente imediatamente para o novo ouvinte começar rápido
+    if (this.recentChunks.length > 0) {
+      console.log(`[RÁDIO] 🚀 Enviando ${this.recentChunks.length} chunks do buffer para novo ouvinte`);
+      this.recentChunks.forEach(chunk => {
+        try {
+          res.write(chunk);
+        } catch (error) {
+          console.error('[RÁDIO] ❌ Erro ao enviar buffer inicial:', error);
+        }
+      });
+    }
+    
+    this.listeners.push(res);
 
     res.on('close', () => {
       const index = this.listeners.indexOf(res);
