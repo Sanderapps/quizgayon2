@@ -2,6 +2,18 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
+## [2025-11-12] - Tarefa #14 Concluída - Animação do Menu
+
+### Corrigido
+- **Animação do menu**: Menu agora expande suavemente do botão e retorna a ele ao fechar
+- Substituída animação `slideDown` por `expandFromButton` com efeito de bounce
+- Transform-origin ajustado para `top right` para alinhar com a posição do botão
+- Animação mais natural e intuitiva usando cubic-bezier
+
+### Detalhes Técnicos
+- Arquivo modificado: `TopMenu.tsx`
+- Commit: `3537715`
+
 ## [2025-11-12] - Tarefa #1 Concluída - Sistema de Rádio Local
 
 ### Adicionado
