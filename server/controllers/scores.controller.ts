@@ -23,8 +23,11 @@ export async function submitScore(req: Request, res: Response) {
 
     const { apelido, pontuacao, tempo_segundos, quiz_token, quiz_id = "gay" } = validationResult.data;
 
+    console.log(`💾 Tentando salvar pontuação: apelido=${apelido}, pontuacao=${pontuacao}, quiz_id=${quiz_id}`);
+
     // Validação de token de sessão
     if (!validateQuizToken(quiz_token)) {
+      console.error(`❌ Token inválido: ${quiz_token}`);
       return res.status(401).json({
         error: "Token inválido ou expirado. Inicie o quiz novamente.",
       });
@@ -51,6 +54,8 @@ export async function submitScore(req: Request, res: Response) {
       quiz_id // Agora dinâmico! 🎉
     });
 
+    console.log(`✅ Pontuação salva com sucesso: ID=${score.id}, quiz_id=${quiz_id}`);
+
     res.status(201).json({
       success: true,
       score,
@@ -72,7 +77,11 @@ export async function fetchLeaderboard(req: Request, res: Response) {
     const limit = parseInt(req.query.limit as string) || 100;
     const quizId = req.query.quiz_id as string || "gay";
 
+    console.log(`🏆 Buscando leaderboard: quiz_id=${quizId}, limit=${limit}`);
+
     const leaderboard = await getLeaderboard(quizId, limit);
+
+    console.log(`📊 Leaderboard encontrado: ${leaderboard.length} entradas para quiz_id=${quizId}`);
 
     res.json({
       success: true,
