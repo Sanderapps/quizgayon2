@@ -81,10 +81,11 @@ async function startServer() {
     console.log(`🔒 Admin password: ${ADMIN_PASSWORD}`);
     
     // Iniciar serviço de rádio streaming
+    // Aguarda um pouco para garantir que os arquivos estão acessíveis
     setTimeout(() => {
+      console.log(`📻 Iniciando serviço de rádio...`);
       radioStreamService.start();
-      console.log(`📻 Rádio streaming iniciada em /api/radio/stream`);
-    }, 2000); // Aguarda 2s para garantir que tudo está pronto
+    }, 3000); // Aguarda 3s para garantir que tudo está pronto
   });
 }
 

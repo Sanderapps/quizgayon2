@@ -29,4 +29,17 @@ router.get('/stats', (req: Request, res: Response) => {
   });
 });
 
+// Endpoint de health check para diagnóstico
+router.get('/health', (req: Request, res: Response) => {
+  const info = radioStreamService.getCurrentSongInfo();
+  const isOnline = info.title !== 'Rádio Offline';
+  
+  res.json({
+    status: isOnline ? 'online' : 'offline',
+    currentSong: info,
+    listeners: radioStreamService.getListenerCount(),
+    message: isOnline ? 'Rádio funcionando normalmente' : 'Rádio não iniciada - verifique os logs do servidor'
+  });
+});
+
 export default router;
