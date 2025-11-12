@@ -1,7 +1,6 @@
 import { createContext, useContext, useRef, useState, useEffect, ReactNode } from "react";
 
 interface Song {
-  file: string;
   title: string;
   artist: string;
 }
@@ -11,6 +10,7 @@ interface RadioContextType {
   volume: number;
   isLoading: boolean;
   currentSong: Song | null;
+  totalSongs: number;
   togglePlay: () => void;
   setVolume: (volume: number) => void;
   audioRef: React.RefObject<HTMLAudioElement>;
@@ -22,9 +22,8 @@ export function RadioProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolumeState] = useState(70);
   const [isLoading, setIsLoading] = useState(false);
-  const [playlist, setPlaylist] = useState<Song[]>([]);
-  const [currentSongIndex, setCurrentSongIndex] = useState(0);
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
+  const [totalSongs, setTotalSongs] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Carregar volume salvo do localStorage
@@ -35,40 +34,13 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Carregar playlist
+  // Inicializar o áudio com o stream do servidor
   useEffect(() => {
-    fetch('/music/playlist.json')
-      .then(res => res.json())
-      .then((songs: Song[]) => {
-        // Embaralhar playlist
-        const shuffled = [...songs].sort(() => Math.random() - 0.5);
-        setPlaylist(shuffled);
-        if (shuffled.length > 0) {
-          setCurrentSong(shuffled[0]);
-        }
-      })
-      .catch(err => console.error('Erro ao carregar playlist:', err));
-  }, []);
-
-  // Inicializar o áudio
-  useEffect(() => {
-    if (!currentSong || !playlist.length) return;
-
-    const audioUrl = `/music/${currentSong.file}`;
-    audioRef.current = new Audio(audioUrl);
+    // Cria o elemento de áudio apontando para o stream
+    const streamUrl = '/api/radio/stream';
+    audioRef.current = new Audio(streamUrl);
     audioRef.current.volume = volume / 100;
-    audioRef.current.preload = "auto";
-
-    // Autoplay na primeira música
-    const isFirstLoad = currentSongIndex === 0 && !isPlaying;
-    if (isFirstLoad) {
-      setIsLoading(true);
-      // Tentar autoplay (pode falhar devido a políticas do navegador)
-      audioRef.current.play().catch((error) => {
-        console.log('Autoplay bloqueado pelo navegador:', error);
-        setIsLoading(false);
-      });
-    }
+    audioRef.current.preload = "none"; // Não pré-carregar, pois é um stream
 
     // Eventos do áudio
     audioRef.current.addEventListener("playing", () => {
@@ -85,17 +57,10 @@ export function RadioProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     });
 
-    audioRef.current.addEventListener("error", () => {
+    audioRef.current.addEventListener("error", (e) => {
       setIsLoading(false);
       setIsPlaying(false);
-      console.error('Erro ao carregar música');
-    });
-
-    // Quando a música terminar, tocar a próxima
-    audioRef.current.addEventListener("ended", () => {
-      const nextIndex = (currentSongIndex + 1) % playlist.length;
-      setCurrentSongIndex(nextIndex);
-      setCurrentSong(playlist[nextIndex]);
+      console.error('Erro ao carregar stream de rádio:', e);
     });
 
     // Cleanup
@@ -105,7 +70,7 @@ export function RadioProvider({ children }: { children: ReactNode }) {
         audioRef.current.src = "";
       }
     };
-  }, [currentSong, playlist]);
+  }, []);
 
   // Atualizar volume quando mudar
   useEffect(() => {
@@ -114,6 +79,33 @@ export function RadioProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("radio_volume", volume.toString());
     }
   }, [volume]);
+
+  // Buscar informações da música atual periodicamente
+  useEffect(() => {
+    const fetchNowPlaying = async () => {
+      try {
+        const response = await fetch('/api/radio/nowplaying');
+        if (response.ok) {
+          const data = await response.json();
+          setCurrentSong({
+            title: data.title,
+            artist: data.artist
+          });
+          setTotalSongs(data.total);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar informações da música:', error);
+      }
+    };
+
+    // Busca imediatamente
+    fetchNowPlaying();
+
+    // Atualiza a cada 10 segundos
+    const interval = setInterval(fetchNowPlaying, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
@@ -140,6 +132,7 @@ export function RadioProvider({ children }: { children: ReactNode }) {
         volume,
         isLoading,
         currentSong,
+        totalSongs,
         togglePlay,
         setVolume,
         audioRef,

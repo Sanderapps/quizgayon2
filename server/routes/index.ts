@@ -4,6 +4,7 @@ import scoresRoutes from "./scores.routes.js";
 import chatRoutes from "./chat.routes.js";
 import adminRoutes from "./admin.routes.js";
 import musicRequestRoutes from "./musicRequest.routes.js";
+import radioRoutes from "./radio.routes.js";
 
 const router = Router();
 
@@ -13,5 +14,6 @@ router.use(scoresRoutes);
 router.use(chatRoutes);
 router.use(adminRoutes);
 router.use(musicRequestRoutes);
+router.use("/api/radio", radioRoutes);
 
 export default router;

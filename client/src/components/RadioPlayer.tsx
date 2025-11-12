@@ -3,7 +3,7 @@ import { useRadio } from "@/contexts/RadioContext";
 import { useState } from "react";
 
 export function RadioPlayer() {
-  const { isPlaying, isLoading, currentSong, togglePlay } = useRadio();
+  const { isPlaying, isLoading, currentSong, totalSongs, togglePlay } = useRadio();
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [requestName, setRequestName] = useState("");
   const [requestSong, setRequestSong] = useState("");
@@ -68,7 +68,7 @@ export function RadioPlayer() {
 
             {/* Info da Música */}
             <div className="flex-1 min-w-0">
-              <p className="text-white font-bold text-base md:text-lg truncate flex items-center gap-1 md:gap-2">
+              <p className="text-white font-bold text-sm md:text-base truncate flex items-center gap-1 md:gap-2">
                 {isPlaying && (
                   <span className="inline-flex gap-0.5">
                     <span className="w-1 h-2 md:h-3 bg-white rounded-full animate-pulse" style={{ animationDelay: "0ms" }}></span>
@@ -82,14 +82,21 @@ export function RadioPlayer() {
                 {currentSong ? currentSong.artist : (isPlaying ? "Ao vivo" : "Parado")}
               </p>
             </div>
+
+            {/* Contador de Músicas - escondido em telas muito pequenas */}
+            {totalSongs > 0 && (
+              <span className="hidden sm:inline-block text-white/70 text-xs md:text-sm whitespace-nowrap px-2 py-1 bg-white/10 rounded-full flex-shrink-0">
+                {totalSongs} músicas
+              </span>
+            )}
           </div>
 
           {/* Lado Direito: Botões FLUTUANTES PRA CIMA */}
           <div className="absolute right-4 top-0 -translate-y-1/2 flex gap-2">
-            {/* Botão Peça sua Música */}
+            {/* Botão Peça sua Música - escondido em mobile muito pequeno */}
             <button
               onClick={() => setShowRequestModal(true)}
-              className="px-3 py-2 md:px-4 md:py-2.5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl shadow-2xl hover:shadow-[0_0_40px_rgba(251,191,36,0.8)] hover:scale-110 active:scale-95 transition-all flex items-center gap-2 text-white font-black text-sm md:text-base"
+              className="hidden sm:flex px-3 py-2 md:px-4 md:py-2.5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl shadow-2xl hover:shadow-[0_0_40px_rgba(251,191,36,0.8)] hover:scale-110 active:scale-95 transition-all items-center gap-2 text-white font-black text-sm md:text-base"
               title="Peça sua Música"
               style={{
                 boxShadow: "0 0 25px rgba(251, 191, 36, 0.7), 0 10px 30px rgba(0,0,0,0.3)"
@@ -105,7 +112,7 @@ export function RadioPlayer() {
               onClick={() => {
                 window.dispatchEvent(new CustomEvent('toggleChat'));
               }}
-              className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-2xl shadow-2xl hover:shadow-[0_0_40px_rgba(236,72,153,0.8)] hover:scale-110 active:scale-95 transition-all flex items-center gap-2 text-white font-black text-base md:text-lg relative overflow-hidden chat-button"
+              className="px-3 py-2 md:px-6 md:py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-2xl shadow-2xl hover:shadow-[0_0_40px_rgba(236,72,153,0.8)] hover:scale-110 active:scale-95 transition-all flex items-center gap-2 text-white font-black text-sm md:text-base relative overflow-hidden chat-button"
               title="Chat Global (Clique para abrir/fechar)"
               style={{
                 animation: "gradient-shift 3s ease infinite, pulse-glow 2s ease-in-out infinite, bounce-subtle 1.5s ease-in-out infinite",
@@ -113,8 +120,8 @@ export function RadioPlayer() {
                 boxShadow: "0 0 30px rgba(236, 72, 153, 0.8), 0 0 50px rgba(168, 85, 247, 0.6), 0 10px 30px rgba(0,0,0,0.3)"
               }}
             >
-              <MessageCircle className="w-5 h-5 md:w-6 md:h-6" />
-              <span className="text-sm md:text-base">Chat</span>
+              <MessageCircle className="w-4 h-4 md:w-6 md:h-6" />
+              <span className="text-xs md:text-base">Chat</span>
               {/* Indicador de chat aberto */}
               <span className="chat-open-indicator hidden absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></span>
             </button>

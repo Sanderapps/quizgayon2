@@ -1,4 +1,4 @@
-# Multi-stage Dockerfile for Quiz App
+# Multi-stage Dockerfile for Quiz App with FFmpeg support
 # Stage 1: Build
 FROM node:20-alpine AS builder
 
@@ -23,6 +23,9 @@ RUN pnpm run build
 
 # Stage 2: Production
 FROM node:20-alpine AS runner
+
+# Install FFmpeg for radio streaming
+RUN apk add --no-cache ffmpeg
 
 # Install pnpm
 RUN npm install -g pnpm@10.4.1
