@@ -175,7 +175,7 @@ export function ChatWidget() {
   const handleSendMessage = () => {
     if (!inputMessage.trim() || !socketRef.current) return;
 
-    socketRef.current.emit("send_message", {
+    socketRef.current.emit("chat_message", {
       apelido,
       mensagem: inputMessage.trim(),
       cor: selectedColor,
@@ -197,7 +197,7 @@ export function ChatWidget() {
       return;
     }
 
-    socketRef.current.emit("send_message", {
+    socketRef.current.emit("chat_message", {
       apelido,
       mensagem: "[GIF]",
       cor: selectedColor,
