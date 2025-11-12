@@ -43,41 +43,49 @@ router.get('/health', (req: Request, res: Response) => {
 });
 
 // Endpoint de diagnóstico de sistema de arquivos
-router.get('/debug/files', (req: Request, res: Response) => {
-  const fs = require('fs');
-  const path = require('path');
-  
-  const debug: any = {
-    __dirname: __dirname,
-    cwd: process.cwd(),
-    paths: {}
-  };
-  
-  // Tenta vários caminhos possíveis
-  const pathsToCheck = [
-    path.resolve(__dirname, '../public'),
-    path.resolve(__dirname, '../public/music'),
-    path.resolve(__dirname, '../../dist/public'),
-    path.resolve(__dirname, '../../dist/public/music'),
-    path.resolve(process.cwd(), 'dist/public'),
-    path.resolve(process.cwd(), 'dist/public/music'),
-    path.resolve(process.cwd(), 'public'),
-    path.resolve(process.cwd(), 'public/music')
-  ];
-  
-  pathsToCheck.forEach(p => {
-    try {
-      const exists = fs.existsSync(p);
-      debug.paths[p] = {
-        exists,
-        files: exists ? fs.readdirSync(p) : null
-      };
-    } catch (error: any) {
-      debug.paths[p] = { error: error.message };
-    }
-  });
-  
-  res.json(debug);
+router.get('/debug/files', async (req: Request, res: Response) => {
+  try {
+    const fs = await import('fs');
+    const path = await import('path');
+    const { fileURLToPath } = await import('url');
+    
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    
+    const debug: any = {
+      __dirname: __dirname,
+      cwd: process.cwd(),
+      paths: {}
+    };
+    
+    // Tenta vários caminhos possíveis
+    const pathsToCheck = [
+      path.resolve(__dirname, '../public'),
+      path.resolve(__dirname, '../public/music'),
+      path.resolve(__dirname, '../../dist/public'),
+      path.resolve(__dirname, '../../dist/public/music'),
+      path.resolve(process.cwd(), 'dist/public'),
+      path.resolve(process.cwd(), 'dist/public/music'),
+      path.resolve(process.cwd(), 'public'),
+      path.resolve(process.cwd(), 'public/music')
+    ];
+    
+    pathsToCheck.forEach(p => {
+      try {
+        const exists = fs.existsSync(p);
+        debug.paths[p] = {
+          exists,
+          files: exists ? fs.readdirSync(p) : null
+        };
+      } catch (error: any) {
+        debug.paths[p] = { error: error.message };
+      }
+    });
+    
+    res.json(debug);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message, stack: error.stack });
+  }
 });
 
 export default router;
