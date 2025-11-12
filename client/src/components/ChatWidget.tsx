@@ -289,9 +289,9 @@ export function ChatWidget() {
         />
       )}
 
-      {/* Janela do chat */}
+      {/* Janela do chat - Tela cheia responsiva */}
       {isOpen && (
-        <div className="fixed bottom-28 right-6 w-80 h-[500px] bg-white dark:bg-gray-800 rounded-lg shadow-2xl flex flex-col border-2 border-pink-500" style={{ zIndex: 9998 }}>
+        <div className="fixed inset-0 md:bottom-28 md:right-6 md:left-auto md:top-auto md:w-96 md:h-[600px] w-full h-full bg-white dark:bg-gray-800 md:rounded-lg shadow-2xl flex flex-col border-2 border-pink-500" style={{ zIndex: 9998 }}>
           {/* Header */}
           <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-3 rounded-t-lg flex justify-between items-center">
             <h3 className="text-white font-bold">💬 Chat Global</h3>

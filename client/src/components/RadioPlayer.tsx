@@ -1,85 +1,9 @@
-import { useState, useRef, useEffect } from "react";
 import { MessageCircle } from "lucide-react";
+import { useRadio } from "@/contexts/RadioContext";
 
-interface RadioPlayerProps {
-  streamUrl?: string;
-  stationName?: string;
-}
-
-export function RadioPlayer({ 
-  streamUrl = "https://stream.zeno.fm/f3wvbbqmdg8uv",
-  stationName = "📻 QuiZoeira"
-}: RadioPlayerProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(70);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  // Carregar estado salvo do localStorage
-  useEffect(() => {
-    const savedVolume = localStorage.getItem("radio_volume");
-    if (savedVolume) {
-      setVolume(parseInt(savedVolume));
-    }
-  }, []);
-
-  // Inicializar o áudio
-  useEffect(() => {
-    audioRef.current = new Audio(streamUrl);
-    audioRef.current.volume = volume / 100;
-    audioRef.current.preload = "none";
-
-    // Eventos do áudio
-    audioRef.current.addEventListener("playing", () => {
-      setIsLoading(false);
-      setIsPlaying(true);
-    });
-
-    audioRef.current.addEventListener("waiting", () => {
-      setIsLoading(true);
-    });
-
-    audioRef.current.addEventListener("error", () => {
-      setIsLoading(false);
-      setIsPlaying(false);
-      alert("Erro ao carregar a rádio. Verifique a conexão.");
-    });
-
-    // Autoplay removido - usuário precisa clicar para iniciar
-
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, [streamUrl]);
-
-  // Atualizar volume do áudio quando o estado mudar
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume / 100;
-      localStorage.setItem("radio_volume", volume.toString());
-    }
-  }, [volume]);
-
-  const handlePlayPause = async () => {
-    if (!audioRef.current) return;
-
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      setIsLoading(true);
-      try {
-        await audioRef.current.play();
-      } catch (error) {
-        console.error("Erro ao reproduzir:", error);
-        setIsLoading(false);
-      }
-    }
-  };
+export function RadioPlayer() {
+  const { isPlaying, isLoading, togglePlay } = useRadio();
+  const stationName = "📻 QuiZoeira";
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[9997] bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 shadow-2xl border-t-2 border-white/20">
@@ -89,7 +13,7 @@ export function RadioPlayer({
         <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
           {/* Botão Play/Pause - menor em mobile */}
           <button
-            onClick={handlePlayPause}
+            onClick={togglePlay}
             disabled={isLoading}
             className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 hover:bg-white shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
             title={isPlaying ? "Pausar" : "Reproduzir"}

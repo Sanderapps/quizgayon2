@@ -4,6 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { RadioProvider } from "./contexts/RadioContext";
 import Home from "./pages/Home";
 import QuizPage from "./pages/QuizPage";
 import QuizSelector from "./pages/QuizSelector";
@@ -34,10 +35,12 @@ function App() {
       <ThemeProvider
         defaultTheme="light"
       >
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+        <RadioProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </RadioProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

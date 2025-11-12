@@ -218,7 +218,7 @@ export default function Home() {
 
   // Função para carregar o placar do banco de dados
   const loadLeaderboard = async () => {
-    const placar = await buscarPlacar(100); // Top 100
+    const placar = await buscarPlacar(100, currentQuiz.id); // Top 100 do quiz atual
     
     // Converter formato do banco para formato do frontend
     const entries: LeaderEntry[] = placar.map(score => {
@@ -327,7 +327,7 @@ export default function Home() {
     const apelido = name || "Anônimo";
 
     // Salvar no banco de dados PostgreSQL
-    const saved = await salvarPontuacao(apelido, totalPoints, tempoSegundos);
+    const saved = await salvarPontuacao(apelido, totalPoints, tempoSegundos, currentQuiz.id);
 
     if (saved) {
       console.log("✅ Pontuação salva no banco de dados:", saved);
