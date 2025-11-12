@@ -44,10 +44,10 @@ class RadioStreamService {
 
     // Lista de caminhos possíveis para tentar
     const possiblePaths = [
-      path.resolve(__dirname, '../public'),
-      path.resolve(process.cwd(), 'dist/public'),
-      path.resolve(process.cwd(), 'public'),
-      path.resolve(__dirname, '../../dist/public'),
+      path.resolve(__dirname, './public'),        // /app/dist/public (CORRETO para produção)
+      path.resolve(__dirname, '../public'),       // /app/public (fallback)
+      path.resolve(process.cwd(), 'dist/public'), // /app/dist/public (alternativo)
+      path.resolve(process.cwd(), 'public'),      // /app/public (alternativo)
     ];
 
     for (const testPath of possiblePaths) {
