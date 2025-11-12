@@ -32,7 +32,13 @@ export const ScoreSubmissionSchema = z.object({
   
   quiz_token: z
     .string()
-    .min(1, "Token de sessão obrigatório")
+    .min(1, "Token de sessão obrigatório"),
+  
+  quiz_id: z
+    .string()
+    .min(1, "ID do quiz obrigatório")
+    .optional()
+    .default("gay")
 });
 
 /**

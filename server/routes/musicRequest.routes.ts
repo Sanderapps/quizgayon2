@@ -4,12 +4,12 @@ import { submitMusicRequest, fetchMusicRequests, updateMusicRequestStatus } from
 const router = Router();
 
 // Submeter novo pedido de música
-router.post("/music-requests", submitMusicRequest);
+router.post("/api/music-requests", submitMusicRequest);
 
 // Buscar todos os pedidos
-router.get("/music-requests", fetchMusicRequests);
+router.get("/api/music-requests", fetchMusicRequests);
 
 // Atualizar status de um pedido
-router.patch("/music-requests/:id", updateMusicRequestStatus);
+router.patch("/api/music-requests/:id", updateMusicRequestStatus);
 
 export default router;
