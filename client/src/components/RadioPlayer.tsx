@@ -76,10 +76,10 @@ export function RadioPlayer() {
                     <span className="w-1 h-2 md:h-3 bg-white rounded-full animate-pulse" style={{ animationDelay: "300ms" }}></span>
                   </span>
                 )}
-                {currentSong ? currentSong.title : "📻 QuiZoeira"}
+                📻 QuiZoeira
               </p>
-              <p className="text-white/80 text-xs md:text-sm truncate">
-                {currentSong ? currentSong.artist : (isPlaying ? "Ao vivo" : "Parado")}
+              <p className="text-white/70 text-[10px] md:text-xs truncate leading-tight">
+                {currentSong ? `${currentSong.title} - ${currentSong.artist}` : (isPlaying ? "Ao vivo" : "Parado")}
               </p>
             </div>
 

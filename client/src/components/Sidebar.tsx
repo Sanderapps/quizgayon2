@@ -15,6 +15,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
     { icon: "📊", label: "Estatísticas", page: "stats" },
     { icon: "⚙️", label: "Configurações", page: "settings" },
     { icon: "👮", label: "Admin", page: "admin" },
+    { icon: "📻", label: "Admin Rádio", page: "admin-radio" },
     { icon: "ℹ️", label: "Sobre", page: "about" },
   ];
 
@@ -28,6 +29,13 @@ export function Sidebar({ onNavigate }: SidebarProps) {
     if (page === "admin") {
       // Navegar para /admin
       window.location.href = "/admin";
+      setIsOpen(false);
+      return;
+    }
+    
+    if (page === "admin-radio") {
+      // Navegar para /admin-radio
+      window.location.href = "/admin-radio";
       setIsOpen(false);
       return;
     }
@@ -79,8 +87,8 @@ export function Sidebar({ onNavigate }: SidebarProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-2xl z-50 transform transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-2xl z-50 transform transition-all duration-300 will-change-transform ${
+          isOpen ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
         }`}
       >
         {/* Header do Sidebar */}

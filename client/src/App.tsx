@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import QuizPage from "./pages/QuizPage";
 import QuizSelector from "./pages/QuizSelector";
 import { AdminDashboard } from "./components/AdminDashboard";
+import AdminRadio from "./pages/AdminRadio";
 
 
 function Router() {
@@ -17,6 +18,7 @@ function Router() {
       <Route path={"/"} component={QuizSelector} />
       <Route path="/quiz/:quizId" component={Home} />
       <Route path={"/admin"} component={AdminDashboard} />
+      <Route path={"/admin-radio"} component={AdminRadio} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

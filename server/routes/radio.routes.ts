@@ -42,6 +42,46 @@ router.get('/health', (req: Request, res: Response) => {
   });
 });
 
+// Middleware de autenticação para rotas de admin
+const adminAuth = (req: Request, res: Response, next: Function) => {
+  const authHeader = req.headers.authorization;
+  const adminKey = process.env.RADIO_ADMIN_KEY;
+
+  if (!adminKey) {
+    return res.status(500).json({ error: 'Chave de admin não configurada no servidor' });
+  }
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Token de autenticação não fornecido' });
+  }
+
+  const token = authHeader.substring(7);
+  
+  if (token !== adminKey) {
+    return res.status(403).json({ error: 'Token de autenticação inválido' });
+  }
+
+  next();
+};
+
+// Rotas de administração da rádio
+router.post('/admin/next', adminAuth, (req: Request, res: Response) => {
+  radioStreamSimpleService.skipToNext();
+  const info = radioStreamSimpleService.getCurrentSongInfo();
+  res.json({ success: true, currentSong: info });
+});
+
+router.post('/admin/restart', adminAuth, (req: Request, res: Response) => {
+  radioStreamSimpleService.restart();
+  const info = radioStreamSimpleService.getCurrentSongInfo();
+  res.json({ success: true, currentSong: info });
+});
+
+router.get('/admin/playlist', adminAuth, (req: Request, res: Response) => {
+  const playlist = radioStreamSimpleService.getPlaylist();
+  res.json({ playlist });
+});
+
 // Endpoint de diagnóstico de sistema de arquivos
 router.get('/debug/files', async (req: Request, res: Response) => {
   try {

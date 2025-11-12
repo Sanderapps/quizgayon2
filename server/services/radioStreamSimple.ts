@@ -135,6 +135,23 @@ class RadioStreamSimpleService {
     return this.currentSongInfo;
   }
 
+  // Métodos de controle para o painel de admin
+  public skipToNext(): void {
+    this.currentSongIndex = (this.currentSongIndex + 1) % this.playlist.length;
+    this.startTime = Date.now();
+    console.log(`[RÁDIO ADMIN] ⏭️ Pulando para: ${this.playlist[this.currentSongIndex].title}`);
+  }
+
+  public restart(): void {
+    this.currentSongIndex = 0;
+    this.startTime = Date.now();
+    console.log('[RÁDIO ADMIN] 🔄 Rein iciando playlist');
+  }
+
+  public getPlaylist(): Song[] {
+    return this.playlist;
+  }
+
   public async streamCurrentSong(res: Response): Promise<void> {
     if (this.playlist.length === 0) {
       res.status(503).json({ error: 'Playlist vazia' });

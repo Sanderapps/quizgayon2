@@ -1,0 +1,54 @@
+feat: Adiciona painel de admin da rádio e melhorias de UI
+
+## Melhorias de Interface (UI/UX)
+
+### 1. Correção da Animação do Menu Hamburger
+- Corrigido bug onde o menu aparecia à esquerda antes de centralizar
+- Adicionada transição de opacidade para animação mais suave
+- Otimização de performance com will-change-transform
+
+### 2. Grid Responsivo de 3 Colunas
+- Grid de quizzes agora exibe 3 colunas em todos os tamanhos de tela
+- Melhora a experiência mobile-first do aplicativo
+- Permite visualização completa dos quizzes sem scroll
+
+### 3. Redesign da Barra da Rádio
+- Título principal alterado para "📻 QuiZoeira"
+- Nome da música exibido em texto menor abaixo
+- Hierarquia visual invertida para fortalecer a marca
+
+## Nova Funcionalidade: Painel de Admin da Rádio
+
+### Backend
+- Novos endpoints de API:
+  - POST /api/radio/admin/next - Pular para próxima música
+  - POST /api/radio/admin/restart - Reiniciar playlist
+  - GET /api/radio/admin/playlist - Listar músicas
+- Autenticação via Bearer Token (RADIO_ADMIN_KEY)
+- Métodos de controle no radioStreamSimpleService
+
+### Frontend
+- Nova página /admin-radio com interface de controle
+- Autenticação com armazenamento local da chave
+- Exibição de estatísticas em tempo real
+- Integração com menu lateral
+
+## Arquivos Modificados
+- client/src/components/Sidebar.tsx
+- client/src/components/RadioPlayer.tsx
+- client/src/pages/QuizSelector.tsx
+- client/src/App.tsx
+- server/routes/radio.routes.ts
+- server/services/radioStreamSimple.ts
+
+## Arquivos Criados
+- client/src/pages/AdminRadio.tsx
+- RAILWAY_SETUP.md
+- CHANGES_LOG.md
+
+## Configuração Necessária
+Adicionar variável de ambiente na Railway:
+RADIO_ADMIN_KEY=sua_chave_secreta_aqui
+
+## Acesso ao Painel
+URL: /admin-radio
