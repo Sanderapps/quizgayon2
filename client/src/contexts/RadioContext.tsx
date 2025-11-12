@@ -1,9 +1,16 @@
 import { createContext, useContext, useRef, useState, useEffect, ReactNode } from "react";
 
+interface Song {
+  file: string;
+  title: string;
+  artist: string;
+}
+
 interface RadioContextType {
   isPlaying: boolean;
   volume: number;
   isLoading: boolean;
+  currentSong: Song | null;
   togglePlay: () => void;
   setVolume: (volume: number) => void;
   audioRef: React.RefObject<HTMLAudioElement>;
@@ -15,6 +22,9 @@ export function RadioProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolumeState] = useState(70);
   const [isLoading, setIsLoading] = useState(false);
+  const [playlist, setPlaylist] = useState<Song[]>([]);
+  const [currentSongIndex, setCurrentSongIndex] = useState(0);
+  const [currentSong, setCurrentSong] = useState<Song | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Carregar volume salvo do localStorage
@@ -25,12 +35,29 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Inicializar o áudio uma única vez
+  // Carregar playlist
   useEffect(() => {
-    const streamUrl = "https://stream.zeno.fm/f3wvbbqmdg8uv";
-    audioRef.current = new Audio(streamUrl);
+    fetch('/music/playlist.json')
+      .then(res => res.json())
+      .then((songs: Song[]) => {
+        // Embaralhar playlist
+        const shuffled = [...songs].sort(() => Math.random() - 0.5);
+        setPlaylist(shuffled);
+        if (shuffled.length > 0) {
+          setCurrentSong(shuffled[0]);
+        }
+      })
+      .catch(err => console.error('Erro ao carregar playlist:', err));
+  }, []);
+
+  // Inicializar o áudio
+  useEffect(() => {
+    if (!currentSong || !playlist.length) return;
+
+    const audioUrl = `/music/${currentSong.file}`;
+    audioRef.current = new Audio(audioUrl);
     audioRef.current.volume = volume / 100;
-    audioRef.current.preload = "none";
+    audioRef.current.preload = "auto";
 
     // Eventos do áudio
     audioRef.current.addEventListener("playing", () => {
@@ -50,16 +77,24 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     audioRef.current.addEventListener("error", () => {
       setIsLoading(false);
       setIsPlaying(false);
+      console.error('Erro ao carregar música');
     });
 
-    // Cleanup ao desmontar o provider (nunca acontece na prática)
+    // Quando a música terminar, tocar a próxima
+    audioRef.current.addEventListener("ended", () => {
+      const nextIndex = (currentSongIndex + 1) % playlist.length;
+      setCurrentSongIndex(nextIndex);
+      setCurrentSong(playlist[nextIndex]);
+    });
+
+    // Cleanup
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.src = "";
       }
     };
-  }, []);
+  }, [currentSong, playlist]);
 
   // Atualizar volume quando mudar
   useEffect(() => {
@@ -93,6 +128,7 @@ export function RadioProvider({ children }: { children: ReactNode }) {
         isPlaying,
         volume,
         isLoading,
+        currentSong,
         togglePlay,
         setVolume,
         audioRef,
