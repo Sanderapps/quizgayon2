@@ -2,6 +2,20 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
+## [2025-11-12] - CORREÇÃO CRÍTICA: quiz_id e Pedidos de Música
+
+### Corrigido
+- **Rankings Vazios**: Adicionado `quiz_id` ao `ScoreSubmissionSchema` - agora cada quiz salva no seu próprio ranking
+- **Pedidos de Música 404**: Adicionado prefixo `/api` às rotas de music-requests
+
+### Causa Raiz
+- O schema de validação Zod não incluía `quiz_id`, então todos os scores eram salvos como 'gay'
+- As rotas de music-requests estavam sem o prefixo `/api`, causando erro 404
+
+### Detalhes Técnicos
+- Arquivos modificados: `validation.ts`, `musicRequest.routes.ts`
+- Commit: `f1d5b9c`
+
 ## [2025-11-12] - Correção de Pedidos de Música e Logs de Debug
 
 ### Corrigido
