@@ -32,6 +32,12 @@ class RadioStreamSimpleService {
     position: 0,
     duration: 0
   };
+  private io: any = null;
+
+  public setSocketIO(io: any): void {
+    this.io = io;
+    console.log('[RÁDIO] Socket.IO conectado para sincronização');
+  }
 
   constructor() {
     this.findPublicPath();
@@ -140,12 +146,14 @@ class RadioStreamSimpleService {
     this.currentSongIndex = (this.currentSongIndex + 1) % this.playlist.length;
     this.startTime = Date.now();
     console.log(`[RÁDIO ADMIN] ⏭️ Pulando para: ${this.playlist[this.currentSongIndex].title}`);
+    this.notifyListeners();
   }
 
   public restart(): void {
     this.currentSongIndex = 0;
     this.startTime = Date.now();
-    console.log('[RÁDIO ADMIN] 🔄 Rein iciando playlist');
+    console.log('[RÁDIO ADMIN] 🔄 Reiniciando playlist');
+    this.notifyListeners();
   }
 
   public getPlaylist(): Song[] {
@@ -157,6 +165,17 @@ class RadioStreamSimpleService {
       this.currentSongIndex = index;
       this.startTime = Date.now();
       console.log(`[RÁDIO ADMIN] ▶️ Tocando: ${this.playlist[index].title}`);
+      this.notifyListeners();
+    }
+  }
+
+  private notifyListeners(): void {
+    if (this.io) {
+      this.io.emit('radio:songChanged', {
+        song: this.currentSongInfo,
+        timestamp: Date.now()
+      });
+      console.log('[RÁDIO] 📡 Notificação enviada aos ouvintes');
     }
   }
 

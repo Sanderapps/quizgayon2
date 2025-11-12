@@ -52,6 +52,10 @@ async function startServer() {
   // Configurar socket do chat
   setupChatSocket(io);
 
+  // Conectar Socket.IO ao serviço de rádio para sincronização
+  const { radioStreamSimpleService } = await import('./services/radioStreamSimple.js');
+  radioStreamSimpleService.setSocketIO(io);
+
   // ==================== ROTAS DE API ====================
   
   // Usar rotas modulares

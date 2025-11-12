@@ -57,11 +57,16 @@ export default function AdminRadio() {
 
   const loadPlaylist = async () => {
     try {
+      const key = adminKey || localStorage.getItem("radio_admin_key") || "";
       const response = await fetch("/api/radio/admin/playlist", {
         headers: {
-          Authorization: `Bearer ${adminKey}`,
+          Authorization: `Bearer ${key}`,
         },
       });
+      if (!response.ok) {
+        console.error("Erro ao carregar playlist:", response.status);
+        return;
+      }
       const data = await response.json();
       setPlaylist(data.playlist || []);
     } catch (error) {

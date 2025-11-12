@@ -1,4 +1,5 @@
-import { createContext, useContext, useRef, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
+import { io } from "socket.io-client";
 
 interface Song {
   title: string;
@@ -114,6 +115,33 @@ export function RadioProvider({ children }: { children: ReactNode }) {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Sincronização em tempo real via WebSocket
+  useEffect(() => {
+    const socket = io();
+
+    socket.on('radio:songChanged', (data) => {
+      console.log('📡 Música trocada pelo admin:', data.song.title);
+      
+      // Se está tocando, reconecta ao stream para sincronizar
+      if (isPlaying && audioRef.current) {
+        const streamUrl = `/api/radio/stream?t=${Date.now()}`;
+        audioRef.current.src = streamUrl;
+        audioRef.current.load();
+        audioRef.current.play().catch(console.error);
+      }
+
+      // Atualiza informações da música
+      setCurrentSong({
+        title: data.song.title,
+        artist: data.song.artist
+      });
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [isPlaying]);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
