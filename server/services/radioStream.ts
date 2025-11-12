@@ -30,28 +30,77 @@ class RadioStreamService {
     total: 0
   };
   private isInitialized: boolean = false;
-  private publicPath: string;
+  private publicPath: string = '';
 
   constructor() {
-    // Determina o caminho correto baseado no ambiente
-    // Em produção: dist/public
-    // O __dirname aqui será dist/services após o build
-    this.publicPath = path.resolve(__dirname, '../public');
-    
-    console.log(`[RÁDIO] Caminho público configurado: ${this.publicPath}`);
+    this.findPublicPath();
     this.loadPlaylist();
   }
 
+  private findPublicPath(): void {
+    console.log(`[RÁDIO] 🔍 Procurando diretório público...`);
+    console.log(`[RÁDIO] __dirname: ${__dirname}`);
+    console.log(`[RÁDIO] process.cwd(): ${process.cwd()}`);
+
+    // Lista de caminhos possíveis para tentar
+    const possiblePaths = [
+      path.resolve(__dirname, '../public'),
+      path.resolve(process.cwd(), 'dist/public'),
+      path.resolve(process.cwd(), 'public'),
+      path.resolve(__dirname, '../../dist/public'),
+    ];
+
+    for (const testPath of possiblePaths) {
+      console.log(`[RÁDIO] 🔍 Testando: ${testPath}`);
+      if (fs.existsSync(testPath)) {
+        const musicPath = path.join(testPath, 'music');
+        if (fs.existsSync(musicPath)) {
+          this.publicPath = testPath;
+          console.log(`[RÁDIO] ✅ Diretório público encontrado: ${this.publicPath}`);
+          console.log(`[RÁDIO] ✅ Diretório de música encontrado: ${musicPath}`);
+          
+          // Lista arquivos no diretório de música
+          try {
+            const files = fs.readdirSync(musicPath);
+            console.log(`[RÁDIO] 📁 Arquivos em ${musicPath}:`, files);
+          } catch (error) {
+            console.error(`[RÁDIO] ❌ Erro ao listar arquivos:`, error);
+          }
+          
+          return;
+        } else {
+          console.log(`[RÁDIO] ⚠️  Diretório existe mas não tem pasta 'music': ${testPath}`);
+        }
+      } else {
+        console.log(`[RÁDIO] ❌ Diretório não existe: ${testPath}`);
+      }
+    }
+
+    console.error(`[RÁDIO] ❌ ERRO CRÍTICO: Nenhum diretório público válido encontrado!`);
+    console.error(`[RÁDIO] Caminhos testados:`, possiblePaths);
+  }
+
   private loadPlaylist() {
+    if (!this.publicPath) {
+      console.error('[RÁDIO] ❌ Não é possível carregar playlist: publicPath não definido');
+      return;
+    }
+
     try {
       const playlistPath = path.join(this.publicPath, 'music', 'playlist.json');
       
-      console.log(`[RÁDIO] Tentando carregar playlist de: ${playlistPath}`);
+      console.log(`[RÁDIO] 📋 Tentando carregar playlist de: ${playlistPath}`);
       
-      // Verifica se o arquivo existe
       if (!fs.existsSync(playlistPath)) {
-        console.error(`[RÁDIO] ❌ Playlist não encontrada em: ${playlistPath}`);
-        console.error(`[RÁDIO] Verifique se os arquivos foram copiados corretamente durante o build.`);
+        console.error(`[RÁDIO] ❌ Arquivo playlist.json não encontrado em: ${playlistPath}`);
+        
+        // Tenta listar o que tem no diretório
+        const musicDir = path.join(this.publicPath, 'music');
+        if (fs.existsSync(musicDir)) {
+          const files = fs.readdirSync(musicDir);
+          console.error(`[RÁDIO] 📁 Arquivos disponíveis em ${musicDir}:`, files);
+        }
+        
         return;
       }
 
@@ -59,11 +108,13 @@ class RadioStreamService {
       this.playlist = JSON.parse(playlistData);
       this.currentSongInfo.total = this.playlist.length;
       
-      console.log(`[RÁDIO] ✅ Playlist carregada com sucesso: ${this.playlist.length} músicas`);
+      console.log(`[RÁDIO] ✅ Playlist carregada com sucesso!`);
+      console.log(`[RÁDIO] 📊 Total de músicas: ${this.playlist.length}`);
       
-      // Lista as músicas carregadas
       this.playlist.forEach((song, index) => {
-        console.log(`[RÁDIO]   ${index + 1}. ${song.title} - ${song.artist}`);
+        const songPath = path.join(this.publicPath, 'music', song.file);
+        const exists = fs.existsSync(songPath);
+        console.log(`[RÁDIO]   ${index + 1}. ${song.title} - ${song.artist} ${exists ? '✅' : '❌ ARQUIVO NÃO ENCONTRADO'}`);
       });
       
     } catch (error) {
@@ -79,13 +130,14 @@ class RadioStreamService {
 
     if (this.playlist.length === 0) {
       console.error('[RÁDIO] ❌ Não é possível iniciar: playlist vazia');
-      console.error('[RÁDIO] Verifique se o arquivo playlist.json existe e contém músicas.');
+      console.error('[RÁDIO] 💡 Verifique se os arquivos foram copiados corretamente durante o build.');
+      console.error('[RÁDIO] 💡 Use o endpoint /api/radio/debug/files para diagnóstico.');
       return;
     }
 
     this.isInitialized = true;
     this.playNextSong();
-    console.log('[RÁDIO] ✅ Serviço de streaming iniciado');
+    console.log('[RÁDIO] ✅ Serviço de streaming iniciado com sucesso!');
   }
 
   private playNextSong() {
@@ -94,23 +146,21 @@ class RadioStreamService {
     }
 
     if (this.currentSongIndex >= this.playlist.length) {
-      this.currentSongIndex = 0; // Loop infinito
+      this.currentSongIndex = 0;
       console.log('[RÁDIO] 🔄 Reiniciando playlist do início');
     }
 
     const song = this.playlist[this.currentSongIndex];
     const musicPath = path.join(this.publicPath, 'music', song.file);
 
-    console.log(`[RÁDIO] 🎵 Tocando agora: ${song.title} - ${song.artist}`);
+    console.log(`[RÁDIO] 🎵 Tocando agora [${this.currentSongIndex + 1}/${this.playlist.length}]: ${song.title} - ${song.artist}`);
 
-    // Atualiza informações da música atual
     this.currentSongInfo = {
       title: song.title,
       artist: song.artist,
       total: this.playlist.length
     };
 
-    // Verifica se o arquivo existe
     if (!fs.existsSync(musicPath)) {
       console.error(`[RÁDIO] ❌ Arquivo não encontrado: ${musicPath}`);
       console.error(`[RÁDIO] Pulando para a próxima música...`);
@@ -119,28 +169,24 @@ class RadioStreamService {
       return;
     }
 
-    // Verifica se FFmpeg está disponível
     try {
-      // Inicia o FFmpeg para streaming
       this.ffmpegProcess = spawn('ffmpeg', [
-        '-re',              // Lê na velocidade nativa (tempo real)
-        '-i', musicPath,    // Arquivo de entrada
-        '-f', 'mp3',        // Formato de saída
-        '-'                 // Saída para stdout
+        '-re',
+        '-i', musicPath,
+        '-f', 'mp3',
+        '-'
       ]);
 
-      // Distribui o áudio para todos os ouvintes
       this.ffmpegProcess.stdout?.on('data', (chunk: Buffer) => {
         this.listeners.forEach(res => {
           try {
             res.write(chunk);
           } catch (error) {
-            // Ignora erros de escrita (conexão fechada)
+            // Ignora erros de escrita
           }
         });
       });
 
-      // Quando a música termina, toca a próxima
       this.ffmpegProcess.on('close', (code) => {
         if (code === 0) {
           console.log(`[RÁDIO] ✅ "${song.title}" terminou. Próxima música...`);
@@ -151,16 +197,13 @@ class RadioStreamService {
         this.playNextSong();
       });
 
-      // Log de erros do FFmpeg
       this.ffmpegProcess.stderr?.on('data', (data: Buffer) => {
-        // FFmpeg envia informações de progresso para stderr
-        // Descomente para debug detalhado:
-        // console.log(`[FFMPEG]: ${data.toString()}`);
+        // FFmpeg envia progresso para stderr
       });
 
       this.ffmpegProcess.on('error', (error) => {
         console.error('[RÁDIO] ❌ Erro no processo FFmpeg:', error);
-        console.error('[RÁDIO] Certifique-se de que o FFmpeg está instalado no sistema.');
+        console.error('[RÁDIO] Certifique-se de que o FFmpeg está instalado.');
       });
       
     } catch (error) {
@@ -174,7 +217,6 @@ class RadioStreamService {
     console.log(`[RÁDIO] 👤 Novo ouvinte conectado. Total: ${this.listeners.length + 1}`);
     this.listeners.push(res);
 
-    // Configura cabeçalhos para streaming
     res.writeHead(200, {
       'Content-Type': 'audio/mpeg',
       'Connection': 'keep-alive',
@@ -184,7 +226,6 @@ class RadioStreamService {
       'Accept-Ranges': 'none'
     });
 
-    // Remove o ouvinte quando a conexão é fechada
     res.on('close', () => {
       const index = this.listeners.indexOf(res);
       if (index > -1) {
@@ -203,5 +244,4 @@ class RadioStreamService {
   }
 }
 
-// Singleton
 export const radioStreamService = new RadioStreamService();
