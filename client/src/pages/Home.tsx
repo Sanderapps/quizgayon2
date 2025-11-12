@@ -152,19 +152,17 @@ export default function Home() {
 
 
 
-  // AudioContext global reutilizável (corrige problema mobile de limite de contextos)
-  const audioContextRef = useRef<AudioContext | null>(null);
+  // Referências de áudio para SFX de guitarra (reutilizáveis)
+  const clickSoundRef = useRef<HTMLAudioElement | null>(null);
+  const successSoundRef = useRef<HTMLAudioElement | null>(null);
   
-  const getAudioContext = () => {
-    if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
-    // Resume context se estiver suspenso (necessário para mobile)
-    if (audioContextRef.current.state === 'suspended') {
-      audioContextRef.current.resume();
-    }
-    return audioContextRef.current;
-  };
+  // Inicializar os áudios de guitarra uma vez
+  useEffect(() => {
+    clickSoundRef.current = new Audio('/sounds/guitar-click.mp3');
+    successSoundRef.current = new Audio('/sounds/guitar-success.mp3');
+    clickSoundRef.current.volume = 0.3;
+    successSoundRef.current.volume = 0.5;
+  }, []);
 
   // Função auxiliar para obter o resultado baseado na porcentagem
   const getResultByPercentage = (percentage: number): Result => {
@@ -260,92 +258,24 @@ export default function Home() {
         answers: shuffleArray(q.answers)
       }));
       setQuestions(questionsWithShuffledAnswers);
-      play8BitMusic();
     }
   }, [quizStarted, questions.length]);
 
-  // Função para gerar um som de clique/resposta 8-bit
+  // Função para tocar som de clique/resposta (power chord de guitarra)
   const playSound = () => {
-    if (!audioEnabled) return;
-    const audioContext = getAudioContext(); // Usar contexto reutilizável
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    oscillator.frequency.value = 1000; // Frequência mais alta
-    oscillator.type = "square"; // Onda quadrada para som 8-bit
-
-    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05); // Mais curto e rápido
-
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.05);
+    if (!audioEnabled || !clickSoundRef.current) return;
+    clickSoundRef.current.currentTime = 0; // Reset para permitir cliques rápidos
+    clickSoundRef.current.play().catch(() => {}); // Catch para evitar erros de autoplay
   };
 
-  // Função para gerar um som de sucesso (fim do quiz)
+  // Função para tocar som de sucesso (riff de guitarra)
   const playSuccessSound = () => {
-    if (!audioEnabled) return;
-    const audioContext = getAudioContext(); // Usar contexto reutilizável
-    const now = audioContext.currentTime;
-    const noteLength = 0.1;
-    const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6 (Acorde de C maior)
-
-    notes.forEach((freq, index) => {
-      const osc = audioContext.createOscillator();
-      const gain = audioContext.createGain();
-
-      osc.connect(gain);
-      gain.connect(audioContext.destination);
-
-      osc.frequency.value = freq;
-      osc.type = "square";
-
-      gain.gain.setValueAtTime(0.2, now + index * 0.05);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.05 + noteLength);
-
-      osc.start(now + index * 0.05);
-      osc.stop(now + index * 0.05 + noteLength);
-    });
+    if (!audioEnabled || !successSoundRef.current) return;
+    successSoundRef.current.currentTime = 0;
+    successSoundRef.current.play().catch(() => {});
   };
 
-  // Gerador de música 8-bits (toca ao iniciar quiz)
-  const play8BitMusic = () => {
-    if (!audioEnabled) return;
-    const audioContext = getAudioContext(); // Usar contexto reutilizável
-    const notes = [262, 294, 330, 349, 392, 440, 494, 523];
 
-    const playNote = (freq: number, duration: number, time: number) => {
-      const osc = audioContext.createOscillator();
-      const gain = audioContext.createGain();
-
-      osc.connect(gain);
-      gain.connect(audioContext.destination);
-
-      osc.frequency.value = freq;
-      osc.type = "square";
-
-      gain.gain.setValueAtTime(0.3, time);
-      gain.gain.exponentialRampToValueAtTime(0.01, time + duration);
-
-      osc.start(time);
-      osc.stop(time + duration);
-    };
-
-    const now = audioContext.currentTime;
-    const noteLength = 0.1;
-
-    const melody = [
-      notes[0], notes[2], notes[4], notes[5],
-      notes[4], notes[5], notes[7], notes[5],
-      notes[4], notes[2], notes[0], notes[2],
-    ];
-
-    melody.forEach((note, index) => {
-      playNote(note, noteLength, now + index * noteLength);
-    });
-  };
 
   const handleAnswer = (points: number) => {
     playSound();
