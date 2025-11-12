@@ -512,7 +512,7 @@ export default function Home() {
           </Card>
 
           {/* Placar de Líderes na tela inicial */}
-          <Leaderboard leaderboard={leaderboard} maxItems={12} />
+          <Leaderboard leaderboard={leaderboard} maxItems={100} />
         </div>
       </div>
       <ChatWidget />
@@ -575,7 +575,7 @@ export default function Home() {
           </div>
 
           {/* Placar de Líderes */}
-          <Leaderboard leaderboard={leaderboard} maxItems={12} />
+          <Leaderboard leaderboard={leaderboard} maxItems={100} />
 
           {/* Botões de Compartilhamento */}
           <div className="grid grid-cols-2 gap-3 mt-8 max-w-md mx-auto">
