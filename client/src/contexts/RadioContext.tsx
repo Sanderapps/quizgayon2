@@ -59,6 +59,17 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     audioRef.current.volume = volume / 100;
     audioRef.current.preload = "auto";
 
+    // Autoplay na primeira música
+    const isFirstLoad = currentSongIndex === 0 && !isPlaying;
+    if (isFirstLoad) {
+      setIsLoading(true);
+      // Tentar autoplay (pode falhar devido a políticas do navegador)
+      audioRef.current.play().catch((error) => {
+        console.log('Autoplay bloqueado pelo navegador:', error);
+        setIsLoading(false);
+      });
+    }
+
     // Eventos do áudio
     audioRef.current.addEventListener("playing", () => {
       setIsLoading(false);

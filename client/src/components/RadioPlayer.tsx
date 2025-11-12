@@ -105,8 +105,8 @@ export function RadioPlayer() {
               onClick={() => {
                 window.dispatchEvent(new CustomEvent('toggleChat'));
               }}
-              className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-2xl shadow-2xl hover:shadow-[0_0_40px_rgba(236,72,153,0.8)] hover:scale-110 active:scale-95 transition-all flex items-center gap-2 text-white font-black text-base md:text-lg relative overflow-hidden"
-              title="Chat Global"
+              className="px-4 py-2 md:px-6 md:py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 rounded-2xl shadow-2xl hover:shadow-[0_0_40px_rgba(236,72,153,0.8)] hover:scale-110 active:scale-95 transition-all flex items-center gap-2 text-white font-black text-base md:text-lg relative overflow-hidden chat-button"
+              title="Chat Global (Clique para abrir/fechar)"
               style={{
                 animation: "gradient-shift 3s ease infinite, pulse-glow 2s ease-in-out infinite, bounce-subtle 1.5s ease-in-out infinite",
                 backgroundSize: "200% 200%",
@@ -115,6 +115,8 @@ export function RadioPlayer() {
             >
               <MessageCircle className="w-5 h-5 md:w-6 md:h-6" />
               <span className="text-sm md:text-base">Chat</span>
+              {/* Indicador de chat aberto */}
+              <span className="chat-open-indicator hidden absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></span>
             </button>
           </div>
         </div>

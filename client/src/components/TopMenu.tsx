@@ -145,14 +145,14 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
       {/* Overlay escuro */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[50]"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998]"
           onClick={() => setIsOpen(false)}
         />
       )}
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden dropdown-menu-open">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden dropdown-menu-open">
           {/* Seção: Menu de Navegação - 7 colunas integradas */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 text-center flex items-center justify-center gap-2">
@@ -316,13 +316,13 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
       <style>{`
         .dropdown-menu-open {
           animation: expandFromButton 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-          transform-origin: top right;
+          transform-origin: top center;
         }
         
         @keyframes expandFromButton {
           from {
             opacity: 0;
-            transform: translate(calc(50vw - 2rem), -4rem) scale(0.1);
+            transform: translate(-50%, -2rem) scale(0.3);
           }
           to {
             opacity: 1;

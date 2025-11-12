@@ -60,9 +60,17 @@ export function ChatWidget() {
       setSelectedEmoji(savedEmoji);
     }
 
-    // Listener para abrir chat via evento da barra de rádio
+    // Listener para abrir/fechar chat via evento da barra de rádio
     const handleToggleChat = () => {
-      setIsOpen(true);
+      setIsOpen(prev => !prev);
+      
+      // Atualizar indicador visual no botão
+      const chatButton = document.querySelector('.chat-button .chat-open-indicator');
+      if (chatButton) {
+        setTimeout(() => {
+          chatButton.classList.toggle('hidden', isOpen);
+        }, 100);
+      }
     };
     window.addEventListener('toggleChat', handleToggleChat);
     
@@ -70,6 +78,18 @@ export function ChatWidget() {
       window.removeEventListener('toggleChat', handleToggleChat);
     };
   }, []);
+
+  // Atualizar indicador visual do botão quando o chat abre/fecha
+  useEffect(() => {
+    const chatButton = document.querySelector('.chat-button .chat-open-indicator');
+    if (chatButton) {
+      if (isOpen) {
+        chatButton.classList.remove('hidden');
+      } else {
+        chatButton.classList.add('hidden');
+      }
+    }
+  }, [isOpen]);
 
   // Scroll automático para última mensagem
   const scrollToBottom = () => {
@@ -291,13 +311,14 @@ export function ChatWidget() {
 
       {/* Janela do chat - Tela cheia responsiva */}
       {isOpen && (
-        <div className="fixed inset-0 md:bottom-28 md:right-6 md:left-auto md:top-auto md:w-96 md:h-[600px] w-full h-full bg-white dark:bg-gray-800 md:rounded-lg shadow-2xl flex flex-col border-2 border-pink-500" style={{ zIndex: 9998 }}>
+        <div className="fixed inset-0 md:bottom-28 md:right-6 md:left-auto md:top-auto md:w-96 md:h-[600px] md:max-h-[calc(100vh-8rem)] w-full h-full bg-white dark:bg-gray-800 md:rounded-lg shadow-2xl flex flex-col border-2 border-pink-500" style={{ zIndex: 9998 }}>
           {/* Header */}
-          <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-3 rounded-t-lg flex justify-between items-center">
+          <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-3 md:rounded-t-lg flex justify-between items-center flex-shrink-0">
             <h3 className="text-white font-bold">💬 Chat Global</h3>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-white hover:bg-white/20 rounded px-2"
+              className="text-white hover:bg-white/20 rounded px-3 py-1 text-xl font-bold transition-colors"
+              title="Fechar Chat"
             >
               ✕
             </button>

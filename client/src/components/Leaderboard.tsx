@@ -406,14 +406,14 @@ export const Leaderboard = ({ leaderboard, maxItems = 50 }: LeaderboardProps) =>
     }
     
     return (
-      <div key={`${category}-${index}`} className={`relative flex justify-between items-center p-1 sm:p-2 bg-gradient-to-r ${bgGradient} rounded-lg hover:scale-[1.01] transition-all duration-300 ${borderClass} ${glowClass} ${cardAnimation}`}>
+      <div key={`${category}-${index}`} className={`relative flex justify-between items-center p-0.5 sm:p-2 bg-gradient-to-r ${bgGradient} rounded-lg hover:scale-[1.01] transition-all duration-300 ${borderClass} ${glowClass} ${cardAnimation}`}>
         {specialAnimation}
-        <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-1">
+        <div className="flex items-center gap-0.5 sm:gap-2 md:gap-3 flex-1 min-w-0">
           <div className="flex flex-col items-center">
-            <span className={`text-xs sm:text-sm font-bold ${rankColor}`}>#{rank}</span>
+            <span className={`text-[10px] sm:text-sm font-bold ${rankColor}`}>#{rank}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className={`font-bold text-sm sm:text-base md:text-lg ${getCategoryTextColor(entry.percentage)} ${entry.percentage >= 90 ? 'dark:text-pink-400' : 'dark:text-gray-100'} truncate`}>
+            <p className={`font-bold text-[11px] sm:text-base md:text-lg ${getCategoryTextColor(entry.percentage)} ${entry.percentage >= 90 ? 'dark:text-pink-400' : 'dark:text-gray-100'} truncate`}>
               {entry.name}
               {/* Badges Alpha */}
               {category === 'alfas' && alphaBadges.length > 0 && (
@@ -439,7 +439,7 @@ export const Leaderboard = ({ leaderboard, maxItems = 50 }: LeaderboardProps) =>
         </div>
         <div className="flex flex-col items-center gap-0.5">
           <RankBadge rank={rank} category={category} />
-          <span className="text-lg sm:text-xl md:text-2xl font-bold text-purple-600 dark:text-purple-300">{displayPercentage}%</span>
+          <span className="text-sm sm:text-xl md:text-2xl font-bold text-purple-600 dark:text-purple-300">{displayPercentage}%</span>
         </div>
       </div>
     );
