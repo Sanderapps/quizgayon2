@@ -21,20 +21,17 @@ export function Sidebar({ onNavigate }: SidebarProps) {
 
   const handleItemClick = (page: string) => {
     if (page === "chat") {
-      // Chat já é um widget flutuante, não precisa navegar
       setIsOpen(false);
       return;
     }
     
     if (page === "admin") {
-      // Navegar para /admin
       window.location.href = "/admin";
       setIsOpen(false);
       return;
     }
     
     if (page === "admin-radio") {
-      // Navegar para /admin-radio
       window.location.href = "/admin-radio";
       setIsOpen(false);
       return;
@@ -54,6 +51,38 @@ export function Sidebar({ onNavigate }: SidebarProps) {
 
   return (
     <>
+      <style>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(-100%);
+          }
+          to {
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes slideOut {
+          from {
+            transform: translateX(0);
+          }
+          to {
+            transform: translateX(-100%);
+          }
+        }
+
+        .sidebar-enter {
+          animation: slideIn 0.3s ease-out forwards;
+        }
+
+        .sidebar-exit {
+          animation: slideOut 0.3s ease-in forwards;
+        }
+
+        .sidebar-closed {
+          transform: translateX(-100%);
+        }
+      `}</style>
+
       {/* Header Fixo */}
       <header className="fixed top-0 left-0 right-0 z-40 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 shadow-lg">
         <div className="flex items-center justify-between px-4 py-3">
@@ -72,12 +101,12 @@ export function Sidebar({ onNavigate }: SidebarProps) {
             Quiz Gayôn
           </h1>
 
-          {/* Botão Tema (já existe no ThemeToggle, mas pode adicionar aqui) */}
-          <div className="w-8"></div> {/* Spacer para centralizar título */}
+          {/* Spacer para centralizar título */}
+          <div className="w-8"></div>
         </div>
       </header>
 
-      {/* Overlay (fundo escuro quando menu aberto) */}
+      {/* Overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 transition-opacity"
@@ -87,8 +116,8 @@ export function Sidebar({ onNavigate }: SidebarProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-2xl z-50 transform transition-all duration-300 will-change-transform ${
-          isOpen ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
+        className={`fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-2xl z-50 ${
+          isOpen ? "sidebar-enter" : "sidebar-closed"
         }`}
       >
         {/* Header do Sidebar */}
