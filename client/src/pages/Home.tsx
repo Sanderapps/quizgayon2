@@ -156,6 +156,20 @@ export default function Home() {
   const clickSoundRef = useRef<HTMLAudioElement | null>(null);
   const successSoundRef = useRef<HTMLAudioElement | null>(null);
   
+  // Resetar estado quando mudar de quiz
+  useEffect(() => {
+    setCurrentQuestion(0);
+    setTotalPoints(0);
+    setShowResult(false);
+    setQuizStarted(false);
+    setQuestions([]);
+    setShowConfetti(false);
+    setFadeOut(false);
+    setShowLeaderboard(false);
+    setShowNameInput(false);
+    setStartTime(0);
+  }, [quizId]);
+
   // Inicializar os áudios de guitarra uma vez
   useEffect(() => {
     clickSoundRef.current = new Audio('/sounds/guitar-click.mp3');
@@ -240,11 +254,11 @@ export default function Home() {
   // Carregar leaderboard ao montar o componente
   useEffect(() => {
     loadLeaderboard();
-  }, []);
+  }, [quizId]); // Recarregar leaderboard quando mudar de quiz
 
-  // Embaralhar perguntas ao iniciar
+  // Embaralhar perguntas ao iniciar ou ao mudar de quiz
   useEffect(() => {
-    if (quizStarted && questions.length === 0) {
+    if (quizStarted) {
       // Usar perguntas do quiz atual (gay ou político)
       const quizQuestions = currentQuiz.questions.map(q => ({
         id: q.id,
@@ -259,7 +273,7 @@ export default function Home() {
       }));
       setQuestions(questionsWithShuffledAnswers);
     }
-  }, [quizStarted, questions.length]);
+  }, [quizStarted, quizId]); // Reembaralhar quando mudar de quiz
 
   // Função para tocar som de clique/resposta (power chord de guitarra)
   const playSound = () => {

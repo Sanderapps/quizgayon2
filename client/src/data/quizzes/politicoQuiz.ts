@@ -8,28 +8,28 @@ import { politicoQuestions } from "./politicoQuestions";
 export const politicoQuiz: Quiz = {
   id: "politico",
   slug: "politico",
-  title: "Lulista ou Bolsonarista?",
-  description: "Descubra seu posicionamento político neste quiz polêmico! De Bolsonarista Raiz a Militante Convicto.",
+  title: "Comunista ou Capitalista?",
+  description: "Descubra seu posicionamento econômico-político neste quiz polêmico! De Capitalista Raiz a Comunista Convicto.",
   emoji: "🗳️",
   
   theme: {
-    primaryColor: "#DC2626",      // Vermelho (Lulista)
-    secondaryColor: "#2563EB",    // Azul (Bolsonarista)
+    primaryColor: "#DC2626",      // Vermelho (Comunista)
+    secondaryColor: "#2563EB",    // Azul (Capitalista)
     gradient: "linear-gradient(135deg, #2563EB 0%, #DC2626 100%)",
     backgroundGradient: "linear-gradient(to bottom right, #2563EB, #DC2626)"
   },
   
   categories: {
-    // 0-49%: Bolsonarista (Azul)
+    // 0-49%: Capitalista (Azul)
     low: {
-      name: "Bolsonarista",
+      name: "Capitalista",
       emoji: "🇧🇷",
       titles: [
-        { min: 0, max: 2, title: "Bolsonarista Raiz", emoji: "🇧🇷" },
-        { min: 3, max: 5, title: "Patriota Convicto", emoji: "💪" },
-        { min: 6, max: 8, title: "Conservador Top", emoji: "🗿" },
-        { min: 9, max: 11, title: "Direita Firmeza", emoji: "🍺" },
-        { min: 12, max: 14, title: "Liberal na Veia", emoji: "💼" },
+        { min: 0, max: 2, title: "Capitalista Raiz", emoji: "💰" },
+        { min: 3, max: 5, title: "Empreendedor Nato", emoji: "💼" },
+        { min: 6, max: 8, title: "Liberal Econômico", emoji: "📈" },
+        { min: 9, max: 11, title: "Livre Mercado", emoji: "🏦" },
+        { min: 12, max: 14, title: "Meritocracia Pura", emoji: "🎯" },
         { min: 15, max: 17, title: "Centro-Direita", emoji: "⚖️" },
         { min: 18, max: 20, title: "Moderado Conservador", emoji: "🤝" },
         { min: 21, max: 23, title: "Centrista Puxando Direita", emoji: "🎯" },
@@ -90,8 +90,8 @@ export const politicoQuiz: Quiz = {
     },
     // 50-100%: Lulista (Vermelho)
     high: {
-      name: "Lulista",
-      emoji: "⭐",
+      name: "Comunista",
+      emoji: "☭",
       titles: [
         { min: 50, max: 52, title: "Começando a Acordar", emoji: "👀" },
         { min: 53, max: 55, title: "Esquerda Curiosa", emoji: "🤔" },
@@ -100,16 +100,16 @@ export const politicoQuiz: Quiz = {
         { min: 62, max: 64, title: "Centro-Esquerda", emoji: "🤝" },
         { min: 65, max: 67, title: "Moderado Progressista", emoji: "📖" },
         { min: 68, max: 70, title: "Social-Democrata", emoji: "🌹" },
-        { min: 71, max: 73, title: "Petista Assumido", emoji: "❤️" },
+        { min: 71, max: 73, title: "Socialista Assumido", emoji: "❤️" },
         { min: 74, max: 76, title: "Esquerdista Convicto", emoji: "✊" },
         { min: 77, max: 79, title: "Progressista Top", emoji: "🚩" },
-        { min: 80, max: 82, title: "Lulista Raiz", emoji: "⭐" },
+        { min: 80, max: 82, title: "Coletivista Raiz", emoji: "☭" },
         { min: 83, max: 85, title: "Militante de Carteirinha", emoji: "📛" },
         { min: 86, max: 88, title: "Companheiro Firmeza", emoji: "✊" },
         { min: 89, max: 91, title: "Revolucionário de Sofá", emoji: "🛋️" },
-        { min: 92, max: 94, title: "Esquerdista Raiz", emoji: "🚩" },
-        { min: 95, max: 97, title: "Militante Convicto", emoji: "⭐" },
-        { min: 98, max: 100, title: "Lula Livre Eterno", emoji: "🔴" },
+        { min: 92, max: 94, title: "Marxista Raiz", emoji: "🚩" },
+        { min: 95, max: 97, title: "Comunista Convicto", emoji: "☭" },
+        { min: 98, max: 100, title: "Revolução Já!", emoji: "🔴" },
       ],
       phrases: {
         1: "Começando a ver a luz 👀",

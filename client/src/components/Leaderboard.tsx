@@ -288,7 +288,7 @@ const RankBadge = ({ rank, category }: RankBadgeProps) => {
   return <span className="text-lg">⭐</span>;
 };
 
-export const Leaderboard = ({ leaderboard, maxItems = 12 }: LeaderboardProps) => {
+export const Leaderboard = ({ leaderboard, maxItems = 50 }: LeaderboardProps) => {
   // Injetar estilos CSS customizados
   React.useEffect(() => {
     const styleId = 'leaderboard-animations';
