@@ -2,6 +2,24 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
+## [2025-11-12] - Correções de UX/UI e Autoplay
+
+### Corrigido
+- **Menu**: Z-index aumentado para ficar acima da barra de rádio (z-9999)
+- **Menu**: Animação simplificada - agora vai direto ao centro sem desvio pela esquerda
+- **Leaderboard Mobile**: Reduzido padding e tamanhos de fonte para melhor visualização em telas pequenas
+- **Chat**: Botão de fechar agora visível em desktop (não sai mais da tela)
+- **Chat**: Botão de chat agora funciona como toggle (abre E fecha)
+- **Chat**: Indicador verde no botão quando chat está aberto
+- **Chat**: Altura máxima ajustada para não ultrapassar a tela
+
+### Adicionado
+- **Rádio**: Autoplay ao carregar o site (com fallback se navegador bloquear)
+
+### Detalhes Técnicos
+- Arquivos modificados: `TopMenu.tsx`, `Leaderboard.tsx`, `ChatWidget.tsx`, `RadioPlayer.tsx`, `RadioContext.tsx`
+- Commit: `6103bdd`
+
 ## [2025-11-12] - Tarefa #14 Concluída - Animação do Menu
 
 ### Corrigido
