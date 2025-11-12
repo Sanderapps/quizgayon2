@@ -43,6 +43,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* ==================== TEMA CLARO (Mantido) ==================== */
 :root {
   --primary: var(--color-blue-700);
   --primary-foreground: var(--color-blue-50);
@@ -79,39 +80,65 @@
   --sidebar-ring: oklch(0.623 0.214 259.815);
 }
 
+/* ==================== TEMA ESCURO (Rosa + Azul + Preto Forte + Cinza Escuro) ==================== */
 .dark {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-500);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.85 0.005 65);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.85 0.005 65);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.85 0.005 65);
-  --secondary: oklch(0.24 0.006 286.033);
-  --secondary-foreground: oklch(0.7 0.005 65);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground:  oklch(0.92 0.005 65);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.488 0.243 264.376);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.85 0.005 65);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground:  oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.488 0.243 264.376);
+  /* Cores primárias - Rosa vibrante */
+  --primary: #ec4899; /* pink-500 */
+  --primary-foreground: #fdf2f8; /* pink-50 */
+  
+  /* Sidebar - Rosa */
+  --sidebar-primary: #db2777; /* pink-600 */
+  --sidebar-primary-foreground: #fdf2f8;
+  
+  /* Background - Preto forte com leve toque de azul escuro */
+  --background: #0a0a0f; /* Quase preto com toque azulado */
+  --foreground: #e2e8f0; /* Texto claro */
+  
+  /* Cards - Cinza escuro com toque de azul */
+  --card: #1a1a2e; /* Cinza escuro azulado */
+  --card-foreground: #e2e8f0;
+  
+  /* Popover - Cinza escuro */
+  --popover: #1a1a2e;
+  --popover-foreground: #e2e8f0;
+  
+  /* Secondary - Azul escuro */
+  --secondary: #1e3a8a; /* blue-900 */
+  --secondary-foreground: #dbeafe; /* blue-100 */
+  
+  /* Muted - Cinza médio escuro */
+  --muted: #334155; /* slate-700 */
+  --muted-foreground: #cbd5e1; /* slate-300 */
+  
+  /* Accent - Rosa + Azul (gradiente simulado com rosa dominante) */
+  --accent: #ec4899; /* pink-500 */
+  --accent-foreground: #fdf2f8;
+  
+  /* Destructive - Vermelho escuro */
+  --destructive: #dc2626; /* red-600 */
+  --destructive-foreground: #fef2f2; /* red-50 */
+  
+  /* Borders - Cinza escuro com transparência */
+  --border: rgba(148, 163, 184, 0.2); /* slate-400 com alpha */
+  --input: rgba(148, 163, 184, 0.25);
+  
+  /* Ring - Rosa vibrante */
+  --ring: #ec4899;
+  
+  /* Charts - Gradiente rosa para azul */
+  --chart-1: #f472b6; /* pink-400 */
+  --chart-2: #a855f7; /* purple-500 */
+  --chart-3: #6366f1; /* indigo-500 */
+  --chart-4: #3b82f6; /* blue-500 */
+  --chart-5: #0ea5e9; /* sky-500 */
+  
+  /* Sidebar específico */
+  --sidebar: #1a1a2e;
+  --sidebar-foreground: #e2e8f0;
+  --sidebar-accent: #ec4899;
+  --sidebar-accent-foreground: #fdf2f8;
+  --sidebar-border: rgba(148, 163, 184, 0.2);
+  --sidebar-ring: #ec4899;
 }
 
 @layer base {

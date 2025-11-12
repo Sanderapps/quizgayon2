@@ -17,12 +17,12 @@ const quizIcons: Record<string, React.ComponentType<{ className?: string }>> = {
 
 /**
  * Página inicial com seletor de quizzes
- * Design mobile-first, moderno e compacto
+ * Design em grid de 3 colunas, mobile-first e moderno
  */
 export default function QuizSelector() {
   return (
     <div 
-      className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-red-500"
+      className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 pb-32"
       style={{
         backgroundImage: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
       }}
@@ -31,7 +31,7 @@ export default function QuizSelector() {
       <ChatWidget />
       <RadioPlayer />
       
-      <div className="container mx-auto px-4 py-8 md:py-16 max-w-4xl">
+      <div className="container mx-auto px-4 py-8 md:py-16 max-w-6xl">
         {/* Header - Mais compacto */}
         <motion.div 
           className="text-center mb-8 md:mb-12"
@@ -40,45 +40,45 @@ export default function QuizSelector() {
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-3 drop-shadow-lg">
-            Escolha seu Quiz
+            QuiZoeira
           </h1>
           <p className="text-base md:text-lg text-white/80 max-w-xl mx-auto">
             Descubra mais sobre você com nossos quizzes divertidos
           </p>
         </motion.div>
 
-        {/* Quiz Cards - Design compacto e moderno */}
-        <div className="space-y-4 md:space-y-6">
+        {/* Quiz Cards - Grid de 3 colunas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {allQuizzes.map((quiz, index) => {
             const IconComponent = quizIcons[quiz.id] || Rainbow;
             
             return (
               <motion.div
                 key={quiz.id}
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Card 
-                  className="relative overflow-hidden bg-white/95 backdrop-blur-md border-0 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
-                >
-                  <Link href={`/quiz/${quiz.slug}`}>
-                    <div className="flex items-center gap-4 p-4 md:p-6 cursor-pointer">
-                      {/* Ícone - Monocromático */}
+                <Link href={`/quiz/${quiz.slug}`}>
+                  <Card 
+                    className="relative overflow-hidden bg-white/95 backdrop-blur-md border-0 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 cursor-pointer h-full"
+                  >
+                    <div className="flex flex-col items-center p-6 text-center space-y-4">
+                      {/* Ícone - Grande e centralizado */}
                       <div 
-                        className="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center shadow-lg"
+                        className="w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center shadow-lg"
                         style={{
                           background: quiz.theme.gradient,
                         }}
                       >
-                        <IconComponent className="w-8 h-8 md:w-10 md:h-10 text-white" />
+                        <IconComponent className="w-10 h-10 md:w-12 md:h-12 text-white" />
                       </div>
 
                       {/* Conteúdo */}
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 space-y-2">
                         {/* Título */}
                         <h2 
-                          className="text-xl md:text-2xl font-bold mb-1 truncate"
+                          className="text-xl md:text-2xl font-bold"
                           style={{
                             background: quiz.theme.gradient,
                             WebkitBackgroundClip: 'text',
@@ -89,13 +89,13 @@ export default function QuizSelector() {
                           {quiz.title.replace(/[^\w\s]/gi, '').trim()}
                         </h2>
 
-                        {/* Descrição - Mais curta */}
-                        <p className="text-gray-600 text-sm md:text-base line-clamp-2 mb-2">
+                        {/* Descrição */}
+                        <p className="text-gray-600 text-sm line-clamp-3">
                           {quiz.description}
                         </p>
 
                         {/* Tags compactas */}
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap justify-center gap-2 pt-2">
                           <span className="inline-flex items-center px-2 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-medium">
                             15 perguntas
                           </span>
@@ -105,20 +105,19 @@ export default function QuizSelector() {
                         </div>
                       </div>
 
-                      {/* Seta - Indicador visual */}
-                      <div className="flex-shrink-0">
-                        <div 
-                          className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-white shadow-md"
-                          style={{
-                            background: quiz.theme.gradient,
-                          }}
-                        >
-                          <ArrowRight className="w-5 h-5 md:w-6 md:h-6" />
-                        </div>
+                      {/* Botão de ação */}
+                      <div 
+                        className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-white font-bold shadow-md transition-all hover:scale-105"
+                        style={{
+                          background: quiz.theme.gradient,
+                        }}
+                      >
+                        <span>Começar</span>
+                        <ArrowRight className="w-5 h-5" />
                       </div>
                     </div>
-                  </Link>
-                </Card>
+                  </Card>
+                </Link>
               </motion.div>
             );
           })}
