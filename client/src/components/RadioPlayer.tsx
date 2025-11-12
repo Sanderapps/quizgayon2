@@ -8,7 +8,7 @@ interface RadioPlayerProps {
 
 export function RadioPlayer({ 
   streamUrl = "https://stream.zeno.fm/f3wvbbqmdg8uv",
-  stationName = "🎸 Flashback 90-2000"
+  stationName = "📻 QuiZoeira"
 }: RadioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(70);
