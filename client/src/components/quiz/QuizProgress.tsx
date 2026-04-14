@@ -1,29 +1,29 @@
 interface QuizProgressProps {
   current: number;
   total: number;
-  percentage: number;
+  points: number;
+  maxPoints: number;
 }
 
-/**
- * Barra de progresso do quiz
- */
-export function QuizProgress({ current, total, percentage }: QuizProgressProps) {
+export function QuizProgress({ current, total, points, maxPoints }: QuizProgressProps) {
+  const progress = ((current + 1) / total) * 100;
+  const pct = Math.round((points / maxPoints) * 100);
+
   return (
-    <div className="w-full mb-8">
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-sm text-white/80">
-          Pergunta {current} de {total}
+    <div className="w-full max-w-xl mx-auto px-4 mb-6">
+      {/* Top bar: progress + score */}
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs font-bold dark:text-gray-400 text-gray-500">
+          {current + 1} <span className="dark:text-gray-600 text-gray-400">/ {total}</span>
         </span>
-        <span className="text-sm text-white/80">
-          {Math.round(percentage)}%
-        </span>
+        <div className="flex items-center gap-2">
+          <div className="orbitron text-sm font-black neon-text">{pct}%</div>
+        </div>
       </div>
-      
-      <div className="w-full bg-white/20 rounded-full h-3 overflow-hidden">
-        <div
-          className="h-full bg-gradient-to-r from-pink-500 to-purple-600 transition-all duration-500 ease-out"
-          style={{ width: `${percentage}%` }}
-        />
+
+      {/* Progress bar */}
+      <div className="progress-neon">
+        <div className="progress-neon-fill" style={{ width: `${progress}%` }} />
       </div>
     </div>
   );

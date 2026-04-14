@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Rainbow, Vote, MapPin, Sparkles } from "lucide-react";
+import { Rainbow, Vote, MapPin, Zap } from "lucide-react";
 
 interface QuizIntroProps {
   onStart: () => void;
@@ -9,54 +8,54 @@ interface QuizIntroProps {
   quizId?: string;
 }
 
-// Mapeamento de ícones para cada quiz
 const quizIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   "gay": Rainbow,
   "politico": Vote,
   "regional": MapPin,
 };
 
-/**
- * Tela de introdução do quiz
- */
-export function QuizIntro({ 
-  onStart, 
-  title = "Quão Gay Você É?",
-  description = "Descubra seu nível de gayness com este quiz divertido e sem compromisso!",
-  quizId = "gay"
-}: QuizIntroProps) {
+export function QuizIntro({ onStart, title = "Quão Gay Você É?", description = "Descubra seu nível com este quiz divertido!", quizId = "gay" }: QuizIntroProps) {
   const IconComponent = quizIcons[quizId] || Rainbow;
-  
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="max-w-2xl w-full p-8 text-center space-y-6 bg-white/10 backdrop-blur-md border-white/20">
-        <div className="mb-4 flex justify-center animate-bounce">
-          <IconComponent className="w-24 h-24 md:w-32 md:h-32 text-white" />
+    <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center p-4 page-enter">
+      <div className="max-w-lg w-full neon-card rounded-3xl p-8 md:p-10 text-center space-y-6">
+        {/* Icon with glow */}
+        <div className="relative w-24 h-24 md:w-28 md:h-28 mx-auto">
+          <div className="absolute inset-0 rounded-3xl blur-2xl opacity-30"
+            style={{ background: "linear-gradient(135deg, #a855f7, #06b6d4)" }} />
+          <div className="relative w-full h-full rounded-2xl flex items-center justify-center"
+            style={{ background: "linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(6, 182, 212, 0.15))", border: "1px solid rgba(139, 92, 246, 0.2)" }}>
+            <IconComponent className="w-12 h-12 md:w-14 md:h-14 text-purple-400" />
+          </div>
         </div>
-        
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-          {title.replace(/[^\w\s]/gi, '').trim()}
-        </h1>
-        
-        <p className="text-lg md:text-xl text-white/90 mb-8">
-          {description}
-        </p>
-        
-        <div className="space-y-4">
-          <Button
-            onClick={onStart}
-            size="lg"
-            className="w-full text-lg md:text-xl py-6 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 flex items-center justify-center gap-2"
-          >
-            <span>Começar Quiz!</span>
-            <Sparkles className="w-5 h-5" />
-          </Button>
-          
-          <p className="text-sm text-white/70">
-            15 perguntas • ~1 minuto • 100% anônimo
+
+        {/* Title */}
+        <div>
+          <h1 className="orbitron text-3xl md:text-4xl font-black dark:text-white text-gray-900 mb-3">
+            {title.replace(/[^\w\s]/gi, '').trim()}
+          </h1>
+          <p className="dark:text-gray-400 text-gray-500 text-sm md:text-base leading-relaxed max-w-sm mx-auto">
+            {description}
           </p>
         </div>
-      </Card>
+
+        {/* Stats */}
+        <div className="flex items-center justify-center gap-4 text-xs dark:text-gray-500 text-gray-400">
+          <span className="flex items-center gap-1"><Zap className="w-3.5 h-3.5 text-amber-500" /> 50 perguntas</span>
+          <span>•</span>
+          <span>~2 minutos</span>
+          <span>•</span>
+          <span>100% anônimo</span>
+        </div>
+
+        {/* Start Button */}
+        <Button onClick={onStart} size="lg"
+          className="w-full text-base py-6 rounded-xl font-bold neon-btn">
+          <span>Entrar na Arena</span>
+          <Zap className="w-5 h-5" />
+        </Button>
+      </div>
     </div>
   );
 }

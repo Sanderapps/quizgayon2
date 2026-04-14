@@ -167,7 +167,7 @@ export async function initializeDatabase() {
     `);
 
     // ==================== TABELA DE PEDIDOS DE MÚSICA ====================
-    
+
     // Criar tabela de pedidos de música se não existir
     await pool.query(`
       CREATE TABLE IF NOT EXISTS music_requests (
@@ -181,13 +181,31 @@ export async function initializeDatabase() {
 
     // Criar índices para otimizar a busca de pedidos
     await pool.query(`
-      CREATE INDEX IF NOT EXISTS idx_music_requests_created_at 
+      CREATE INDEX IF NOT EXISTS idx_music_requests_created_at
       ON music_requests(created_at DESC);
     `);
 
     await pool.query(`
-      CREATE INDEX IF NOT EXISTS idx_music_requests_status 
+      CREATE INDEX IF NOT EXISTS idx_music_requests_status
       ON music_requests(status);
+    `);
+
+    // ==================== TABELA DE CHANGELOG ====================
+
+    // Criar tabela de changelog se não existir (usada pelo admin panel)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS changelog (
+        id SERIAL PRIMARY KEY,
+        version TEXT NOT NULL,
+        description TEXT NOT NULL,
+        emoji TEXT DEFAULT '✨',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_changelog_created
+      ON changelog (created_at DESC);
     `);
 
     console.log("✅ Banco de dados inicializado com sucesso");

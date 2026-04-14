@@ -5,67 +5,55 @@ export function WelcomeAnimation() {
   const [step, setStep] = useState(0);
 
   useEffect(() => {
-    // Verificar se já viu a animação
     const hasSeenWelcome = localStorage.getItem("hasSeenWelcome");
-    
     if (!hasSeenWelcome) {
       setShow(true);
-      
-      // Sequência de animação
       setTimeout(() => setStep(1), 500);
-      setTimeout(() => setStep(2), 1500);
-      setTimeout(() => setStep(3), 2500);
+      setTimeout(() => setStep(2), 1200);
+      setTimeout(() => setStep(3), 2000);
       setTimeout(() => {
         setShow(false);
         localStorage.setItem("hasSeenWelcome", "true");
-      }, 4000);
+      }, 3500);
     }
   }, []);
 
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-pink-500 via-purple-500 to-blue-500 animate-gradient">
-      <div className="text-center">
-        {/* Passo 1: Emoji grande */}
-        {step >= 0 && (
-          <div
-            className={`text-9xl mb-8 transition-all duration-1000 ${
-              step >= 1 ? "scale-100 opacity-100" : "scale-0 opacity-0"
-            }`}
-          >
-            🌈
-          </div>
-        )}
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#06060e]">
+      {/* Ambient glow */}
+      <div className="absolute inset-0">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-cyan-500/15 rounded-full blur-3xl" />
+      </div>
 
-        {/* Passo 2: Título */}
-        {step >= 1 && (
-          <h1
-            className={`text-6xl font-bold text-white mb-4 transition-all duration-1000 ${
-              step >= 2 ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-            }`}
-          >
-            Quiz Gayôn
-          </h1>
-        )}
+      <div className="relative text-center">
+        {/* Logo */}
+        <div
+          className={`orbitron text-5xl md:text-6xl font-black mb-4 transition-all duration-700 ${
+            step >= 1 ? "opacity-100 scale-100" : "opacity-0 scale-75"
+          }`}
+        >
+          <span className="text-white">Qui</span>
+          <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">Zoeira</span>
+        </div>
 
-        {/* Passo 3: Subtítulo */}
-        {step >= 2 && (
-          <p
-            className={`text-2xl text-white/90 transition-all duration-1000 ${
-              step >= 3 ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-            }`}
-          >
-            Descubra seu lado arco-íris! ✨
-          </p>
-        )}
+        {/* Subtitle */}
+        <p
+          className={`text-lg text-gray-400 transition-all duration-700 ${
+            step >= 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}
+        >
+          ArenaQuiz — Descubra, Responda, Domine
+        </p>
 
-        {/* Passo 4: Loading dots */}
+        {/* Loading dots */}
         {step >= 3 && (
           <div className="mt-8 flex justify-center gap-2">
-            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+            {[0, 150, 300].map((delay) => (
+              <div key={delay} className="w-2.5 h-2.5 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: `${delay}ms` }} />
+            ))}
           </div>
         )}
       </div>

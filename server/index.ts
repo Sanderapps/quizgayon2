@@ -54,10 +54,21 @@ async function startServer() {
   await cleanupExpiredBans();
 
   // ==================== SOCKET.IO (CHAT) ====================
-  
+
+  // Restringir origens permitidas para segurança
+  const allowedOrigins = process.env.SOCKET_ORIGINS
+    ? process.env.SOCKET_ORIGINS.split(",")
+    : [
+        "https://web-production-b5e40.up.railway.app",
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:5173",
+      ];
+
   const io = new Server(server, {
     cors: {
-      origin: "*",
+      origin: allowedOrigins,
+      methods: ["GET", "POST"],
     },
   });
 
@@ -94,11 +105,49 @@ async function startServer() {
     console.log(`🚀 Server running on http://localhost:${port}/`);
     console.log(`📊 API disponível em /api/scores e /api/leaderboard`);
     console.log(`💬 Chat WebSocket ativo`);
-    console.log(`🔒 Admin password: ${ADMIN_PASSWORD}`);
-    
+
     // Serviço de rádio simples é inicializado automaticamente
     console.log(`📻 Serviço de rádio ativo (versão simples)`);
   });
+
+  // ==================== GRACEFUL SHUTDOWN ====================
+
+  async function gracefulShutdown(signal: string) {
+    console.log(`\n🛑 Recebido sinal ${signal}. Encerrando gracefully...`);
+
+    // Parar de aceitar novas conexões
+    server.close(async () => {
+      console.log("🔌 Servidor HTTP encerrado");
+
+      // Fechar conexões do pool PostgreSQL
+      try {
+        await pool.end();
+        console.log("🗄️ Pool PostgreSQL encerrado");
+      } catch (error) {
+        console.error("❌ Erro ao fechar pool:", error);
+      }
+
+      // Fechar conexões do Socket.IO
+      try {
+        await io.close();
+        console.log("🔌 Socket.IO encerrado");
+      } catch (error) {
+        console.error("❌ Erro ao fechar Socket.IO:", error);
+      }
+
+      console.log("✅ Shutdown completo");
+      process.exit(0);
+    });
+
+    // Forçar saída se demorar mais de 10 segundos
+    setTimeout(() => {
+      console.error("⚠️ Shutdown demorou mais de 10s. Forçando saída.");
+      process.exit(1);
+    }, 10000);
+  }
+
+  process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+  process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 }
 
 startServer().catch(console.error);
