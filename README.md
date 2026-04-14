@@ -103,6 +103,39 @@ O banco de dados PostgreSQL contém 3 tabelas principais:
 
 ---
 
+## 🚀 Deploy
+
+### Railway (Recomendado)
+
+Este projeto está configurado para deploy na **Railway** com suporte completo a WebSockets e PostgreSQL.
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.com/project/1ce4c5a0-0044-4b31-b2c4-dce9e43ded73)
+
+**URL de Produção:** https://web-production-b5e40.up.railway.app
+
+**Como deployar:**
+
+```bash
+# Instalar Railway CLI e fazer login
+railway login
+
+# Linkar o projeto e fazer deploy
+railway link --project spectacular-intuition
+railway up --service web --detach
+```
+
+**Configuração do PostgreSQL:**
+O Railway provisiona automaticamente o banco de dados PostgreSQL e configura a variável `DATABASE_URL`.
+
+**Variáveis de Ambiente:**
+- `ADMIN_PASSWORD` - Senha do painel admin
+- `RADIO_ADMIN_KEY` - Chave de acesso à administração da rádio
+- `DATABASE_URL` - Configurada automaticamente pelo Railway
+
+> ⚠️ **Nota:** A Vercel **NÃO** é recomendada para este projeto pois não suporta WebSockets/Socket.IO necessários para o chat em tempo real e streaming de rádio.
+
+---
+
 ## 📦 Instalação e Desenvolvimento
 
 **Pré-requisitos:** Node.js (>=20), pnpm, e uma instância do PostgreSQL.
