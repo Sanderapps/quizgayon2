@@ -1,4 +1,8 @@
-import "dotenv/config";
+// Carregar variáveis de ambiente apenas em desenvolvimento
+if (process.env.NODE_ENV !== "production") {
+  await import("dotenv/config");
+}
+
 import express from "express";
 import { createServer } from "http";
 import path from "path";
@@ -12,6 +16,14 @@ import { setupChatSocket } from "./sockets/chat.socket.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Debug: log DATABASE_URL em produção
+if (process.env.NODE_ENV === "production") {
+  console.log("🔧 DATABASE_URL configurada:", process.env.DATABASE_URL ? "✅ SIM" : "❌ NÃO");
+  if (process.env.DATABASE_URL) {
+    console.log("🔗 Connection string:", process.env.DATABASE_URL.substring(0, 30) + "...");
+  }
+}
 
 // Senha de admin (pode ser configurada via variável de ambiente)
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "@dm1n321";
