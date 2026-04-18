@@ -1,15 +1,26 @@
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { RadioProvider } from "./contexts/RadioContext";
-import Home from "./pages/Home";
-import QuizPage from "./pages/QuizPage";
-import QuizSelector from "./pages/QuizSelector";
-import { AdminDashboard } from "./components/AdminDashboard";
-import AdminRadio from "./pages/AdminRadio";
+
+const NotFound = lazy(() => import("@/pages/NotFound"));
+const Home = lazy(() => import("@/pages/Home"));
+const QuizSelector = lazy(() => import("@/pages/QuizSelector"));
+const AdminDashboard = lazy(() =>
+  import("@/components/AdminDashboard").then((module) => ({ default: module.AdminDashboard }))
+);
+const AdminRadio = lazy(() => import("@/pages/AdminRadio"));
+
+function RouteFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#06060e] text-gray-500 dark:text-gray-400">
+      Carregando...
+    </div>
+  );
+}
 
 
 function Router() {
@@ -40,7 +51,9 @@ function App() {
         <RadioProvider>
           <TooltipProvider>
             <Toaster />
-            <Router />
+            <Suspense fallback={<RouteFallback />}>
+              <Router />
+            </Suspense>
           </TooltipProvider>
         </RadioProvider>
       </ThemeProvider>

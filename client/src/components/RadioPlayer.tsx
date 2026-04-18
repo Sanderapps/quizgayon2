@@ -3,7 +3,7 @@ import { useRadio } from "@/contexts/RadioContext";
 import { useState } from "react";
 
 export function RadioPlayer() {
-  const { isPlaying, isLoading, currentSong, totalSongs, togglePlay } = useRadio();
+  const { isPlaying, isLoading, autoplayBlocked, currentSong, totalSongs, togglePlay } = useRadio();
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [requestName, setRequestName] = useState("");
   const [requestSong, setRequestSong] = useState("");
@@ -85,6 +85,11 @@ export function RadioPlayer() {
               <p className="dark:text-gray-500 text-gray-400 text-[11px] truncate">
                 {currentSong ? currentSong.title : (isPlaying ? "Ao vivo" : "Parado")}
               </p>
+              {autoplayBlocked && (
+                <p className="text-[10px] text-amber-500 font-medium truncate">
+                  Toque em reproduzir para retomar a rádio
+                </p>
+              )}
             </div>
           </div>
 

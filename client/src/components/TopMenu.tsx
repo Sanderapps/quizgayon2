@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { changelog } from "@/data/changelog";
 import { Home, Gamepad2, Trophy, MessageCircle, Shield, Lightbulb, Sun, Moon, Menu, X, ClipboardList, Sparkles } from "lucide-react";
 
@@ -7,6 +8,7 @@ interface TopMenuProps {
 }
 
 export function TopMenu({ onNavigate }: TopMenuProps) {
+  const [, setLocation] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem("theme");
@@ -45,12 +47,12 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
       return;
     }
     if (page === "admin") {
-      window.location.href = "/admin";
+      setLocation("/admin");
       setIsOpen(false);
       return;
     }
     if (page === "home") {
-      window.location.href = "/";
+      setLocation("/");
       setIsOpen(false);
       return;
     }

@@ -1,6 +1,10 @@
 import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
 import { io } from "socket.io-client";
 
+const RADIO_VOLUME_KEY = "radio_volume";
+const RADIO_SHOULD_RESUME_KEY = "radio_should_resume";
+const STREAM_URL = "/api/radio/stream";
+
 interface Song {
   title: string;
   artist: string;
@@ -10,6 +14,7 @@ interface RadioContextType {
   isPlaying: boolean;
   volume: number;
   isLoading: boolean;
+  autoplayBlocked: boolean;
   currentSong: Song | null;
   totalSongs: number;
   togglePlay: () => void;
@@ -23,57 +28,92 @@ export function RadioProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolumeState] = useState(70);
   const [isLoading, setIsLoading] = useState(false);
+  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
   const [totalSongs, setTotalSongs] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const shouldResumeRef = useRef(false);
+  const resumeOnInteractionRef = useRef(false);
 
   // Carregar volume salvo do localStorage
   useEffect(() => {
-    const savedVolume = localStorage.getItem("radio_volume");
+    const savedVolume = localStorage.getItem(RADIO_VOLUME_KEY);
     if (savedVolume) {
       setVolumeState(parseInt(savedVolume));
     }
+
+    shouldResumeRef.current = localStorage.getItem(RADIO_SHOULD_RESUME_KEY) === "true";
   }, []);
 
   // Inicializar o áudio com o stream do servidor
   useEffect(() => {
-    // Cria o elemento de áudio apontando para o stream
-    // Adiciona timestamp para evitar cache e sempre pegar o stream ao vivo
-    const streamUrl = '/api/radio/stream';
-    audioRef.current = new Audio(streamUrl);
+    audioRef.current = new Audio(STREAM_URL);
     audioRef.current.volume = volume / 100;
-    audioRef.current.preload = "none"; // Não pré-carregar, pois é um stream
+    audioRef.current.preload = "none";
     
-    // Desabilita seeking para comportamento de rádio ao vivo
-    audioRef.current.addEventListener('seeking', (e) => {
+    const audio = audioRef.current;
+
+    const resumePlayback = async () => {
+      if (!audioRef.current || !shouldResumeRef.current || isPlaying) return;
+
+      const liveStreamUrl = `${STREAM_URL}?t=${Date.now()}`;
+      audioRef.current.src = liveStreamUrl;
+      audioRef.current.load();
+      setIsLoading(true);
+
+      try {
+        await audioRef.current.play();
+        resumeOnInteractionRef.current = false;
+        setAutoplayBlocked(false);
+      } catch (error) {
+        console.warn("Autoplay da rádio foi bloqueado; aguardando interação do usuário.", error);
+        setIsLoading(false);
+        resumeOnInteractionRef.current = true;
+        setAutoplayBlocked(true);
+      }
+    };
+
+    const handleUserInteraction = () => {
+      if (!resumeOnInteractionRef.current) return;
+      resumePlayback().catch(console.error);
+    };
+
+    audio.addEventListener('seeking', () => {
       if (audioRef.current) {
         audioRef.current.currentTime = audioRef.current.duration || 0;
       }
     });
 
-    // Eventos do áudio
-    audioRef.current.addEventListener("playing", () => {
+    audio.addEventListener("playing", () => {
       setIsLoading(false);
       setIsPlaying(true);
+      setAutoplayBlocked(false);
     });
 
-    audioRef.current.addEventListener("waiting", () => {
+    audio.addEventListener("waiting", () => {
       setIsLoading(true);
     });
 
-    audioRef.current.addEventListener("pause", () => {
+    audio.addEventListener("pause", () => {
       setIsPlaying(false);
       setIsLoading(false);
     });
 
-    audioRef.current.addEventListener("error", (e) => {
+    audio.addEventListener("error", (e) => {
       setIsLoading(false);
       setIsPlaying(false);
+      setAutoplayBlocked(false);
       console.error('Erro ao carregar stream de rádio:', e);
     });
 
-    // Cleanup
+    window.addEventListener("pointerdown", handleUserInteraction);
+    window.addEventListener("keydown", handleUserInteraction);
+    resumePlayback().catch(console.error);
+
     return () => {
+      window.removeEventListener("pointerdown", handleUserInteraction);
+      window.removeEventListener("keydown", handleUserInteraction);
+
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.src = "";
@@ -85,7 +125,7 @@ export function RadioProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume / 100;
-      localStorage.setItem("radio_volume", volume.toString());
+      localStorage.setItem(RADIO_VOLUME_KEY, volume.toString());
     }
   }, [volume]);
 
@@ -147,19 +187,24 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     if (!audioRef.current) return;
 
     if (isPlaying) {
-      // Para o stream
+      shouldResumeRef.current = false;
+      resumeOnInteractionRef.current = false;
+      localStorage.setItem(RADIO_SHOULD_RESUME_KEY, "false");
+      setAutoplayBlocked(false);
       audioRef.current.pause();
-      audioRef.current.src = ""; // Desconecta do stream
+      audioRef.current.src = "";
     } else {
-      // Reconecta ao stream ao vivo (sempre pega o momento atual)
-      const streamUrl = `/api/radio/stream?t=${Date.now()}`;
-      audioRef.current.src = streamUrl;
+      shouldResumeRef.current = true;
+      localStorage.setItem(RADIO_SHOULD_RESUME_KEY, "true");
+      audioRef.current.src = `${STREAM_URL}?t=${Date.now()}`;
       audioRef.current.load();
       
       setIsLoading(true);
       audioRef.current.play().catch((error) => {
         console.error("Erro ao reproduzir:", error);
         setIsLoading(false);
+        resumeOnInteractionRef.current = true;
+        setAutoplayBlocked(true);
       });
     }
   };
@@ -174,6 +219,7 @@ export function RadioProvider({ children }: { children: ReactNode }) {
         isPlaying,
         volume,
         isLoading,
+        autoplayBlocked,
         currentSong,
         totalSongs,
         togglePlay,
