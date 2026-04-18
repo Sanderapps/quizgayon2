@@ -176,7 +176,10 @@ export default function Home() {
     if (quizStarted) {
       const quizQuestions = currentQuiz.questions.map(q => ({
         id: q.id, text: q.pergunta,
-        answers: q.opcoes.map(o => ({ text: `${o.emoji} ${o.texto}`, points: o.pontos }))
+        answers: q.opcoes.map(o => ({
+          text: `${o.emoji ? `${o.emoji} ` : ""}${o.texto}`,
+          points: o.pontos
+        }))
       }));
       const shuffled = shuffleArray(quizQuestions).slice(0, 15);
       setQuestions(shuffled.map(q => ({ ...q, answers: shuffleArray(q.answers) })));
@@ -216,7 +219,7 @@ export default function Home() {
 
   const startQuiz = async () => {
     try {
-      const response = await fetch('/api/quiz/start');
+      const response = await fetch(`/api/quiz/start?quiz_id=${encodeURIComponent(currentQuiz.id)}`);
       const data = await response.json();
       if (data.success && data.token) {
         sessionStorage.setItem('quiz_token', data.token);

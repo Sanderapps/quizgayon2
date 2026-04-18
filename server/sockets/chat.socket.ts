@@ -7,9 +7,7 @@ import {
   countUniqueReports,
   filterBadWords 
 } from "../services/chatService.js";
-
-// Senha de admin
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "@dm1n321";
+import { isValidAdminPassword } from "../auth/adminAuth.js";
 
 // Map para rastrear última mensagem de cada usuário (cooldown)
 const userLastMessage = new Map<string, number>();
@@ -79,7 +77,7 @@ export function setupChatSocket(io: Server) {
         const { messageId, adminPassword } = data;
 
         // Verificar senha de admin
-        if (adminPassword !== ADMIN_PASSWORD) {
+        if (!isValidAdminPassword(adminPassword)) {
           socket.emit("error", "Senha de administrador incorreta");
           return;
         }

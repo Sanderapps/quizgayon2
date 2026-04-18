@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { pool } from "../db.js";
 import { ScoreSubmissionSchema } from "../schemas/validation.js";
 import { validateQuizToken, markTokenAsUsed } from "../services/quizService.js";
 import { saveScore, getLeaderboard, getStats, deleteScore, resetLeaderboard } from "../services/scoreService.js";
@@ -26,15 +27,12 @@ export async function submitScore(req: Request, res: Response) {
     console.log(`💾 Tentando salvar pontuação: apelido=${apelido}, pontuacao=${pontuacao}, quiz_id=${quiz_id}`);
 
     // Validação de token de sessão
-    if (!validateQuizToken(quiz_token)) {
+    if (!(await validateQuizToken(quiz_token, quiz_id))) {
       console.error(`❌ Token inválido: ${quiz_token}`);
       return res.status(401).json({
         error: "Token inválido ou expirado. Inicie o quiz novamente.",
       });
     }
-
-    // Marcar token como usado
-    markTokenAsUsed(quiz_token);
 
     const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
 
@@ -46,13 +44,36 @@ export async function submitScore(req: Request, res: Response) {
       });
     }
 
-    // Salvar pontuação
-    const score = await saveScore({
-      apelido,
-      pontuacao,
-      tempo_segundos,
-      quiz_id // Agora dinâmico! 🎉
-    });
+    const client = await pool.connect();
+    let score;
+
+    try {
+      await client.query("BEGIN");
+
+      const tokenMarkedAsUsed = await markTokenAsUsed(quiz_token, quiz_id, client);
+
+      if (!tokenMarkedAsUsed) {
+        await client.query("ROLLBACK");
+        console.error(`❌ Falha ao consumir token antes de confirmar score: ${quiz_token}`);
+        return res.status(409).json({
+          error: "Sessão de quiz inválida. Inicie o quiz novamente.",
+        });
+      }
+
+      score = await saveScore({
+        apelido,
+        pontuacao,
+        tempo_segundos,
+        quiz_id
+      }, client);
+
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
 
     console.log(`✅ Pontuação salva com sucesso: ID=${score.id}, quiz_id=${quiz_id}`);
 

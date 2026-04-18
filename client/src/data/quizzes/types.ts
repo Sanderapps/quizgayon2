@@ -3,7 +3,7 @@
  */
 export interface QuestionOption {
   texto: string;
-  emoji: string;
+  emoji?: string;
   pontos: number;
 }
 

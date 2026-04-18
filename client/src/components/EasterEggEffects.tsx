@@ -4,7 +4,15 @@
  */
 
 import { useEffect, useState } from "react";
-import type { EasterEggState } from "@/hooks/useEasterEggs";
+
+export interface EasterEggState {
+  konamiActive: boolean;
+  secretMessage: string | null;
+  blackScreenMode: boolean;
+  rainbowMode: boolean;
+  prideMode: boolean;
+  discoMode: boolean;
+}
 
 interface EasterEggEffectsProps {
   state: EasterEggState;

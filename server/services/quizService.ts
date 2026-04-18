@@ -1,52 +1,73 @@
-// Gerenciar tokens de sessão do quiz
-interface QuizToken {
-  token: string;
-  createdAt: number;
-  used: boolean;
-}
+import { randomUUID } from "crypto";
+import type { PoolClient } from "pg";
+import { pool } from "../db.js";
 
-const quizTokens = new Map<string, QuizToken>();
 const TOKEN_EXPIRY_MS = 5 * 60 * 1000; // 5 minutos
 
 /**
  * Gera um token único para iniciar uma sessão de quiz
  */
-export function generateQuizToken(): string {
-  const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
-  
-  quizTokens.set(token, {
-    token,
-    createdAt: Date.now(),
-    used: false
-  });
-  
+export async function generateQuizToken(quizId: string = "gay"): Promise<string> {
+  const token = randomUUID();
+  const expiresAt = new Date(Date.now() + TOKEN_EXPIRY_MS);
+
+  await pool.query(
+    `INSERT INTO quiz_tokens (token, quiz_id, expires_at)
+     VALUES ($1, $2, $3)`,
+    [token, quizId, expiresAt]
+  );
+
   return token;
 }
 
 /**
  * Valida se um token é válido e não foi usado
  */
-export function validateQuizToken(token: string): boolean {
-  const tokenData = quizTokens.get(token);
-  
-  if (!tokenData) return false;
-  if (tokenData.used) return false;
-  if (Date.now() - tokenData.createdAt > TOKEN_EXPIRY_MS) {
-    quizTokens.delete(token);
-    return false;
+export async function validateQuizToken(token: string, quizId?: string): Promise<boolean> {
+  const params: Array<string> = [token];
+  let query = `
+    SELECT 1
+    FROM quiz_tokens
+    WHERE token = $1
+      AND used_at IS NULL
+      AND expires_at > NOW()
+  `;
+
+  if (quizId) {
+    params.push(quizId);
+    query += ` AND quiz_id = $2`;
   }
-  
-  return true;
+
+  const result = await pool.query(query, params);
+  return result.rowCount !== null && result.rowCount > 0;
 }
 
 /**
  * Marca um token como usado (para evitar reuso)
  */
-export function markTokenAsUsed(token: string): void {
-  const tokenData = quizTokens.get(token);
-  if (tokenData) {
-    tokenData.used = true;
+export async function markTokenAsUsed(
+  token: string,
+  quizId?: string,
+  client: PoolClient | typeof pool = pool
+): Promise<boolean> {
+  const params: Array<string> = [token];
+  let query = `
+    UPDATE quiz_tokens
+    SET used_at = NOW()
+    WHERE token = $1
+      AND used_at IS NULL
+      AND expires_at > NOW()
+  `;
+
+  if (quizId) {
+    params.push(quizId);
+    query += ` AND quiz_id = $2`;
   }
+
+  query += ` RETURNING token`;
+
+  const result = await client.query(query, params);
+  return result.rowCount !== null && result.rowCount > 0;
 }
 
 /**
@@ -56,12 +77,10 @@ export function getTokenExpiry(): number {
   return TOKEN_EXPIRY_MS;
 }
 
-// Limpar tokens expirados a cada 10 minutos
-setInterval(() => {
-  const now = Date.now();
-  for (const [token, data] of Array.from(quizTokens.entries())) {
-    if (now - data.createdAt > TOKEN_EXPIRY_MS) {
-      quizTokens.delete(token);
-    }
-  }
-}, 10 * 60 * 1000);
+export async function cleanupExpiredQuizTokens(): Promise<void> {
+  await pool.query(
+    `DELETE FROM quiz_tokens
+     WHERE expires_at <= NOW()
+        OR used_at IS NOT NULL`
+  );
+}

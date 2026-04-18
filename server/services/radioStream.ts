@@ -23,6 +23,7 @@ class RadioStreamService {
   private listeners: Response[] = [];
   private ffmpegProcess: ChildProcess | null = null;
   private currentSongIndex = 0;
+  private playlist: Song[] = [];
   private currentSongInfo: CurrentSongInfo = {
     title: 'Rádio Offline',
     artist: 'Aguarde...',

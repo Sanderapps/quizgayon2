@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { radioStreamSimpleService } from '../services/radioStreamSimple.js';
+import { isValidAdminPassword } from "../auth/adminAuth.js";
 
 const router = Router();
 
@@ -31,13 +32,13 @@ router.get('/stats', (req: Request, res: Response) => {
 
 // Endpoint de health check para diagnóstico
 router.get('/health', (req: Request, res: Response) => {
-  const info = radioStreamService.getCurrentSongInfo();
+  const info = radioStreamSimpleService.getCurrentSongInfo();
   const isOnline = info.title !== 'Rádio Offline';
   
   res.json({
     status: isOnline ? 'online' : 'offline',
     currentSong: info,
-    listeners: radioStreamService.getListenerCount(),
+    listeners: 0,
     message: isOnline ? 'Rádio funcionando normalmente' : 'Rádio não iniciada - verifique os logs do servidor'
   });
 });
@@ -93,7 +94,15 @@ router.post('/admin/play/:index', adminAuth, (req: Request, res: Response) => {
 });
 
 // Endpoint de diagnóstico de sistema de arquivos
-router.get('/debug/files', async (req: Request, res: Response) => {
+router.get('/debug/files', (req: Request, res: Response, next: Function) => {
+  const providedPassword = req.headers["x-admin-password"];
+
+  if (typeof providedPassword !== "string" || !isValidAdminPassword(providedPassword)) {
+    return res.status(401).json({ error: "Senha de administrador incorreta" });
+  }
+
+  next();
+}, async (req: Request, res: Response) => {
   try {
     const fs = await import('fs');
     const path = await import('path');

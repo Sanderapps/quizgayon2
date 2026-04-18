@@ -7,11 +7,16 @@ import { generateQuizToken, getTokenExpiry } from "../services/quizService.js";
  */
 export async function startQuiz(req: Request, res: Response) {
   try {
-    const token = generateQuizToken();
+    const quizId =
+      typeof req.query.quiz_id === "string" && req.query.quiz_id.trim().length > 0
+        ? req.query.quiz_id.trim()
+        : "gay";
+    const token = await generateQuizToken(quizId);
     
     res.json({
       success: true,
       token,
+      quizId,
       expiresIn: getTokenExpiry()
     });
   } catch (error) {

@@ -1,3 +1,4 @@
+import type { PoolClient } from "pg";
 import { pool } from "../db.js";
 
 export interface ScoreData {
@@ -10,10 +11,10 @@ export interface ScoreData {
 /**
  * Salva uma nova pontuação no banco de dados
  */
-export async function saveScore(data: ScoreData) {
+export async function saveScore(data: ScoreData, client: PoolClient | typeof pool = pool) {
   const { apelido, pontuacao, tempo_segundos, quiz_id = "gay" } = data;
   
-  const result = await pool.query(
+  const result = await client.query(
     `INSERT INTO scores (apelido, pontuacao, tempo_segundos, quiz_id, data_registro)
      VALUES ($1, $2, $3, $4, NOW())
      RETURNING *`,
@@ -46,7 +47,7 @@ export async function getStats(quizId: string = "gay") {
   const result = await pool.query(
     `SELECT 
        COUNT(*) as total_jogadores,
-       AVG(pontuacao) as media_pontuacao,
+       ROUND(AVG(pontuacao)::numeric, 2) as media_pontuacao,
        MAX(pontuacao) as maior_pontuacao,
        MIN(pontuacao) as menor_pontuacao
      FROM scores

@@ -18,6 +18,7 @@ export default async function handler(req: any, res: any) {
   }
 
   const app = express();
+  app.use(express.json());
   
   // Use routes
   app.use(routes);

@@ -18,9 +18,9 @@ export interface LeaderboardEntry {
 
 export interface Stats {
   total_jogadores: number;
-  pontuacao_maxima: number;
-  pontuacao_media: string;
-  tempo_minimo: number;
+  media_pontuacao: string | null;
+  maior_pontuacao: number | null;
+  menor_pontuacao: number | null;
 }
 
 const API_BASE_URL = "/api";

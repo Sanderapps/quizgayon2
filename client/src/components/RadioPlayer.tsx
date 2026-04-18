@@ -26,7 +26,7 @@ export function RadioPlayer() {
       } else {
         alert('Erro ao enviar pedido. Tente novamente.');
       }
-    } catch {
+    } catch (error) {
       console.error('Erro ao enviar pedido:', error);
       alert('Erro ao enviar pedido. Tente novamente.');
     } finally {

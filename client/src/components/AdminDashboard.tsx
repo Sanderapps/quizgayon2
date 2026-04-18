@@ -131,12 +131,23 @@ export function AdminDashboard() {
     }
   }, [isAuthenticated]);
 
-  const handleLogin = () => {
-    if (adminPassword === "@dm1n321" || adminPassword === process.env.ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      setError("");
-    } else {
-      setError("Senha incorreta");
+  const handleLogin = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/admin/stats", {
+        headers: { "X-Admin-Password": adminPassword }
+      });
+
+      if (response.ok) {
+        setIsAuthenticated(true);
+        setError("");
+      } else {
+        setError("Senha incorreta");
+      }
+    } catch (error) {
+      setError("Erro ao validar senha");
+    } finally {
+      setLoading(false);
     }
   };
 

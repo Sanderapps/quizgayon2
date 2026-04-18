@@ -14,7 +14,7 @@ interface RadioContextType {
   totalSongs: number;
   togglePlay: () => void;
   setVolume: (volume: number) => void;
-  audioRef: React.RefObject<HTMLAudioElement>;
+  audioRef: React.RefObject<HTMLAudioElement | null>;
 }
 
 const RadioContext = createContext<RadioContextType | undefined>(undefined);

@@ -11,32 +11,22 @@ interface Song {
   artist: string;
 }
 
-interface CurrentSong {
-  title: string;
-  artist: string;
-  total: number;
-  position: number;
-  duration: number;
+interface RadioStats {
+  currentSong: {
+    title: string;
+    artist: string;
+  };
+  totalSongs: number;
+  listeners: number;
 }
 
 export default function AdminRadio() {
   const [adminKey, setAdminKey] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentSong, setCurrentSong] = useState<CurrentSong | null>(null);
+  const [currentSong, setCurrentSong] = useState<RadioStats | null>(null);
   const [playlist, setPlaylist] = useState<Song[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    // Tentar carregar a chave do localStorage
-    const savedKey = localStorage.getItem("radio_admin_key");
-    if (savedKey) {
-      setAdminKey(savedKey);
-      setIsAuthenticated(true);
-      loadStats();
-      loadPlaylist();
-    }
-  }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -57,10 +47,9 @@ export default function AdminRadio() {
 
   const loadPlaylist = async () => {
     try {
-      const key = adminKey || localStorage.getItem("radio_admin_key") || "";
       const response = await fetch("/api/radio/admin/playlist", {
         headers: {
-          Authorization: `Bearer ${key}`,
+          Authorization: `Bearer ${adminKey}`,
         },
       });
       if (!response.ok) {
@@ -74,13 +63,36 @@ export default function AdminRadio() {
     }
   };
 
-  const handleAuth = () => {
-    if (adminKey.trim()) {
-      localStorage.setItem("radio_admin_key", adminKey);
+  const handleAuth = async () => {
+    const trimmedKey = adminKey.trim();
+    if (!trimmedKey) return;
+
+    setIsLoading(true);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/radio/admin/playlist", {
+        headers: {
+          Authorization: `Bearer ${trimmedKey}`,
+        },
+      });
+
+      if (!response.ok) {
+        setMessage("❌ Chave inválida");
+        return;
+      }
+
+      const data = await response.json();
+      setAdminKey(trimmedKey);
+      setPlaylist(data.playlist || []);
       setIsAuthenticated(true);
       loadStats();
-      loadPlaylist();
       setMessage("✅ Autenticado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao autenticar:", error);
+      setMessage("❌ Erro ao autenticar");
+    } finally {
+      setIsLoading(false);
       setTimeout(() => setMessage(""), 3000);
     }
   };
@@ -146,9 +158,10 @@ export default function AdminRadio() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("radio_admin_key");
     setAdminKey("");
     setIsAuthenticated(false);
+    setPlaylist([]);
+    setCurrentSong(null);
     setMessage("👋 Desconectado");
     setTimeout(() => setMessage(""), 3000);
   };
@@ -180,9 +193,10 @@ export default function AdminRadio() {
             />
             <Button
               onClick={handleAuth}
+              disabled={isLoading || !adminKey.trim()}
               className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:shadow-lg"
             >
-              Entrar
+              {isLoading ? "Validando..." : "Entrar"}
             </Button>
           </div>
 

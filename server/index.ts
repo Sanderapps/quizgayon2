@@ -1,21 +1,24 @@
-// Carregar variáveis de ambiente apenas em desenvolvimento
-if (process.env.NODE_ENV !== "production") {
-  await import("dotenv/config");
-}
-
 import express from "express";
+import dotenv from "dotenv";
 import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
 import { Server } from "socket.io";
 import { pool, initializeDatabase } from "./db.js";
+import { assertAdminPasswordConfigured } from "./auth/adminAuth.js";
 import { cleanupOldEvents, cleanupExpiredBans } from "./middleware/antiSpam.js";
 import routes from "./routes/index.js";
 import { setupChatSocket } from "./sockets/chat.socket.js";
+import { cleanupExpiredQuizTokens } from "./services/quizService.js";
 // Radio stream service removido - usando versão simples
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Carregar variáveis de ambiente apenas em desenvolvimento
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config();
+}
 
 // Debug: log DATABASE_URL em produção
 if (process.env.NODE_ENV === "production") {
@@ -25,10 +28,9 @@ if (process.env.NODE_ENV === "production") {
   }
 }
 
-// Senha de admin (pode ser configurada via variável de ambiente)
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "@dm1n321";
-
 async function startServer() {
+  assertAdminPasswordConfigured();
+
   const app = express();
   const server = createServer(app);
 
@@ -49,9 +51,15 @@ async function startServer() {
     await cleanupExpiredBans();
   }, 30 * 60 * 1000); // 30 minutos
 
+  // Limpar tokens expirados/usados a cada 10 minutos
+  setInterval(async () => {
+    await cleanupExpiredQuizTokens();
+  }, 10 * 60 * 1000); // 10 minutos
+
   // Executar limpeza inicial
   await cleanupOldEvents();
   await cleanupExpiredBans();
+  await cleanupExpiredQuizTokens();
 
   // ==================== SOCKET.IO (CHAT) ====================
 

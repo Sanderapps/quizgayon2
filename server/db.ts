@@ -166,6 +166,28 @@ export async function initializeDatabase() {
       );
     `);
 
+    // ==================== TABELA DE TOKENS DE QUIZ ====================
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS quiz_tokens (
+        token TEXT PRIMARY KEY,
+        quiz_id TEXT NOT NULL DEFAULT 'gay',
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP NOT NULL,
+        used_at TIMESTAMP
+      );
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_quiz_tokens_expires_at
+      ON quiz_tokens (expires_at);
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_quiz_tokens_used_at
+      ON quiz_tokens (used_at);
+    `);
+
     // ==================== TABELA DE PEDIDOS DE MÚSICA ====================
 
     // Criar tabela de pedidos de música se não existir
