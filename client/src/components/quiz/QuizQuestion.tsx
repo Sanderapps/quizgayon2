@@ -16,10 +16,10 @@ interface QuizQuestionProps {
 }
 
 const answerGradients = [
-  "from-purple-600/20 to-purple-600/5 hover:from-purple-600/30 hover:to-purple-600/10",
-  "from-cyan-600/20 to-cyan-600/5 hover:from-cyan-600/30 hover:to-cyan-600/10",
-  "from-pink-600/20 to-pink-600/5 hover:from-pink-600/30 hover:to-pink-600/10",
-  "from-amber-600/20 to-amber-600/5 hover:from-amber-600/30 hover:to-amber-600/10",
+  "from-purple-600/20 to-purple-600/8 hover:from-purple-600/28 hover:to-purple-600/12",
+  "from-cyan-600/20 to-cyan-600/8 hover:from-cyan-600/28 hover:to-cyan-600/12",
+  "from-pink-600/20 to-pink-600/8 hover:from-pink-600/28 hover:to-pink-600/12",
+  "from-amber-600/20 to-amber-600/8 hover:from-amber-600/28 hover:to-amber-600/12",
 ];
 
 const answerBorders = [
@@ -33,9 +33,9 @@ export function QuizQuestion({ question, questionIndex, totalQuestions, onAnswer
   return (
     <motion.div
       className="question-enter mx-auto w-full max-w-3xl"
-      initial={{ opacity: 0, y: 16, scale: 0.985 }}
+      initial={{ opacity: 0, y: 8, scale: 0.992 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="quiz-reading-surface rounded-[28px] p-5 md:p-8">
         <div className="mb-6 border-b border-slate-200/70 pb-5 text-center dark:border-white/8 md:mb-7">
@@ -56,9 +56,9 @@ export function QuizQuestion({ question, questionIndex, totalQuestions, onAnswer
                 key={i}
                 onClick={() => onAnswer(answer.points, i)}
                 disabled={selectedAnswer !== null}
-                className={`answer-option w-full touch-manipulation rounded-2xl border p-4 text-left transition-all duration-150 disabled:cursor-default md:p-5 ${
+                className={`answer-option w-full touch-manipulation rounded-2xl border p-4 text-left transition-all duration-100 disabled:cursor-default md:p-5 ${
                   isSelected
-                    ? "scale-[1.01] border-fuchsia-500/50 bg-fuchsia-500/10 shadow-[0_10px_30px_rgba(217,70,239,0.12)] dark:border-purple-400/60 dark:bg-purple-500/12"
+                    ? "scale-[1.01] border-fuchsia-500/60 bg-fuchsia-500/12 shadow-[0_12px_28px_rgba(217,70,239,0.16)] dark:border-purple-400/70 dark:bg-purple-500/14"
                     : `bg-gradient-to-r ${answerGradients[i]} ${answerBorders[i]}`
                 }`}
               >

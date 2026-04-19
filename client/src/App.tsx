@@ -29,6 +29,8 @@ function Router() {
     <Switch>
       <Route path={"/"} component={QuizSelector} />
       <Route path="/quiz/:quizId" component={Home} />
+      <Route path="/resultado" component={ResultSharePage} />
+      <Route path="/resultado/codigo/:scoreId" component={ResultSharePage} />
       <Route path="/resultado/:quizId/:percentage" component={ResultSharePage} />
       <Route path={"/admin"} component={AdminDashboard} />
       <Route path={"/admin-radio"} component={AdminRadio} />

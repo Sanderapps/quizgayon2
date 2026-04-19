@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { buildResultShareMeta } from "../client/src/lib/quizShare.ts";
+import { buildResultShareMeta, type ResultShareMeta } from "../client/src/lib/quizShare.ts";
 
 function escapeHtml(value: string) {
   return value
@@ -10,8 +10,7 @@ function escapeHtml(value: string) {
     .replaceAll(">", "&gt;");
 }
 
-export function renderResultShareHtml(indexHtmlPath: string, origin: string, quizId: string, percentage: number) {
-  const meta = buildResultShareMeta(quizId, percentage);
+function renderShareHtml(indexHtmlPath: string, origin: string, meta: ResultShareMeta) {
   const canonicalUrl = new URL(meta.canonicalPath, origin).toString();
   const imageUrl = new URL(meta.imagePath, origin).toString();
   const indexHtml = fs.readFileSync(indexHtmlPath, "utf-8");
@@ -38,6 +37,14 @@ export function renderResultShareHtml(indexHtmlPath: string, origin: string, qui
   return indexHtml
     .replace(/<title>.*?<\/title>/, tags)
     .replace('<html lang="en">', '<html lang="pt-BR">');
+}
+
+export function renderResultShareHtml(indexHtmlPath: string, origin: string, quizId: string, percentage: number) {
+  return renderShareHtml(indexHtmlPath, origin, buildResultShareMeta(quizId, percentage));
+}
+
+export function renderResultShareHtmlFromMeta(indexHtmlPath: string, origin: string, meta: ResultShareMeta) {
+  return renderShareHtml(indexHtmlPath, origin, meta);
 }
 
 export function resolveIndexHtmlPath(staticPath: string) {

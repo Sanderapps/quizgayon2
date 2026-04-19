@@ -40,6 +40,18 @@ export async function getLeaderboard(quizId: string = "gay", limit: number = 100
   return result.rows;
 }
 
+export async function getScoreById(id: number) {
+  const result = await pool.query(
+    `SELECT id, apelido, pontuacao, tempo_segundos, quiz_id, data_registro
+     FROM scores
+     WHERE id = $1
+     LIMIT 1`,
+    [id]
+  );
+
+  return result.rows[0] || null;
+}
+
 /**
  * Busca estatísticas gerais do quiz
  */

@@ -10,11 +10,12 @@ import { CardSkeleton } from "@/components/LoadingSkeleton";
 import { QuizIntro, QuizProgress, QuizQuestion, QuizResult } from "@/components/quiz";
 import { QuizShareButtons } from "@/components/quiz/QuizShareButtons";
 import { quizAudio } from "@/lib/quizAudio";
-import { buildResultShareUrl, buildShareMessage, getResultDescription } from "@/lib/quizShare";
+import { buildResultShareUrl, buildSavedScoreShareUrl, buildShareMessage, getResultDescription } from "@/lib/quizShare";
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap, Volume2, VolumeX, Trophy } from "lucide-react";
 
 const QUIZ_AUDIO_ENABLED_KEY = "quiz_audio_enabled";
+const ANSWER_ADVANCE_DELAY_MS = 95;
 
 interface Question {
   id: number;
@@ -110,6 +111,7 @@ export default function Home() {
   const [startTime, setStartTime] = useState<number>(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showIntro, setShowIntro] = useState(true);
+  const [savedScoreId, setSavedScoreId] = useState<number | null>(null);
   const answerLockRef = useRef(false);
 
   useEffect(() => {
@@ -136,6 +138,7 @@ export default function Home() {
     setStartTime(0);
     setSelectedAnswer(null);
     setShowIntro(true);
+    setSavedScoreId(null);
     answerLockRef.current = false;
   }, [quizId]);
 
@@ -218,16 +221,12 @@ export default function Home() {
     answerLockRef.current = true;
     playSound();
     setSelectedAnswer(answerIndex);
-    if (currentQuestion < questions.length - 1) {
-      window.setTimeout(() => {
-        quizAudio.playConfirm();
-      }, 120);
-    }
-    setTimeout(() => {
+    window.setTimeout(() => {
       const newTotal = totalPoints + points;
       setTotalPoints(newTotal);
       setSelectedAnswer(null);
       if (currentQuestion < questions.length - 1) {
+        quizAudio.playConfirm();
         setCurrentQuestion(currentQuestion + 1);
       } else {
         playSuccessSound();
@@ -235,7 +234,7 @@ export default function Home() {
         setShowNameInput(true);
       }
       answerLockRef.current = false;
-    }, 220);
+    }, ANSWER_ADVANCE_DELAY_MS);
   };
 
   const startQuiz = async () => {
@@ -267,6 +266,7 @@ export default function Home() {
     const apelido = name || "Anônimo";
     const saved = await salvarPontuacao(apelido, totalPoints, tempoSegundos, currentQuiz.id);
     if (saved) {
+      setSavedScoreId(saved.id || null);
       await loadLeaderboard();
     } else {
       const result = getResult();
@@ -276,6 +276,7 @@ export default function Home() {
       const updated = [entry, ...leaderboard].slice(0, 50);
       setLeaderboard(updated);
       localStorage.setItem("gayQuizLeaderboard", JSON.stringify(updated));
+      setSavedScoreId(null);
     }
     setShowNameInput(false);
     setShowResult(true);
@@ -301,7 +302,10 @@ export default function Home() {
   const shareResult = (platform: "twitter" | "facebook" | "telegram" | "whatsapp") => {
     const maxPoints = questions.length * 4;
     const percentage = Math.round((totalPoints / maxPoints) * 100);
-    const url = buildResultShareUrl(window.location.origin, currentQuiz.id, percentage, totalPoints, (Date.now() - startTime) / 1000);
+    const elapsedTime = (Date.now() - startTime) / 1000;
+    const url = savedScoreId
+      ? buildSavedScoreShareUrl(window.location.origin, savedScoreId)
+      : buildResultShareUrl(window.location.origin, currentQuiz.id, percentage, totalPoints, elapsedTime);
     const text = buildShareMessage(currentQuiz.id, percentage);
     const shareUrls = {
       twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
@@ -352,7 +356,7 @@ export default function Home() {
                 onChange={(e) => setPlayerName(e.target.value)} maxLength={20}
                 className="w-full rounded-xl border border-slate-200/80 bg-white/85 px-4 py-3 text-center text-sm text-slate-900 outline-none transition-colors focus:border-fuchsia-400/60 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100 dark:focus:border-purple-400/50" />
               <button onClick={() => saveToLeaderboard(playerName)}
-                className="neon-btn w-full rounded-xl py-3 font-bold text-white">
+                className="neon-btn neon-btn-strong w-full rounded-xl py-3 font-bold text-white">
                 <Trophy className="w-5 h-5 mr-2" />
                 Salvar no placar
               </button>
@@ -381,12 +385,12 @@ export default function Home() {
                   </h1>
                   <p className="mt-3 text-lg text-slate-600 dark:text-slate-300">{currentQuiz.description}</p>
                   <div className="mt-8 space-y-3">
-                    <button onClick={startQuiz} className="neon-btn w-full rounded-xl py-4 text-lg font-bold text-white">
+                    <button onClick={startQuiz} className="neon-btn neon-btn-strong w-full rounded-xl py-4 text-lg font-bold text-white">
                       <Zap className="w-5 h-5 mr-2 inline" />
                       Começar quiz
                     </button>
                     <button onClick={() => { setAudioEnabled(!audioEnabled); setShowIntro(false); }}
-                      className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-medium text-slate-200 transition-all hover:bg-white/10">
+                      className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200/80 bg-white/85 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-white dark:border-white/10 dark:bg-white/8 dark:text-slate-100 dark:hover:bg-white/12">
                       {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
                       Efeitos {audioEnabled ? "ligados" : "desligados"}
                     </button>
@@ -469,7 +473,7 @@ export default function Home() {
                 initial={{ opacity: 0, x: 60 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -60 }}
-                transition={{ duration: 0.35, type: "spring", stiffness: 200 }}
+                transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
               >
                 <QuizQuestion
                   question={question}

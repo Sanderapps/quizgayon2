@@ -5,6 +5,7 @@ export interface Score {
   apelido: string;
   pontuacao: number;
   tempo_segundos: number;
+  quiz_id?: string;
   data_registro?: string;
 }
 
@@ -21,6 +22,15 @@ export interface Stats {
   media_pontuacao: string | null;
   maior_pontuacao: number | null;
   menor_pontuacao: number | null;
+}
+
+export interface SharedScoreResult {
+  id: number;
+  apelido: string;
+  pontuacao: number;
+  tempo_segundos: number;
+  quiz_id: string;
+  data_registro: string;
 }
 
 const API_BASE_URL = "/api";
@@ -92,6 +102,23 @@ export async function buscarPlacar(
   } catch (error) {
     console.error("Erro de rede ao buscar placar:", error);
     return [];
+  }
+}
+
+export async function buscarResultadoCompartilhavel(id: number): Promise<SharedScoreResult | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/scores/${id}`);
+
+    if (!response.ok) {
+      console.error("Erro ao buscar resultado compartilhável");
+      return null;
+    }
+
+    const data = await response.json();
+    return data.score || null;
+  } catch (error) {
+    console.error("Erro de rede ao buscar resultado compartilhável:", error);
+    return null;
   }
 }
 

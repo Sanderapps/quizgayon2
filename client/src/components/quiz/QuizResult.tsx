@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArenaSurface } from "@/components/layout/ArenaSurface";
-import { Trophy, Share2, RotateCcw, Sparkles, ArrowRight } from "lucide-react";
+import { Trophy, Share2, RotateCcw, Sparkles, ArrowRight, BadgeCheck, TimerReset } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface QuizResultProps {
@@ -26,9 +26,9 @@ export function QuizResult({ percentage, title, emoji, description, time, points
     D: 'from-gray-500 to-gray-600',
   };
   const stats = [
-    { label: "Nível", value: `${percentage}%`, valueClassName: "neon-text" },
-    { label: "Tempo", value: `${time.toFixed(0)}s`, valueClassName: "text-cyan-400" },
-    { label: "Pontos", value: String(points), valueClassName: "text-amber-400" },
+    { label: "Faixa", value: `${percentage}%`, valueClassName: "neon-text", icon: BadgeCheck },
+    { label: "Tempo", value: `${time.toFixed(0)}s`, valueClassName: "text-cyan-400", icon: TimerReset },
+    { label: "Pontos", value: String(points), valueClassName: "text-amber-400", icon: Trophy },
   ];
 
   return (
@@ -38,40 +38,49 @@ export function QuizResult({ percentage, title, emoji, description, time, points
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <ArenaSurface variant="reading" className="space-y-6 rounded-3xl p-8 text-center md:p-10">
-        <div className="relative inline-block">
-          <div className={`orbitron bg-gradient-to-br text-7xl font-black text-transparent bg-clip-text md:text-8xl ${gradeColors[grade]}`}>
-            {grade}
+      <ArenaSurface variant="reading" className="space-y-6 rounded-3xl p-8 text-center shadow-[0_24px_80px_rgba(76,29,149,0.12)] md:p-10">
+        <div className="relative overflow-hidden rounded-[28px] border border-fuchsia-400/20 bg-gradient-to-br from-fuchsia-500/10 via-transparent to-cyan-500/10 px-6 py-8">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600 dark:bg-white/5 dark:text-slate-300">
+            Resultado final
           </div>
-          <div className="absolute -inset-4 blur-3xl opacity-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-full" />
+          <div className="relative inline-block">
+            <div className={`orbitron bg-gradient-to-br text-7xl font-black text-transparent bg-clip-text md:text-8xl ${gradeColors[grade]}`}>
+              {grade}
+            </div>
+            <div className="absolute -inset-4 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 opacity-20 blur-3xl" />
+          </div>
+
+          <div className="mt-4">
+            <div className="mb-3 text-5xl">{emoji}</div>
+            <h2 className="mb-2 text-2xl font-black text-slate-900 dark:text-slate-50 md:text-3xl">
+              {title}
+            </h2>
+            <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+              {points}/{totalQuestions * 4} pontos • {time.toFixed(1)}s
+            </p>
+          </div>
         </div>
 
-        <div>
-          <div className="mb-3 text-5xl">{emoji}</div>
-          <h2 className="mb-2 text-xl font-black text-slate-900 dark:text-slate-50 md:text-2xl">
-            {title}
-          </h2>
-          <p className="text-sm text-slate-600 dark:text-slate-300">
-            {points}/{totalQuestions * 4} pontos • {time.toFixed(1)}s
+        {description ? (
+          <p className="mx-auto max-w-md text-sm leading-relaxed text-slate-600 dark:text-slate-300 md:text-[15px]">
+            {description}
           </p>
-          {description ? (
-            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-              {description}
-            </p>
-          ) : null}
-        </div>
+        ) : null}
 
         <div className="grid grid-cols-3 gap-3">
           {stats.map((stat) => (
-            <ArenaSurface key={stat.label} variant="soft" className="rounded-xl p-3">
+            <ArenaSurface key={stat.label} variant="soft" className="rounded-xl border border-white/12 p-3">
+              <div className="mb-2 flex justify-center">
+                <stat.icon className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+              </div>
               <div className={`orbitron text-lg font-black ${stat.valueClassName}`}>{stat.value}</div>
               <div className="mt-1 text-[10px] font-medium uppercase tracking-[0.18em] text-slate-500">{stat.label}</div>
             </ArenaSurface>
           ))}
         </div>
 
-        <div className="space-y-3">
-          <Button onClick={onLeaderboard} size="lg" className="neon-btn rank-cta w-full rounded-2xl px-4 py-5 font-bold">
+        <div className="space-y-3 rounded-2xl border border-slate-200/70 bg-white/70 p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
+          <Button onClick={onLeaderboard} size="lg" className="neon-btn neon-btn-strong rank-cta w-full rounded-2xl px-4 py-5 font-bold">
             <span className="rank-cta__icon">
               <Trophy className="h-5 w-5" />
             </span>
@@ -87,12 +96,12 @@ export function QuizResult({ percentage, title, emoji, description, time, points
 
           <div className="grid grid-cols-2 gap-3">
             <Button onClick={onRestart} variant="outline" size="lg"
-              className="rounded-xl border-slate-200/70 bg-white/75 py-4 font-bold text-slate-700 transition-all hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10">
+              className="rounded-xl border-slate-300/90 bg-white py-4 font-bold text-slate-800 shadow-sm transition-all hover:bg-white dark:border-white/12 dark:bg-white/8 dark:text-slate-100 dark:hover:bg-white/12">
               <RotateCcw className="w-4 h-4 mr-1.5" />
               Jogar de novo
             </Button>
             <Button onClick={onShare} variant="outline" size="lg"
-              className="rounded-xl border-slate-200/70 bg-white/75 py-4 font-bold text-slate-700 transition-all hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10">
+              className="rounded-xl border-cyan-300/70 bg-cyan-50 py-4 font-bold text-cyan-900 shadow-sm transition-all hover:bg-cyan-100 dark:border-cyan-400/20 dark:bg-cyan-500/10 dark:text-cyan-100 dark:hover:bg-cyan-500/14">
               <Share2 className="w-4 h-4 mr-1.5" />
               Compartilhar
             </Button>

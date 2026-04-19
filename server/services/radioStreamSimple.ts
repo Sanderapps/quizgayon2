@@ -25,6 +25,7 @@ class RadioStreamSimpleService {
   private currentSongIndex = 0;
   private startTime: number = Date.now();
   private publicPath: string = '';
+  private durationCache = new Map<string, number>();
   private currentSongInfo: CurrentSongInfo = {
     title: 'Rádio Offline',
     artist: 'Aguarde...',
@@ -87,25 +88,82 @@ class RadioStreamSimpleService {
     }
   }
 
-  private async getMp3Duration(filePath: string): Promise<number> {
+  private readMp3Bitrate(filePath: string): number | null {
     try {
-      const stats = fs.statSync(filePath);
-      const fileSizeInBytes = stats.size;
-      
-      // Estimativa aproximada: MP3 128kbps = 16KB/s
-      // Duração = tamanho / (bitrate / 8)
-      const bitrateKbps = 128;
-      const bytesPerSecond = (bitrateKbps * 1000) / 8;
-      const durationSeconds = fileSizeInBytes / bytesPerSecond;
-      
-      return Math.floor(durationSeconds);
+      const fd = fs.openSync(filePath, 'r');
+      const buffer = Buffer.alloc(32768);
+      const bytesRead = fs.readSync(fd, buffer, 0, buffer.length, 0);
+      fs.closeSync(fd);
+
+      const bitrateTable: Record<string, number[]> = {
+        V1L3: [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0],
+        V2L3: [0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0],
+      };
+
+      for (let offset = 0; offset < bytesRead - 4; offset++) {
+        if (buffer[offset] !== 0xff || (buffer[offset + 1] & 0xe0) !== 0xe0) {
+          continue;
+        }
+
+        const versionBits = (buffer[offset + 1] >> 3) & 0x03;
+        const layerBits = (buffer[offset + 1] >> 1) & 0x03;
+        const bitrateIndex = (buffer[offset + 2] >> 4) & 0x0f;
+
+        const isMpeg1 = versionBits === 0x03;
+        const isLayer3 = layerBits === 0x01;
+
+        if (!isLayer3 || bitrateIndex === 0 || bitrateIndex === 0x0f) {
+          continue;
+        }
+
+        const tableKey = isMpeg1 ? 'V1L3' : 'V2L3';
+        const bitrate = bitrateTable[tableKey][bitrateIndex];
+        if (bitrate > 0) {
+          return bitrate * 1000;
+        }
+      }
+
+      return null;
     } catch (error) {
-      console.error('[RÁDIO SIMPLES] ❌ Erro ao calcular duração:', error);
-      return 180; // 3 minutos como fallback
+      console.error('[RÁDIO SIMPLES] ❌ Erro ao ler bitrate MP3:', error);
+      return null;
     }
   }
 
-  private async updateCurrentSong() {
+  private getMp3Duration(filePath: string): number {
+    const cachedDuration = this.durationCache.get(filePath);
+    if (cachedDuration) {
+      return cachedDuration;
+    }
+
+    try {
+      const stats = fs.statSync(filePath);
+      const fileSizeInBytes = stats.size;
+      const bitrate = this.readMp3Bitrate(filePath) || 128000;
+      const durationSeconds = Math.max(1, Math.floor((fileSizeInBytes * 8) / bitrate));
+      this.durationCache.set(filePath, durationSeconds);
+      return durationSeconds;
+    } catch (error) {
+      console.error('[RÁDIO SIMPLES] ❌ Erro ao calcular duração:', error);
+      return 180;
+    }
+  }
+
+  private buildSongInfo(songIndex: number, position: number): CurrentSongInfo {
+    const song = this.playlist[songIndex];
+    const songPath = path.join(this.publicPath, 'music', song.file);
+    const duration = fs.existsSync(songPath) ? this.getMp3Duration(songPath) : 0;
+
+    return {
+      title: song.title,
+      artist: song.artist,
+      total: this.playlist.length,
+      position: Math.max(0, Math.min(position, Math.max(duration - 1, 0))),
+      duration,
+    };
+  }
+
+  private updateCurrentSong() {
     if (this.playlist.length === 0) return;
 
     let elapsedSeconds = Math.floor((Date.now() - this.startTime) / 1000);
@@ -125,7 +183,7 @@ class RadioStreamSimpleService {
         continue;
       }
 
-      duration = await this.getMp3Duration(songPath);
+      duration = this.getMp3Duration(songPath);
       if (elapsedSeconds < duration) {
         break;
       }
@@ -143,13 +201,7 @@ class RadioStreamSimpleService {
       console.log(`[RÁDIO SIMPLES] 🎵 Próxima música: ${this.playlist[this.currentSongIndex].title}`);
     }
 
-    this.currentSongInfo = {
-      title: song.title,
-      artist: song.artist,
-      total: this.playlist.length,
-      position: Math.min(elapsedSeconds, Math.max(duration - 1, 0)),
-      duration
-    };
+    this.currentSongInfo = this.buildSongInfo(songIndex, elapsedSeconds);
   }
 
   public getCurrentSongInfo(): CurrentSongInfo {
@@ -160,14 +212,7 @@ class RadioStreamSimpleService {
   public skipToNext(): void {
     this.currentSongIndex = (this.currentSongIndex + 1) % this.playlist.length;
     this.startTime = Date.now();
-    const song = this.playlist[this.currentSongIndex];
-    this.currentSongInfo = {
-      title: song.title,
-      artist: song.artist,
-      total: this.playlist.length,
-      position: 0,
-      duration: 0,
-    };
+    this.currentSongInfo = this.buildSongInfo(this.currentSongIndex, 0);
     console.log(`[RÁDIO ADMIN] ⏭️ Pulando para: ${this.playlist[this.currentSongIndex].title}`);
     this.notifyListeners();
   }
@@ -175,14 +220,7 @@ class RadioStreamSimpleService {
   public restart(): void {
     this.currentSongIndex = 0;
     this.startTime = Date.now();
-    const song = this.playlist[this.currentSongIndex];
-    this.currentSongInfo = {
-      title: song.title,
-      artist: song.artist,
-      total: this.playlist.length,
-      position: 0,
-      duration: 0,
-    };
+    this.currentSongInfo = this.buildSongInfo(this.currentSongIndex, 0);
     console.log('[RÁDIO ADMIN] 🔄 Reiniciando playlist');
     this.notifyListeners();
   }
@@ -195,14 +233,7 @@ class RadioStreamSimpleService {
     if (index >= 0 && index < this.playlist.length) {
       this.currentSongIndex = index;
       this.startTime = Date.now();
-      const song = this.playlist[this.currentSongIndex];
-      this.currentSongInfo = {
-        title: song.title,
-        artist: song.artist,
-        total: this.playlist.length,
-        position: 0,
-        duration: 0,
-      };
+      this.currentSongInfo = this.buildSongInfo(this.currentSongIndex, 0);
       console.log(`[RÁDIO ADMIN] ▶️ Tocando: ${this.playlist[index].title}`);
       this.notifyListeners();
     }
@@ -236,6 +267,12 @@ class RadioStreamSimpleService {
       return;
     }
 
+    this.updateCurrentSong();
+
+    if (this.currentSongInfo.duration > 0 && this.currentSongInfo.position >= this.currentSongInfo.duration - 1) {
+      this.skipToNext();
+    }
+
     const song = this.playlist[this.currentSongIndex];
     const songPath = path.join(this.publicPath, 'music', song.file);
 
@@ -246,11 +283,11 @@ class RadioStreamSimpleService {
 
     const stat = fs.statSync(songPath);
     const fileSize = stat.size;
-    const duration = await this.getMp3Duration(songPath);
+    const duration = this.getMp3Duration(songPath);
     
     // Calcula o offset baseado na posição atual
     const position = this.currentSongInfo.position;
-    const bytesPerSecond = fileSize / duration;
+    const bytesPerSecond = duration > 0 ? fileSize / duration : fileSize;
     const startByte = Math.floor(position * bytesPerSecond);
 
     console.log(`[RÁDIO SIMPLES] 🎧 Novo ouvinte - Posição: ${position}s/${duration}s (byte ${startByte}/${fileSize})`);

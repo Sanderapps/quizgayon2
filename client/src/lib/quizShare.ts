@@ -11,6 +11,10 @@ export interface ResultShareMeta {
   imagePath: string;
 }
 
+export function buildScoreSharePath(scoreId: number | string) {
+  return `/resultado/codigo/${scoreId}`;
+}
+
 const resultCopyByQuiz: Record<string, { low: string[]; high: string[] }> = {
   gay: {
     low: [
@@ -87,6 +91,14 @@ export function buildResultShareMeta(quizId: string, percentage: number): Result
   };
 }
 
+export function buildSavedScoreShareMeta(scoreId: number | string, quizId: string, percentage: number): ResultShareMeta {
+  const meta = buildResultShareMeta(quizId, percentage);
+  return {
+    ...meta,
+    canonicalPath: buildScoreSharePath(scoreId),
+  };
+}
+
 export function buildResultShareUrl(origin: string, quizId: string, percentage: number, points?: number, time?: number) {
   const meta = buildResultShareMeta(quizId, percentage);
   const url = new URL(meta.canonicalPath, origin);
@@ -95,6 +107,10 @@ export function buildResultShareUrl(origin: string, quizId: string, percentage: 
   if (typeof time === "number") url.searchParams.set("tempo", String(Math.round(time)));
 
   return url.toString();
+}
+
+export function buildSavedScoreShareUrl(origin: string, scoreId: number | string) {
+  return new URL(buildScoreSharePath(scoreId), origin).toString();
 }
 
 export function buildShareMessage(quizId: string, percentage: number) {

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import { GifPicker } from "./GifPicker";
+import { Flag, MessageSquare, Palette, Send, SmilePlus, Sticker, Trash2, UserRound, X } from "lucide-react";
 
 interface ChatMessage {
   id: number;
@@ -199,33 +200,52 @@ export function ChatWidget() {
       )}
 
       {isOpen && (
-        <div className="fixed inset-0 md:bottom-24 md:right-4 md:left-auto md:top-auto md:w-[400px] md:h-[580px] md:max-h-[calc(100vh-6rem)] w-full h-full dark:bg-[#0e0e1a]/98 bg-white/98 backdrop-blur-xl flex flex-col dark:border border-purple-500/20 border-gray-200" style={{ zIndex: 9998 }}>
+        <div className="fixed inset-0 z-[9998] flex h-full w-full flex-col overflow-hidden border border-slate-200 bg-white/98 backdrop-blur-xl md:bottom-24 md:left-auto md:right-4 md:top-auto md:h-[580px] md:max-h-[calc(100vh-6rem)] md:w-[400px] md:rounded-[28px] dark:border-purple-500/20 dark:bg-[#0e0e1a]/98">
           {/* Header */}
-          <div className="p-3 flex justify-between items-center flex-shrink-0 dark:border-b border-purple-500/10 border-gray-100"
-            style={{ background: "linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%)" }}>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <h3 className="font-bold text-sm dark:text-white text-gray-900">Chat Global</h3>
+          <div
+            className="flex flex-shrink-0 items-center justify-between border-b border-gray-100 p-3 dark:border-purple-500/10"
+            style={{ background: "linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%)" }}
+          >
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-purple-500/20 bg-white/70 text-purple-500 dark:bg-white/5 dark:text-cyan-300">
+                <MessageSquare className="h-5 w-5" />
+              </span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white">Chat ao vivo</h3>
+                </div>
+                <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">Comentários rápidos da arena</p>
+              </div>
               {unreadCount > 0 && (
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-purple-500 text-white">{unreadCount}</span>
+                <span className="rounded-full bg-purple-500 px-1.5 py-0.5 text-[10px] font-bold text-white">{unreadCount}</span>
               )}
             </div>
-            <button onClick={() => setIsOpen(false)} className="dark:text-gray-400 text-gray-500 hover:text-gray-200 rounded-lg w-8 h-8 flex items-center justify-center hover:bg-white/5 transition-colors text-lg font-bold">
-              ✕
+            <button
+              onClick={() => setIsOpen(false)}
+              className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-500 transition-colors hover:bg-white/40 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200"
+              aria-label="Fechar chat"
+            >
+              <X className="h-4 w-4" />
             </button>
           </div>
 
           {/* Content */}
           {!isApelidoSet ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-6 overflow-y-auto">
-              <div className="text-6xl mb-4">{selectedEmoji}</div>
-              <p className="dark:text-gray-300 text-gray-600 mb-6 text-center font-medium text-sm">
-                Configure seu perfil para entrar no chat
+            <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto p-6">
+              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-[24px] border border-slate-200 bg-white/75 text-4xl dark:border-purple-500/15 dark:bg-white/5">
+                {selectedEmoji}
+              </div>
+              <p className="mb-6 text-center text-sm font-medium text-gray-600 dark:text-gray-300">
+                Defina um apelido e um avatar rápido para entrar na conversa.
               </p>
 
               {/* Avatar */}
-              <button onClick={() => setShowAvatarPicker(!showAvatarPicker)}
-                className="w-20 h-20 rounded-2xl dark:bg-white/5 bg-gray-50 flex items-center justify-center mb-4 hover:scale-105 transition-transform dark:border border-purple-500/20 border-gray-200 text-4xl">
+              <button
+                onClick={() => setShowAvatarPicker(!showAvatarPicker)}
+                className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 text-4xl transition-transform hover:scale-105 dark:border-purple-500/20 dark:bg-white/5"
+                aria-label="Escolher avatar"
+              >
                 {selectedEmoji}
               </button>
               {showAvatarPicker && (
@@ -235,60 +255,95 @@ export function ChatWidget() {
               )}
 
               {/* Nickname */}
-              <input type="text" value={apelido} onChange={(e) => setApelido(e.target.value)}
-                onKeyPress={handleKeyPress} placeholder="Seu apelido" maxLength={20}
-                className="w-full px-4 py-2.5 rounded-xl dark:bg-white/5 bg-gray-50 dark:text-white text-gray-900 dark:border-purple-500/20 border-gray-200 border-2 focus:border-purple-500 focus:outline-none transition-colors text-sm text-center mb-4" />
+              <div className="relative mb-4 w-full">
+                <UserRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={apelido}
+                  onChange={(e) => setApelido(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Seu apelido"
+                  maxLength={20}
+                  className="w-full rounded-xl border-2 border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-center text-sm text-gray-900 transition-colors focus:border-purple-500 focus:outline-none dark:border-purple-500/20 dark:bg-white/5 dark:text-white"
+                />
+              </div>
 
               {/* Color palette */}
               <div className="mb-5 w-full">
-                <p className="text-[10px] dark:text-gray-500 text-gray-400 mb-2 text-center font-medium uppercase tracking-wider">Cor do nome</p>
+                <p className="mb-2 flex items-center justify-center gap-1 text-[10px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                  <Palette className="h-3 w-3" />
+                  Cor do nome
+                </p>
                 <div className="flex flex-wrap justify-center gap-2">
                   {COLOR_PALETTE.map((color) => (
-                    <button key={color} onClick={() => setSelectedColor(color)}
-                      className={`w-8 h-8 rounded-full transition-all ${selectedColor === color ? "scale-125 ring-2 ring-white dark:ring-purple-400" : "hover:scale-110"}`}
-                      style={{ backgroundColor: color }} />
+                    <button
+                      key={color}
+                      onClick={() => setSelectedColor(color)}
+                      className={`h-8 w-8 rounded-full transition-all ${selectedColor === color ? "scale-125 ring-2 ring-white dark:ring-purple-400" : "hover:scale-110"}`}
+                      style={{ backgroundColor: color }}
+                      aria-label={`Escolher cor ${color}`}
+                    />
                   ))}
                 </div>
               </div>
 
               {/* Preview */}
-              <div className="mb-5 px-4 py-2 dark:bg-white/5 bg-gray-50 rounded-xl text-center">
+              <div className="mb-5 rounded-xl bg-gray-50 px-4 py-2 text-center dark:bg-white/5">
                 <span className="text-xl">{selectedEmoji}</span>
                 <span className="font-bold ml-2 text-sm" style={{ color: selectedColor }}>{apelido || "Seu nome"}</span>
               </div>
 
-              <button onClick={handleSetApelido} disabled={apelido.trim().length < 2}
-                className="w-full py-2.5 rounded-xl text-white font-bold text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                style={{ background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)", boxShadow: "0 0 15px rgba(168, 85, 247, 0.3)" }}>
-                Entrar no Chat
+              <button
+                onClick={handleSetApelido}
+                disabled={apelido.trim().length < 2}
+                className="w-full rounded-xl py-2.5 text-sm font-bold text-white transition-all disabled:cursor-not-allowed disabled:opacity-40"
+                style={{ background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)", boxShadow: "0 0 15px rgba(168, 85, 247, 0.3)" }}
+              >
+                Entrar no chat
               </button>
             </div>
           ) : (
             <>
               {/* Messages */}
-              <div ref={messagesContainerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-3 space-y-1.5">
+              <div ref={messagesContainerRef} onScroll={handleScroll} className="flex-1 space-y-2 overflow-y-auto p-3">
                 {isLoadingMore && (
-                  <div className="text-center text-[10px] dark:text-gray-600 text-gray-400 py-2">
+                  <div className="py-2 text-center text-[10px] text-gray-400 dark:text-gray-600">
                     Carregando mais...
                   </div>
                 )}
                 {messages.map((msg) => (
-                  <div key={msg.id} className="text-[13px] group relative py-1 px-2 rounded-lg hover:bg-white/5 dark:hover:bg-white/5 transition-colors">
-                    <div className="flex items-start gap-1.5">
-                      <span className="text-base flex-shrink-0 mt-0.5">{msg.emoji_avatar || "😀"}</span>
+                  <div key={msg.id} className="group relative rounded-xl border border-transparent bg-black/[0.015] px-2.5 py-2 text-[13px] transition-colors hover:border-white/8 hover:bg-white/40 dark:bg-white/[0.02] dark:hover:bg-white/5">
+                    <div className="flex items-start gap-2">
+                      <span className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-white/70 text-base dark:bg-white/5">
+                        {msg.emoji_avatar || "😀"}
+                      </span>
                       <div className="flex-1 min-w-0">
-                        <span className="font-bold text-xs" style={{ color: msg.cor }}>{msg.apelido}:</span>{" "}
+                        <span className="text-xs font-bold" style={{ color: msg.cor }}>{msg.apelido}</span>{" "}
                         {msg.tipo === 'gif' && msg.gif_url ? (
                           <img src={msg.gif_url} alt="GIF" className="mt-1.5 max-w-full rounded-lg max-h-40 object-contain" loading="lazy" />
                         ) : (
-                          <span className="dark:text-gray-300 text-gray-700 break-words" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                          <span className="break-words text-gray-700 dark:text-gray-300" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                             {msg.mensagem}
                           </span>
                         )}
                       </div>
-                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => handleReportMessage(msg.id)} className="text-xs hover:scale-110 transition-transform" title="Reportar">🚨</button>
-                        <button onClick={() => handleDeleteMessage(msg.id)} className="text-xs hover:scale-110 transition-transform" title="Deletar">🗑️</button>
+                      <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                        <button
+                          onClick={() => handleReportMessage(msg.id)}
+                          className="rounded-lg p-1 text-amber-500 transition-colors hover:bg-amber-500/10"
+                          title="Reportar"
+                          aria-label="Reportar mensagem"
+                        >
+                          <Flag className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteMessage(msg.id)}
+                          className="rounded-lg p-1 text-rose-500 transition-colors hover:bg-rose-500/10"
+                          title="Deletar"
+                          aria-label="Deletar mensagem"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -298,7 +353,7 @@ export function ChatWidget() {
 
               {/* Error */}
               {error && (
-                <div className="px-3 py-1.5 dark:bg-red-500/10 bg-red-50 dark:text-red-400 text-red-600 text-[11px] text-center font-medium">
+                <div className="px-3 py-1.5 text-center text-[11px] font-medium text-red-600 bg-red-50 dark:bg-red-500/10 dark:text-red-400">
                   {error}
                 </div>
               )}
@@ -311,24 +366,44 @@ export function ChatWidget() {
               )}
 
               {/* Input */}
-              <div className="p-2.5 dark:border-t border-purple-500/10 border-gray-100 flex gap-2 items-end">
-                <button onClick={() => setShowEmojiPicker(!showEmojiPicker)} className="text-xl hover:scale-110 transition-transform p-1">😀</button>
-                <button onClick={() => setShowGifPicker(true)} disabled={gifCooldown > 0}
-                  className="text-xl hover:scale-110 transition-transform p-1 relative disabled:opacity-40 disabled:cursor-not-allowed"
-                  title={gifCooldown > 0 ? `Aguarde ${gifCooldown}s` : "Enviar GIF"}>
-                  🎬
+              <div className="flex items-end gap-2 border-t border-gray-100 p-2.5 dark:border-purple-500/10">
+                <button
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
+                  aria-label="Abrir emojis"
+                >
+                  <SmilePlus className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setShowGifPicker(true)}
+                  disabled={gifCooldown > 0}
+                  className="relative flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-40 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
+                  title={gifCooldown > 0 ? `Aguarde ${gifCooldown}s` : "Enviar GIF"}
+                  aria-label="Abrir GIFs"
+                >
+                  <Sticker className="h-4 w-4" />
                   {gifCooldown > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-bold rounded-full w-4 h-4 flex items-center justify-center">{gifCooldown}</span>
+                    <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white">{gifCooldown}</span>
                   )}
                 </button>
-                <textarea value={inputMessage} onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={handleKeyPress} placeholder="Digite sua mensagem..." maxLength={200} rows={1}
-                  className="flex-1 px-3 py-2 rounded-xl text-[13px] dark:bg-white/5 bg-gray-50 dark:text-white text-gray-900 dark:border-purple-500/15 border-gray-200 border focus:border-purple-500 focus:outline-none resize-none dark:placeholder-gray-600 placeholder-gray-400"
-                  style={{ minHeight: "38px", maxHeight: "70px" }} />
-                <button onClick={handleSendMessage} disabled={!inputMessage.trim()}
-                  className="px-3 py-2 rounded-xl text-white font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95"
-                  style={{ background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)", boxShadow: "0 0 10px rgba(168, 85, 247, 0.3)" }}>
-                  ➤
+                <textarea
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Escreva uma mensagem"
+                  maxLength={200}
+                  rows={1}
+                  className="flex-1 resize-none rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-[13px] text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:outline-none dark:border-purple-500/15 dark:bg-white/5 dark:text-white dark:placeholder-gray-600"
+                  style={{ minHeight: "40px", maxHeight: "72px" }}
+                />
+                <button
+                  onClick={handleSendMessage}
+                  disabled={!inputMessage.trim()}
+                  className="flex h-10 w-10 items-center justify-center rounded-xl text-white transition-all hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+                  style={{ background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)", boxShadow: "0 0 10px rgba(168, 85, 247, 0.3)" }}
+                  aria-label="Enviar mensagem"
+                >
+                  <Send className="h-4 w-4" />
                 </button>
               </div>
             </>

@@ -47,6 +47,10 @@ export function RadioProvider({ children }: { children: ReactNode }) {
   const resumeOnInteractionRef = useRef(false);
   const reconnectTimeoutRef = useRef<number | null>(null);
   const manualStopRef = useRef(false);
+  const streamOffsetRef = useRef(0);
+  const isPlayingRef = useRef(false);
+  const currentPositionRef = useRef(0);
+  const currentDurationRef = useRef(0);
 
   const clearReconnectTimeout = () => {
     if (reconnectTimeoutRef.current !== null) {
@@ -60,13 +64,14 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     if (!audio) return;
 
     clearReconnectTimeout();
+    streamOffsetRef.current = currentPositionRef.current;
     audio.src = `${STREAM_URL}?t=${Date.now()}`;
     audio.load();
     setIsLoading(true);
     await audio.play();
   };
 
-  const scheduleReconnect = (reason: "ended" | "error" | "songChanged", delay = 700) => {
+  const scheduleReconnect = (reason: "ended" | "error" | "songChanged", delay = 200) => {
     if (!audioRef.current || !shouldResumeRef.current || reconnectTimeoutRef.current !== null) {
       return;
     }
@@ -87,7 +92,7 @@ export function RadioProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        scheduleReconnect(reason, Math.min(delay + 500, 2500));
+        scheduleReconnect(reason, Math.min(delay + 250, 1400));
       });
     }, delay);
   };
@@ -102,6 +107,18 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     shouldResumeRef.current = localStorage.getItem(RADIO_SHOULD_RESUME_KEY) === "true";
   }, []);
 
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
+
+  useEffect(() => {
+    currentPositionRef.current = currentPosition;
+  }, [currentPosition]);
+
+  useEffect(() => {
+    currentDurationRef.current = currentDuration;
+  }, [currentDuration]);
+
   // Inicializar o áudio com o stream do servidor
   useEffect(() => {
     audioRef.current = new Audio(STREAM_URL);
@@ -111,7 +128,7 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     const audio = audioRef.current;
 
     const resumePlayback = async () => {
-      if (!audioRef.current || !shouldResumeRef.current || isPlaying) return;
+      if (!audioRef.current || !shouldResumeRef.current || isPlayingRef.current) return;
 
       try {
         await connectToLiveStream();
@@ -130,23 +147,40 @@ export function RadioProvider({ children }: { children: ReactNode }) {
       resumePlayback().catch(console.error);
     };
 
-    audio.addEventListener('seeking', () => {
-      if (audioRef.current) {
-        audioRef.current.currentTime = audioRef.current.duration || 0;
+    const handleLoadedMetadata = () => {
+      if (!audioRef.current) return;
+      const remainingDuration = Number.isFinite(audioRef.current.duration) ? audioRef.current.duration : 0;
+      if (remainingDuration > 0) {
+        setCurrentDuration((prev) => Math.max(prev, Math.round(streamOffsetRef.current + remainingDuration)));
       }
-    });
+    };
 
-    audio.addEventListener("playing", () => {
+    const handleTimeUpdate = () => {
+      if (!audioRef.current) return;
+      const audioElement = audioRef.current;
+
+      const actualPosition = streamOffsetRef.current + audioElement.currentTime;
+      setCurrentPosition(Math.floor(actualPosition));
+
+      if (Number.isFinite(audioElement.duration) && audioElement.duration > 0) {
+        setCurrentDuration((prev) =>
+          Math.max(prev, Math.round(streamOffsetRef.current + audioElement.duration), Math.ceil(actualPosition))
+        );
+      }
+    };
+
+    const handlePlaying = () => {
       setIsLoading(false);
       setIsPlaying(true);
       setAutoplayBlocked(false);
-    });
+      setCurrentPosition(Math.floor(streamOffsetRef.current));
+    };
 
-    audio.addEventListener("waiting", () => {
+    const handleWaiting = () => {
       setIsLoading(true);
-    });
+    };
 
-    audio.addEventListener("pause", () => {
+    const handlePause = () => {
       if (!manualStopRef.current && shouldResumeRef.current) {
         return;
       }
@@ -154,14 +188,15 @@ export function RadioProvider({ children }: { children: ReactNode }) {
       manualStopRef.current = false;
       setIsPlaying(false);
       setIsLoading(false);
-    });
+    };
 
-    audio.addEventListener("ended", () => {
+    const handleEnded = () => {
       if (!shouldResumeRef.current) return;
-      scheduleReconnect("ended");
-    });
+      setCurrentPosition((prev) => Math.max(prev, currentDurationRef.current));
+      scheduleReconnect("ended", 80);
+    };
 
-    audio.addEventListener("error", (e) => {
+    const handleError = (e: Event) => {
       console.error('Erro ao carregar stream de rádio:', e);
 
       if (shouldResumeRef.current) {
@@ -172,7 +207,15 @@ export function RadioProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
       setIsPlaying(false);
       setAutoplayBlocked(false);
-    });
+    };
+
+    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("playing", handlePlaying);
+    audio.addEventListener("waiting", handleWaiting);
+    audio.addEventListener("pause", handlePause);
+    audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("error", handleError);
 
     window.addEventListener("pointerdown", handleUserInteraction);
     window.addEventListener("keydown", handleUserInteraction);
@@ -184,6 +227,13 @@ export function RadioProvider({ children }: { children: ReactNode }) {
       clearReconnectTimeout();
 
       if (audioRef.current) {
+        audioRef.current.removeEventListener("loadedmetadata", handleLoadedMetadata);
+        audioRef.current.removeEventListener("timeupdate", handleTimeUpdate);
+        audioRef.current.removeEventListener("playing", handlePlaying);
+        audioRef.current.removeEventListener("waiting", handleWaiting);
+        audioRef.current.removeEventListener("pause", handlePause);
+        audioRef.current.removeEventListener("ended", handleEnded);
+        audioRef.current.removeEventListener("error", handleError);
         audioRef.current.pause();
         audioRef.current.src = "";
       }
@@ -214,8 +264,13 @@ export function RadioProvider({ children }: { children: ReactNode }) {
             artist: data.artist
           });
           setTotalSongs(data.total);
-          setCurrentPosition(data.position || 0);
-          setCurrentDuration(data.duration || 0);
+          if (!audioRef.current || audioRef.current.paused || audioRef.current.readyState < HTMLMediaElement.HAVE_METADATA) {
+            streamOffsetRef.current = data.position || 0;
+            setCurrentPosition(data.position || 0);
+            setCurrentDuration(data.duration || 0);
+          } else if ((data.duration || 0) > currentDurationRef.current) {
+            setCurrentDuration(data.duration || 0);
+          }
         }
 
         if (queueResponse.ok) {
@@ -242,8 +297,9 @@ export function RadioProvider({ children }: { children: ReactNode }) {
       console.log('📡 Música trocada pelo admin:', data.song.title);
       
       // Se está tocando, reconecta ao stream para sincronizar
-      if (isPlaying && audioRef.current) {
-        scheduleReconnect("songChanged", 150);
+      if (isPlayingRef.current && audioRef.current) {
+        streamOffsetRef.current = 0;
+        scheduleReconnect("songChanged", 80);
       }
 
       // Atualiza informações da música
@@ -251,6 +307,7 @@ export function RadioProvider({ children }: { children: ReactNode }) {
         title: data.song.title,
         artist: data.song.artist
       });
+      streamOffsetRef.current = data.song.position || 0;
       setCurrentPosition(data.song.position || 0);
       setCurrentDuration(data.song.duration || 0);
 
@@ -267,15 +324,16 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     return () => {
       socket.disconnect();
     };
-  }, [isPlaying]);
+  }, []);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
 
-    if (isPlaying) {
+    if (isPlayingRef.current) {
       manualStopRef.current = true;
       shouldResumeRef.current = false;
       resumeOnInteractionRef.current = false;
+      streamOffsetRef.current = 0;
       clearReconnectTimeout();
       localStorage.setItem(RADIO_SHOULD_RESUME_KEY, "false");
       setAutoplayBlocked(false);
@@ -286,6 +344,7 @@ export function RadioProvider({ children }: { children: ReactNode }) {
       shouldResumeRef.current = true;
       localStorage.setItem(RADIO_SHOULD_RESUME_KEY, "true");
       setIsLoading(true);
+      streamOffsetRef.current = currentPositionRef.current;
       connectToLiveStream().catch((error) => {
         console.error("Erro ao reproduzir:", error);
         setIsLoading(false);

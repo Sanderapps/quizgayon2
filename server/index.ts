@@ -10,7 +10,9 @@ import { cleanupOldEvents, cleanupExpiredBans } from "./middleware/antiSpam.js";
 import routes from "./routes/index.js";
 import { setupChatSocket } from "./sockets/chat.socket.js";
 import { cleanupExpiredQuizTokens } from "./services/quizService.js";
-import { renderResultShareHtml, resolveIndexHtmlPath } from "./sharePage.js";
+import { getScoreById } from "./services/scoreService.js";
+import { renderResultShareHtml, renderResultShareHtmlFromMeta, resolveIndexHtmlPath } from "./sharePage.js";
+import { buildSavedScoreShareMeta } from "../client/src/lib/quizShare.ts";
 // Radio stream service removido - usando versão simples
 
 const __filename = fileURLToPath(import.meta.url);
@@ -102,6 +104,28 @@ async function startServer() {
       : path.resolve(__dirname, "..", "dist", "public");
 
   app.use(express.static(staticPath));
+
+  app.get("/resultado/codigo/:scoreId", async (req, res) => {
+    const scoreId = Number(req.params.scoreId || 0);
+
+    if (!Number.isFinite(scoreId)) {
+      return res.status(400).send("Código de resultado inválido");
+    }
+
+    const score = await getScoreById(scoreId);
+    if (!score) {
+      return res.status(404).send("Resultado não encontrado");
+    }
+
+    const origin = `${req.protocol}://${req.get("host")}`;
+    const percentage = Math.round((score.pontuacao / (15 * 4)) * 100);
+    const html = renderResultShareHtmlFromMeta(
+      resolveIndexHtmlPath(staticPath),
+      origin,
+      buildSavedScoreShareMeta(score.id, score.quiz_id, percentage)
+    );
+    res.send(html);
+  });
 
   app.get("/resultado/:quizId/:percentage", (req, res) => {
     const percentage = Number(req.params.percentage || 0);

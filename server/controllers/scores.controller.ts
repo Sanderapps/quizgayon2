@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { pool } from "../db.js";
 import { ScoreSubmissionSchema } from "../schemas/validation.js";
 import { validateQuizToken, markTokenAsUsed } from "../services/quizService.js";
-import { saveScore, getLeaderboard, getStats, deleteScore, resetLeaderboard } from "../services/scoreService.js";
+import { saveScore, getLeaderboard, getStats, deleteScore, resetLeaderboard, getScoreById } from "../services/scoreService.js";
 import { checkAntiSpam } from "../middleware/antiSpam.js";
 
 /**
@@ -134,6 +134,36 @@ export async function fetchStats(req: Request, res: Response) {
     console.error("Erro ao buscar estatísticas:", error);
     res.status(500).json({
       error: "Erro ao buscar estatísticas",
+    });
+  }
+}
+
+export async function fetchScoreResult(req: Request, res: Response) {
+  try {
+    const id = parseInt(req.params.id, 10);
+
+    if (!Number.isFinite(id)) {
+      return res.status(400).json({
+        error: "Código de resultado inválido",
+      });
+    }
+
+    const score = await getScoreById(id);
+
+    if (!score) {
+      return res.status(404).json({
+        error: "Resultado não encontrado",
+      });
+    }
+
+    res.json({
+      success: true,
+      score,
+    });
+  } catch (error) {
+    console.error("Erro ao buscar resultado por código:", error);
+    res.status(500).json({
+      error: "Erro ao buscar resultado",
     });
   }
 }
