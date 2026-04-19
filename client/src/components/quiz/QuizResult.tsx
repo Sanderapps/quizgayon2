@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { ArenaSurface } from "@/components/layout/ArenaSurface";
 import { Trophy, Share2, RotateCcw, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -24,6 +25,11 @@ export function QuizResult({ percentage, title, emoji, time, points, totalQuesti
     C: 'from-emerald-400 to-teal-500',
     D: 'from-gray-500 to-gray-600',
   };
+  const stats = [
+    { label: "Nível", value: `${percentage}%`, valueClassName: "neon-text" },
+    { label: "Tempo", value: `${time.toFixed(0)}s`, valueClassName: "text-cyan-400" },
+    { label: "Pontos", value: String(points), valueClassName: "text-amber-400" },
+  ];
 
   return (
     <motion.div
@@ -32,64 +38,53 @@ export function QuizResult({ percentage, title, emoji, time, points, totalQuesti
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="neon-card rounded-3xl p-8 md:p-10 text-center space-y-6">
-        {/* Grade */}
+      <ArenaSurface variant="reading" className="space-y-6 rounded-3xl p-8 text-center md:p-10">
         <div className="relative inline-block">
-          <div className={`orbitron text-7xl md:text-8xl font-black bg-gradient-to-br ${gradeColors[grade]} bg-clip-text text-transparent`}>
+          <div className={`orbitron bg-gradient-to-br text-7xl font-black text-transparent bg-clip-text md:text-8xl ${gradeColors[grade]}`}>
             {grade}
           </div>
           <div className="absolute -inset-4 blur-3xl opacity-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-full" />
         </div>
 
-        {/* Result title */}
         <div>
-          <div className="text-5xl mb-3">{emoji}</div>
-          <h2 className="orbitron text-xl md:text-2xl font-black dark:text-white text-gray-900 mb-2">
+          <div className="mb-3 text-5xl">{emoji}</div>
+          <h2 className="mb-2 text-xl font-black text-slate-50 md:text-2xl">
             {title}
           </h2>
-          <p className="dark:text-gray-400 text-gray-500 text-sm">
+          <p className="text-sm text-slate-300">
             {points}/{totalQuestions * 4} pontos • {time.toFixed(1)}s
           </p>
         </div>
 
-        {/* Stats row */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="dark:bg-white/5 bg-gray-50 rounded-xl p-3 dark:border border-purple-500/10 border-gray-200">
-            <div className="orbitron text-lg font-black neon-text">{percentage}%</div>
-            <div className="text-[10px] dark:text-gray-500 text-gray-400 font-medium mt-1">Nível</div>
-          </div>
-          <div className="dark:bg-white/5 bg-gray-50 rounded-xl p-3 dark:border border-purple-500/10 border-gray-200">
-            <div className="orbitron text-lg font-black dark:text-cyan-400 text-cyan-600">{time.toFixed(0)}s</div>
-            <div className="text-[10px] dark:text-gray-500 text-gray-400 font-medium mt-1">Tempo</div>
-          </div>
-          <div className="dark:bg-white/5 bg-gray-50 rounded-xl p-3 dark:border border-purple-500/10 border-gray-200">
-            <div className="orbitron text-lg font-black dark:text-amber-400 text-amber-600">{points}</div>
-            <div className="text-[10px] dark:text-gray-500 text-gray-400 font-medium mt-1">Pontos</div>
-          </div>
+          {stats.map((stat) => (
+            <ArenaSurface key={stat.label} variant="soft" className="rounded-xl p-3">
+              <div className={`orbitron text-lg font-black ${stat.valueClassName}`}>{stat.value}</div>
+              <div className="mt-1 text-[10px] font-medium uppercase tracking-[0.18em] text-slate-500">{stat.label}</div>
+            </ArenaSurface>
+          ))}
         </div>
 
-        {/* Actions */}
         <div className="space-y-3">
-          <Button onClick={onLeaderboard} size="lg"
-            className="w-full py-5 rounded-xl font-bold neon-btn">
+          <Button onClick={onLeaderboard} size="lg" className="neon-btn w-full rounded-xl py-5 font-bold">
             <Trophy className="w-5 h-5" />
             Ver Ranking
           </Button>
 
           <div className="grid grid-cols-2 gap-3">
             <Button onClick={onRestart} variant="outline" size="lg"
-              className="py-4 rounded-xl font-bold dark:bg-white/5 bg-gray-50 dark:text-gray-300 text-gray-700 dark:border-purple-500/20 border-gray-200 dark:hover:bg-white/10 hover:bg-gray-100 transition-all">
+              className="rounded-xl border-white/10 bg-white/5 py-4 font-bold text-slate-200 transition-all hover:bg-white/10">
               <RotateCcw className="w-4 h-4 mr-1.5" />
               Jogar de Novo
             </Button>
             <Button onClick={onShare} variant="outline" size="lg"
-              className="py-4 rounded-xl font-bold dark:bg-white/5 bg-gray-50 dark:text-gray-300 text-gray-700 dark:border-purple-500/20 border-gray-200 dark:hover:bg-white/10 hover:bg-gray-100 transition-all">
+              className="rounded-xl border-white/10 bg-white/5 py-4 font-bold text-slate-200 transition-all hover:bg-white/10">
               <Share2 className="w-4 h-4 mr-1.5" />
               Compartilhar
             </Button>
           </div>
         </div>
-      </div>
+      </ArenaSurface>
     </motion.div>
   );
 }

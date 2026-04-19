@@ -1,7 +1,21 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { changelog } from "@/data/changelog";
-import { Home, Gamepad2, Trophy, MessageCircle, Shield, Lightbulb, Sun, Moon, Menu, X, ClipboardList, Sparkles } from "lucide-react";
+import {
+  ChevronRight,
+  ClipboardList,
+  Gamepad2,
+  Home,
+  Lightbulb,
+  Menu,
+  MessageCircle,
+  Moon,
+  Shield,
+  Sparkles,
+  Sun,
+  Trophy,
+  X,
+} from "lucide-react";
 
 interface TopMenuProps {
   onNavigate?: (page: string) => void;
@@ -10,249 +24,335 @@ interface TopMenuProps {
 export function TopMenu({ onNavigate }: TopMenuProps) {
   const [, setLocation] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
-  const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem("theme");
-    return saved === "dark";
-  });
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showUpdates, setShowUpdates] = useState(false);
   const [message, setMessage] = useState("");
   const [apelido, setApelido] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [feedback, setFeedback] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [isDark, setIsDark] = useState(() => localStorage.getItem("theme") === "dark");
 
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
+      return;
     }
+
+    document.documentElement.classList.remove("dark");
+    localStorage.setItem("theme", "light");
   }, [isDark]);
 
-  const menuItems = [
-    { icon: Home, page: "home", label: "Início" },
-    { icon: Gamepad2, page: "quiz", label: "Jogar" },
-    { icon: Trophy, page: "leaderboard", label: "Placar" },
-    { icon: MessageCircle, page: "chat", label: "Chat" },
-    { icon: Shield, page: "admin", label: "Admin" },
-    { icon: Lightbulb, page: "suggestions", label: "Sugestões" },
-    { icon: isDark ? Sun : Moon, page: "theme", label: isDark ? "Claro" : "Escuro" },
-  ];
+  const navigationItems = useMemo(
+    () => [
+      { icon: Home, page: "home", label: "Início", description: "Voltar para a arena principal" },
+      { icon: Gamepad2, page: "quiz", label: "Jogar", description: "Abrir a seleção de quizzes" },
+      { icon: Trophy, page: "leaderboard", label: "Placar", description: "Ver ranking e resultados" },
+      { icon: MessageCircle, page: "chat", label: "Chat", description: "Abrir o chat da comunidade" },
+      { icon: Shield, page: "admin", label: "Admin", description: "Entrar na área administrativa" },
+    ],
+    [],
+  );
 
   const handleItemClick = (page: string) => {
     if (page === "chat") {
-      window.dispatchEvent(new CustomEvent('toggleChat'));
+      window.dispatchEvent(new CustomEvent("toggleChat"));
       setIsOpen(false);
       return;
     }
+
     if (page === "admin") {
       setLocation("/admin");
       setIsOpen(false);
       return;
     }
-    if (page === "home") {
+
+    if (page === "home" || page === "quiz") {
       setLocation("/");
       setIsOpen(false);
+      if (page === "quiz" && onNavigate) onNavigate(page);
       return;
     }
-    if (page === "suggestions") {
-      setIsOpen(false);
-      setShowSuggestions(true);
-      return;
-    }
-    if (page === "theme") {
-      setIsDark(!isDark);
-      return;
-    }
+
     if (onNavigate) {
       onNavigate(page);
     }
+
     setIsOpen(false);
   };
 
   const handleSubmitSuggestion = async () => {
     if (!message.trim() || !apelido.trim()) {
-      setFeedback({ type: 'error', text: 'Preencha todos os campos!' });
+      setFeedback({ type: "error", text: "Preencha todos os campos." });
       return;
     }
+
     setIsSubmitting(true);
     setFeedback(null);
+
     try {
-      const response = await fetch('/api/suggestions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/suggestions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ apelido: apelido.trim(), mensagem: message.trim() }),
       });
+
       if (response.ok) {
-        setFeedback({ type: 'success', text: 'Sugestão enviada com sucesso! Obrigado! 💖' });
+        setFeedback({ type: "success", text: "Sugestão enviada." });
         setMessage("");
         setApelido("");
-        setTimeout(() => { setShowSuggestions(false); setFeedback(null); }, 2000);
-      } else {
-        const errorData = await response.json();
-        setFeedback({ type: 'error', text: errorData.message || 'Erro ao enviar sugestão.' });
+        setTimeout(() => {
+          setShowSuggestions(false);
+          setFeedback(null);
+        }, 1800);
+        return;
       }
+
+      const errorData = await response.json();
+      setFeedback({ type: "error", text: errorData.message || "Erro ao enviar sugestão." });
     } catch {
-      setFeedback({ type: 'error', text: 'Erro de conexão. Verifique sua internet.' });
+      setFeedback({ type: "error", text: "Erro de conexão. Tente novamente." });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && e.ctrlKey) handleSubmitSuggestion();
+    if (e.key === "Enter" && e.ctrlKey) handleSubmitSuggestion();
   };
 
   return (
     <>
-      {/* Hamburger Button — fixed top-right */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 right-4 z-[70] w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 dark:bg-white/5 bg-gray-900/5 border dark:border-purple-500/20 border-gray-200 backdrop-blur-xl"
-        aria-label="Menu"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="fixed right-4 top-4 z-[70] flex h-12 items-center gap-2 rounded-lg border border-white/10 bg-slate-950/82 px-3 text-slate-100 shadow-lg backdrop-blur-xl transition-all hover:border-purple-400/30"
+        aria-label="Abrir menu"
       >
-        {isOpen ? (
-          <X className="w-5 h-5 dark:text-white text-gray-900" />
-        ) : (
-          <Menu className="w-5 h-5 dark:text-white text-gray-900" />
-        )}
+        <Menu className="h-4 w-4" />
+        <span className="text-sm font-medium hidden sm:inline">Menu</span>
       </button>
 
-      {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
+          className="fixed inset-0 z-[9998] bg-black/70 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
         />
       )}
 
-      {/* Dropdown Menu */}
-      {isOpen && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-md rounded-2xl overflow-hidden dark:bg-[#0e0e1a]/95 bg-white shadow-2xl border dark:border-purple-500/20 border-gray-200 backdrop-blur-xl"
-          style={{ animation: "menu-expand 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)" }}
-        >
-          {/* Navigation */}
-          <div className="p-5 dark:border-b border-purple-500/10 border-gray-100">
-            <h3 className="text-sm font-bold dark:text-gray-300 text-gray-600 mb-4 text-center flex items-center justify-center gap-2">
-              <Sparkles className="w-4 h-4 text-purple-500" />
-              <span>Navegação</span>
-            </h3>
-            <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
-              {menuItems.map((item) => {
-                const IconComponent = item.icon;
-                return (
-                  <button
-                    key={item.page}
-                    onClick={() => handleItemClick(item.page)}
-                    className="flex flex-col items-center justify-center transition-all group"
-                    title={item.label}
-                  >
-                    <div className="w-14 h-14 rounded-xl dark:bg-white/5 bg-gray-50 flex items-center justify-center dark:group-hover:bg-purple-500/15 group-hover:bg-purple-50 transition-all group-hover:scale-110">
-                      <IconComponent className="w-5 h-5 dark:text-gray-400 text-gray-600 group-hover:text-purple-500 transition-colors" />
-                    </div>
-                    <span className="hidden sm:block text-[9px] mt-1 dark:text-gray-500 text-gray-400 font-medium">
-                      {item.label}
-                    </span>
-                  </button>
-                );
-              })}
+      <aside
+        className={`fixed z-[9999] transition-transform duration-300 ease-out ${
+          isOpen ? "translate-y-0 md:translate-x-0" : "translate-y-full md:translate-y-0 md:translate-x-full"
+        } bottom-0 left-0 right-0 md:bottom-4 md:left-auto md:right-4 md:top-20 md:w-[24rem]`}
+        aria-hidden={!isOpen}
+      >
+        <div className="arena-panel rounded-t-3xl border-b-0 p-5 md:rounded-2xl md:border-b">
+          <div className="mb-5 flex items-start justify-between gap-4">
+            <div>
+              <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-purple-400/20 bg-purple-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-purple-200">
+                <Sparkles className="h-3.5 w-3.5" />
+                Navegação
+              </div>
+              <h2 className="text-lg font-semibold text-slate-50">QuiZoeira</h2>
+              <p className="mt-1 text-sm text-slate-300">Acesso rápido, ajustes e novidades fora do fluxo do quiz.</p>
             </div>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="rounded-lg border border-white/10 bg-white/5 p-2 text-slate-300 transition-colors hover:text-white"
+              aria-label="Fechar menu"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
 
-          {/* Changelog */}
-          <div className="p-4 dark:border-b border-purple-500/10 border-gray-100 max-h-48 overflow-y-auto">
-            <h3 className="text-xs font-bold dark:text-gray-400 text-gray-500 mb-3 flex items-center gap-2">
-              <ClipboardList className="w-3.5 h-3.5" />
-              <span>Atualizações</span>
-            </h3>
-            <div className="space-y-1">
-              {changelog.map((entry, index) => (
-                <div key={index} className="flex items-center gap-2 py-1.5 px-2 rounded dark:hover:bg-white/5 hover:bg-gray-50 transition-colors">
-                  <span className="text-base flex-shrink-0">{entry.emoji}</span>
-                  <span className="font-bold text-[10px] dark:text-gray-500 text-gray-400 flex-shrink-0 w-8">
-                    {entry.version}
+          <div className="space-y-5">
+            <section>
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Navegação</h3>
+              <div className="space-y-2">
+                {navigationItems.map((item) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <button key={item.page} onClick={() => handleItemClick(item.page)} className="menu-item-row">
+                      <span className="flex items-center gap-3">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-purple-300">
+                          <IconComponent className="h-4 w-4" />
+                        </span>
+                        <span className="text-left">
+                          <span className="block text-sm font-semibold text-slate-100">{item.label}</span>
+                          <span className="block text-xs text-slate-400">{item.description}</span>
+                        </span>
+                      </span>
+                      <ChevronRight className="h-4 w-4 text-slate-500" />
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+
+            <section>
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Preferências</h3>
+              <div className="space-y-2">
+                <button onClick={() => setIsDark((prev) => !prev)} className="menu-item-row">
+                  <span className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-cyan-300">
+                      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                    </span>
+                    <span className="text-left">
+                      <span className="block text-sm font-semibold text-slate-100">Tema {isDark ? "claro" : "escuro"}</span>
+                      <span className="block text-xs text-slate-400">Alternar contraste da interface</span>
+                    </span>
                   </span>
-                  <p className="text-[11px] font-medium flex-1 dark:text-gray-300 text-gray-600" style={{ color: entry.color }}>
-                    {entry.text}
-                  </p>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowSuggestions(true);
+                    setIsOpen(false);
+                  }}
+                  className="menu-item-row"
+                >
+                  <span className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-amber-300">
+                      <Lightbulb className="h-4 w-4" />
+                    </span>
+                    <span className="text-left">
+                      <span className="block text-sm font-semibold text-slate-100">Sugestões</span>
+                      <span className="block text-xs text-slate-400">Enviar ideia, feedback ou ajuste</span>
+                    </span>
+                  </span>
+                  <ChevronRight className="h-4 w-4 text-slate-500" />
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowUpdates(true);
+                    setIsOpen(false);
+                  }}
+                  className="menu-item-row"
+                >
+                  <span className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-pink-300">
+                      <ClipboardList className="h-4 w-4" />
+                    </span>
+                    <span className="text-left">
+                      <span className="block text-sm font-semibold text-slate-100">Atualizações</span>
+                      <span className="block text-xs text-slate-400">Ver changelog fora do menu principal</span>
+                    </span>
+                  </span>
+                  <ChevronRight className="h-4 w-4 text-slate-500" />
+                </button>
+              </div>
+            </section>
+          </div>
+        </div>
+      </aside>
+
+      {showUpdates && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="arena-panel w-full max-w-xl rounded-2xl p-6">
+            <div className="mb-5 flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-50">Atualizações</h2>
+                <p className="mt-1 text-sm text-slate-300">Mudanças recentes sem disputar espaço com a navegação.</p>
+              </div>
+              <button
+                onClick={() => setShowUpdates(false)}
+                className="rounded-lg border border-white/10 bg-white/5 p-2 text-slate-300 hover:text-white"
+                aria-label="Fechar atualizações"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="max-h-[60vh] space-y-2 overflow-y-auto pr-1">
+              {changelog.map((entry, index) => (
+                <div key={index} className="arena-panel-soft rounded-xl p-3">
+                  <div className="flex items-start gap-3">
+                    <span className="text-lg">{entry.emoji}</span>
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-1 flex items-center gap-2">
+                        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                          {entry.version}
+                        </span>
+                      </div>
+                      <p className="text-sm leading-relaxed text-slate-200">{entry.text}</p>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-
-          {/* Footer */}
-          <div className="p-3 text-center">
-            <p className="text-[9px] dark:text-gray-600 text-gray-400">
-              ArenaQuiz © 2025
-            </p>
-          </div>
         </div>
       )}
 
-      {/* Suggestion Modal */}
       {showSuggestions && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="dark:bg-[#0e0e1a] bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 border dark:border-purple-500/20 border-gray-200"
-            style={{ animation: "scale-in 0.2s ease-out" }}
-          >
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold dark:text-white text-gray-900 flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-amber-500" />
-                <span>Sugestões</span>
-              </h2>
-              <button onClick={() => setShowSuggestions(false)} className="dark:text-gray-400 text-gray-500 hover:text-gray-200 transition-colors">
-                <X className="w-5 h-5" />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="arena-panel w-full max-w-md rounded-2xl p-6 space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-semibold text-slate-50">Sugestões</h2>
+                <p className="mt-1 text-sm text-slate-300">Manda a ideia com contexto suficiente para virar ajuste de verdade.</p>
+              </div>
+              <button onClick={() => setShowSuggestions(false)} className="rounded-lg border border-white/10 bg-white/5 p-2 text-slate-300 hover:text-white">
+                <X className="h-4 w-4" />
               </button>
             </div>
-            <p className="dark:text-gray-400 text-gray-500 text-sm">
-              Manda aquela sua ideia louca pra nós!
-            </p>
+
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium dark:text-gray-400 text-gray-500 mb-1">Seu nome/apelido</label>
-                <input type="text" value={apelido} onChange={(e) => setApelido(e.target.value)} placeholder="Como quer ser chamado?" maxLength={30}
-                  className="w-full px-4 py-2.5 rounded-xl dark:bg-white/5 bg-gray-50 dark:text-white text-gray-900 dark:border-purple-500/20 border-gray-200 border-2 focus:border-purple-500 focus:outline-none transition-colors text-sm"
-                  disabled={isSubmitting} />
+                <label className="mb-1 block text-xs font-medium text-slate-400">Seu nome ou apelido</label>
+                <input
+                  type="text"
+                  value={apelido}
+                  onChange={(e) => setApelido(e.target.value)}
+                  placeholder="Como quer aparecer?"
+                  maxLength={30}
+                  className="w-full rounded-xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm text-slate-100 outline-none transition-colors focus:border-purple-400/50"
+                  disabled={isSubmitting}
+                />
               </div>
               <div>
-                <label className="block text-xs font-medium dark:text-gray-400 text-gray-500 mb-1">Sua sugestão</label>
-                <textarea value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleKeyPress}
-                  placeholder="Escreva sua sugestão... (Ctrl+Enter para enviar)" rows={4} maxLength={500}
-                  className="w-full px-4 py-2.5 rounded-xl dark:bg-white/5 bg-gray-50 dark:text-white text-gray-900 dark:border-purple-500/20 border-gray-200 border-2 focus:border-purple-500 focus:outline-none transition-colors resize-none text-sm"
-                  disabled={isSubmitting} />
-                <div className="text-[10px] dark:text-gray-600 text-gray-400 text-right mt-1">{message.length}/500</div>
+                <label className="mb-1 block text-xs font-medium text-slate-400">Sugestão</label>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder="Descreva problema, ideia ou melhoria."
+                  rows={4}
+                  maxLength={500}
+                  className="w-full resize-none rounded-xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm text-slate-100 outline-none transition-colors focus:border-purple-400/50"
+                  disabled={isSubmitting}
+                />
+                <div className="mt-1 text-right text-[11px] text-slate-500">{message.length}/500</div>
               </div>
             </div>
+
             {feedback && (
-              <div className={`p-3 rounded-xl text-xs font-medium ${feedback.type === 'success' ? 'dark:bg-green-500/10 bg-green-50 dark:text-green-400 text-green-700' : 'dark:bg-red-500/10 bg-red-50 dark:text-red-400 text-red-700'}`}>
+              <div
+                className={`rounded-xl px-4 py-3 text-sm ${
+                  feedback.type === "success"
+                    ? "border border-emerald-400/20 bg-emerald-500/10 text-emerald-300"
+                    : "border border-red-400/20 bg-red-500/10 text-red-300"
+                }`}
+              >
                 {feedback.text}
               </div>
             )}
+
             <div className="flex gap-3">
-              <button onClick={() => setShowSuggestions(false)} className="flex-1 px-4 py-2.5 rounded-xl dark:bg-white/5 bg-gray-100 dark:text-gray-300 text-gray-700 font-medium hover:bg-gray-200 dark:hover:bg-white/10 transition-colors text-sm" disabled={isSubmitting}>
+              <button
+                onClick={() => setShowSuggestions(false)}
+                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-200"
+                disabled={isSubmitting}
+              >
                 Cancelar
               </button>
-              <button onClick={handleSubmitSuggestion} className="flex-1 px-4 py-2.5 rounded-xl text-white font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)", boxShadow: "0 0 15px rgba(168, 85, 247, 0.3)" }}
-                disabled={isSubmitting}>
-                {isSubmitting ? 'Enviando...' : 'Enviar'}
+              <button onClick={handleSubmitSuggestion} className="neon-btn flex-1 rounded-xl px-4 py-3 text-sm font-semibold" disabled={isSubmitting}>
+                {isSubmitting ? "Enviando..." : "Enviar"}
               </button>
             </div>
           </div>
         </div>
       )}
-
-      <style>{`
-        @keyframes menu-expand {
-          from { opacity: 0; transform: translate(-50%, -1rem) scale(0.85); }
-          to { opacity: 1; transform: translate(-50%, 0) scale(1); }
-        }
-        @keyframes scale-in {
-          from { opacity: 0; transform: scale(0.92); }
-          to { opacity: 1; transform: scale(1); }
-        }
-      `}</style>
     </>
   );
 }

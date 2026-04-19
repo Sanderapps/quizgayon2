@@ -18,40 +18,32 @@ export function QuizIntro({ onStart, title = "Quão Gay Você É?", description 
   const IconComponent = quizIcons[quizId] || Rainbow;
 
   return (
-    <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center p-4 page-enter">
-      <div className="max-w-lg w-full neon-card rounded-3xl p-8 md:p-10 text-center space-y-6">
-        {/* Icon with glow */}
-        <div className="relative w-24 h-24 md:w-28 md:h-28 mx-auto">
-          <div className="absolute inset-0 rounded-3xl blur-2xl opacity-30"
-            style={{ background: "linear-gradient(135deg, #a855f7, #06b6d4)" }} />
-          <div className="relative w-full h-full rounded-2xl flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(6, 182, 212, 0.15))", border: "1px solid rgba(139, 92, 246, 0.2)" }}>
-            <IconComponent className="w-12 h-12 md:w-14 md:h-14 text-purple-400" />
+    <div className="page-enter flex min-h-[calc(100vh-8rem)] items-center justify-center p-4">
+      <div className="quiz-reading-surface w-full max-w-xl rounded-[30px] p-8 text-center md:p-10">
+        <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-[26px] border border-white/10 bg-white/[0.03] md:h-28 md:w-28">
+          <div className="quiz-intro-icon-core flex h-16 w-16 items-center justify-center rounded-2xl md:h-20 md:w-20">
+            <IconComponent className="h-12 w-12 text-purple-300 md:h-14 md:w-14" />
           </div>
         </div>
 
-        {/* Title */}
-        <div>
-          <h1 className="orbitron text-3xl md:text-4xl font-black dark:text-white text-gray-900 mb-3">
+        <div className="mb-6">
+          <div className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Pronto para entrar?</div>
+          <h1 className="mb-3 text-3xl font-black text-slate-50 md:text-4xl">
             {title.replace(/[^\w\s]/gi, '').trim()}
           </h1>
-          <p className="dark:text-gray-400 text-gray-500 text-sm md:text-base leading-relaxed max-w-sm mx-auto">
+          <p className="mx-auto max-w-md text-sm leading-relaxed text-slate-300 md:text-base">
             {description}
           </p>
         </div>
 
-        {/* Stats */}
-        <div className="flex items-center justify-center gap-4 text-xs dark:text-gray-500 text-gray-400">
-          <span className="flex items-center gap-1"><Zap className="w-3.5 h-3.5 text-amber-500" /> 50 perguntas</span>
-          <span>•</span>
-          <span>~2 minutos</span>
-          <span>•</span>
-          <span>100% anônimo</span>
+        <div className="mb-8 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-300">
+          <span className="arena-panel-soft flex items-center gap-1 rounded-full px-3 py-2"><Zap className="w-3.5 h-3.5 text-amber-500" /> 50 perguntas</span>
+          <span className="arena-panel-soft rounded-full px-3 py-2">~2 minutos</span>
+          <span className="arena-panel-soft rounded-full px-3 py-2">100% anônimo</span>
         </div>
 
-        {/* Start Button */}
         <Button onClick={onStart} size="lg"
-          className="w-full text-base py-6 rounded-xl font-bold neon-btn">
+          className="neon-btn w-full rounded-xl py-6 text-base font-bold">
           <span>Entrar na Arena</span>
           <Zap className="w-5 h-5" />
         </Button>

@@ -197,9 +197,9 @@
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
-  background-size: 60px 60px;
+    linear-gradient(rgba(139, 92, 246, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.018) 1px, transparent 1px);
+  background-size: 72px 72px;
   pointer-events: none;
   z-index: 0;
 }
@@ -212,11 +212,11 @@
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(ellipse at 30% 20%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
-              radial-gradient(ellipse at 70% 80%, rgba(6, 182, 212, 0.06) 0%, transparent 50%);
+  background: radial-gradient(ellipse at 25% 18%, rgba(168, 85, 247, 0.05) 0%, transparent 45%),
+              radial-gradient(ellipse at 72% 82%, rgba(6, 182, 212, 0.04) 0%, transparent 45%);
   pointer-events: none;
   z-index: 0;
-  animation: ambient-shift 15s ease-in-out infinite;
+  animation: ambient-shift 24s ease-in-out infinite;
 }
 
 @keyframes ambient-shift {
@@ -227,19 +227,19 @@
 
 /* Neon glow for cards */
 .dark .neon-card {
-  background: linear-gradient(135deg, rgba(15, 15, 35, 0.9) 0%, rgba(10, 10, 25, 0.95) 100%);
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.08),
-              0 8px 32px rgba(0, 0, 0, 0.4),
-              inset 0 1px 0 rgba(168, 85, 247, 0.1);
+  background: linear-gradient(180deg, rgba(13, 15, 28, 0.94) 0%, rgba(8, 10, 20, 0.97) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.34),
+              0 0 0 1px rgba(168, 85, 247, 0.06),
+              inset 0 1px 0 rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(12px);
 }
 
 .dark .neon-card:hover {
-  border-color: rgba(139, 92, 246, 0.4);
-  box-shadow: 0 0 30px rgba(139, 92, 246, 0.15),
-              0 12px 40px rgba(0, 0, 0, 0.5),
-              inset 0 1px 0 rgba(168, 85, 247, 0.15);
+  border-color: rgba(168, 85, 247, 0.24);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.38),
+              0 0 0 1px rgba(168, 85, 247, 0.09),
+              inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 /* Neon button */
@@ -312,7 +312,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.4));
+  filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.25));
 }
 
 .neon-text-pink {
@@ -320,7 +320,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.4));
+  filter: drop-shadow(0 0 6px rgba(236, 72, 153, 0.25));
 }
 
 .neon-text-cyan {
@@ -328,7 +328,123 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.4));
+  filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.25));
+}
+
+.arena-backdrop {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at top, rgba(168, 85, 247, 0.09), transparent 34%),
+    radial-gradient(circle at 82% 78%, rgba(6, 182, 212, 0.08), transparent 28%),
+    linear-gradient(180deg, #05070f 0%, #070a14 52%, #05070d 100%);
+}
+
+.arena-shell {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+}
+
+.arena-panel {
+  background: linear-gradient(180deg, rgba(11, 14, 24, 0.92) 0%, rgba(8, 10, 18, 0.96) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(14px);
+}
+
+.arena-panel-soft {
+  background: linear-gradient(180deg, rgba(10, 12, 22, 0.76) 0%, rgba(8, 10, 18, 0.88) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  backdrop-filter: blur(12px);
+}
+
+.arena-text-main {
+  color: #f8fafc;
+}
+
+.arena-text-muted {
+  color: #cbd5e1;
+}
+
+.arena-text-subtle {
+  color: #94a3b8;
+}
+
+.arena-divider {
+  border-color: rgba(148, 163, 184, 0.12);
+}
+
+.menu-item-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(15, 23, 42, 0.32);
+  padding: 0.875rem 1rem;
+  color: #e2e8f0;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.menu-item-row:hover {
+  border-color: rgba(168, 85, 247, 0.32);
+  background: rgba(20, 27, 47, 0.5);
+  transform: translateY(-1px);
+}
+
+.quiz-reading-surface {
+  background: linear-gradient(180deg, rgba(9, 12, 22, 0.96) 0%, rgba(7, 9, 18, 0.98) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(16px);
+}
+
+.quiz-card-shell {
+  background: linear-gradient(180deg, rgba(12, 15, 26, 0.96) 0%, rgba(8, 10, 18, 0.98) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+}
+
+.quiz-theme-gay {
+  --quiz-gradient: linear-gradient(135deg, #ec4899 0%, #a855f7 50%, #06b6d4 100%);
+  --quiz-glow: rgba(236, 72, 153, 0.18);
+}
+
+.quiz-theme-politico {
+  --quiz-gradient: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+  --quiz-glow: rgba(245, 158, 11, 0.18);
+}
+
+.quiz-theme-regional {
+  --quiz-gradient: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+  --quiz-glow: rgba(16, 185, 129, 0.18);
+}
+
+.quiz-card-tag,
+.quiz-card-icon,
+.quiz-card-icon-glow,
+.quiz-card-cta,
+.quiz-intro-icon-core {
+  background: var(--quiz-gradient);
+}
+
+.quiz-card-tag {
+  color: #fff;
+}
+
+.quiz-card-icon-glow {
+  opacity: 0.3;
+}
+
+.quiz-card-cta {
+  box-shadow: 0 8px 20px var(--quiz-glow);
+}
+
+.quiz-intro-icon-core {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.22), rgba(6, 182, 212, 0.16));
 }
 
 /* Orbitron font for headings/titles */
@@ -384,16 +500,16 @@
 /* Answer hover glow */
 .dark .answer-option {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(139, 92, 246, 0.15);
-  background: rgba(15, 15, 35, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(15, 23, 42, 0.72);
 }
 
 .dark .answer-option:hover {
-  border-color: rgba(168, 85, 247, 0.5);
-  background: rgba(20, 20, 45, 0.9);
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.15),
-              inset 0 1px 0 rgba(168, 85, 247, 0.1);
-  transform: translateX(4px);
+  border-color: rgba(168, 85, 247, 0.38);
+  background: rgba(20, 28, 48, 0.92);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.24),
+              inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
 }
 
 /* Correct/wrong feedback */

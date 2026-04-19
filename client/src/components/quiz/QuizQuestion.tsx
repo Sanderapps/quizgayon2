@@ -32,50 +32,55 @@ const answerBorders = [
 export function QuizQuestion({ question, questionIndex, onAnswer, selectedAnswer }: QuizQuestionProps) {
   return (
     <motion.div
-      className="w-full max-w-xl mx-auto px-4 question-enter"
+      className="question-enter mx-auto w-full max-w-3xl"
       initial={{ opacity: 0, x: 60 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.4, type: "spring", stiffness: 200 }}
     >
-      {/* Question */}
-      <div className="mb-6 text-center">
-        {question.emoji && (
-          <span className="text-4xl mb-3 inline-block">{question.emoji}</span>
-        )}
-        <h2 className="orbitron text-lg md:text-xl font-bold dark:text-white text-gray-900 leading-relaxed">
-          {question.text}
-        </h2>
-      </div>
+      <div className="quiz-reading-surface rounded-[28px] p-5 md:p-8">
+        <div className="mb-6 border-b border-white/8 pb-5 text-center md:mb-7">
+          <div className="mb-3 flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+            <span>Pergunta</span>
+            <span className="text-slate-600">{questionIndex + 1}</span>
+          </div>
+          {question.emoji && <span className="mb-3 inline-block text-4xl">{question.emoji}</span>}
+          <h2 className="mx-auto max-w-2xl text-balance text-xl font-semibold leading-relaxed text-slate-50 md:text-[1.9rem] md:leading-[1.45]">
+            {question.text}
+          </h2>
+        </div>
 
-      {/* Answers */}
-      <div className="space-y-3">
-        {question.answers.map((answer, i) => {
-          const isSelected = selectedAnswer === i;
-          return (
-            <button
-              key={i}
-              onClick={() => onAnswer(answer.points)}
-              disabled={selectedAnswer !== null}
-              className={`w-full text-left p-4 rounded-xl transition-all duration-200 bg-gradient-to-r ${answerGradients[i]} ${answerBorders[i]} border dark:border-white/[0.06] border-gray-200 disabled:cursor-default ${
-                isSelected
-                  ? 'dark:border-purple-500/60 border-purple-400 dark:bg-purple-500/15 bg-purple-50 scale-[1.02] shadow-lg'
-                  : 'dark:text-gray-200 text-gray-700'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                {/* Answer letter */}
-                <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black flex-shrink-0 ${
+        <div className="space-y-3">
+          {question.answers.map((answer, i) => {
+            const isSelected = selectedAnswer === i;
+            return (
+              <button
+                key={i}
+                onClick={() => onAnswer(answer.points)}
+                disabled={selectedAnswer !== null}
+                className={`answer-option w-full rounded-2xl border p-4 text-left transition-all duration-200 disabled:cursor-default md:p-5 ${
                   isSelected
-                    ? 'bg-purple-500 text-white'
-                    : 'dark:bg-white/5 bg-gray-100 dark:text-gray-500 text-gray-400'
-                }`}>
-                  {String.fromCharCode(65 + i)}
-                </span>
-                <span className="text-sm md:text-base font-medium flex-1">{answer.text}</span>
-              </div>
-            </button>
-          );
-        })}
+                    ? "scale-[1.01] border-purple-400/60 bg-purple-500/12 shadow-lg"
+                    : `bg-gradient-to-r ${answerGradients[i]} ${answerBorders[i]}`
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-sm font-black ${
+                      isSelected
+                        ? "bg-purple-500 text-white"
+                        : "bg-white/6 text-slate-300"
+                    }`}
+                  >
+                    {String.fromCharCode(65 + i)}
+                  </span>
+                  <span className="flex-1 text-sm font-medium leading-relaxed text-slate-100 md:text-base">
+                    {answer.text}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </motion.div>
   );

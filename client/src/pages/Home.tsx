@@ -2,17 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { useParams } from "wouter";
 import { getQuizById, getDefaultQuiz } from "@/data/quizzes";
 import { salvarPontuacao, buscarPlacar, pontuacaoParaPercentual } from "@/services/api";
-import { Button } from "@/components/ui/button";
-import { RankBadge } from "@/components/RankBadge";
 import { Leaderboard } from "@/components/Leaderboard";
-import { ChatWidget } from "@/components/ChatWidget";
-import { RadioPlayer } from "@/components/RadioPlayer";
-import { TopMenu } from "@/components/TopMenu";
 import { WelcomeAnimation } from "@/components/WelcomeAnimation";
-import { LoadingSkeleton, CardSkeleton } from "@/components/LoadingSkeleton";
+import { ArenaPageShell } from "@/components/layout/ArenaPageShell";
+import { ArenaSurface } from "@/components/layout/ArenaSurface";
+import { CardSkeleton } from "@/components/LoadingSkeleton";
 import { QuizIntro, QuizProgress, QuizQuestion, QuizResult } from "@/components/quiz";
 import { motion, AnimatePresence } from "framer-motion";
-import { Zap, Volume2, VolumeX, Trophy, Share2, RotateCcw, Timer } from "lucide-react";
+import { Zap, Volume2, VolumeX, Trophy } from "lucide-react";
 
 interface Question {
   id: number;
@@ -258,6 +255,17 @@ export default function Home() {
     setShowResult(true);
   };
 
+  const handleMenuNavigation = (page: string) => {
+    if (page === "leaderboard") {
+      setShowLeaderboard(true);
+      return;
+    }
+
+    if (page === "quiz") {
+      resetQuiz();
+    }
+  };
+
   const resetQuiz = () => {
     setCurrentQuestion(0); setTotalPoints(0); setShowResult(false);
     setQuizStarted(false); setQuestions([]); setShowConfetti(false);
@@ -282,112 +290,98 @@ export default function Home() {
   // ==================== RENDER: LEADERBOARD VIEW ====================
   if (showLeaderboard) {
     return (
-      <div className="relative min-h-screen">
-        <div className="fixed inset-0 dark:bg-[#06060e] bg-gradient-to-br from-purple-100 via-pink-50 to-cyan-50" />
-        <div className="relative z-10 pt-20 pb-32 px-4">
-          <TopMenu />
-          <div className="max-w-3xl mx-auto">
+      <ArenaPageShell onNavigate={handleMenuNavigation} shellClassName="px-4 pb-32 pt-20">
+          <div className="mx-auto max-w-3xl">
             <button onClick={() => setShowLeaderboard(false)}
-              className="mb-4 flex items-center gap-2 text-sm font-medium dark:text-gray-400 text-gray-500 hover:text-purple-500 transition-colors">
+              className="mb-4 flex items-center gap-2 text-sm font-medium text-slate-300 transition-colors hover:text-purple-300">
               ← Voltar
             </button>
-            <Leaderboard leaderboard={leaderboard} maxItems={100} />
+            <ArenaSurface variant="panel" className="rounded-[28px] p-4 sm:p-6">
+              <Leaderboard leaderboard={leaderboard} maxItems={100} />
+            </ArenaSurface>
           </div>
-        </div>
-        <ChatWidget />
-        <RadioPlayer />
-      </div>
+      </ArenaPageShell>
     );
   }
 
   // ==================== RENDER: NAME INPUT ====================
   if (showNameInput && !showResult) {
     return (
-      <div className="relative min-h-screen">
-        <div className="fixed inset-0 dark:bg-[#06060e] bg-gradient-to-br from-purple-100 via-pink-50 to-cyan-50" />
-        <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
-          {showConfetti && <CanvasConfetti />}
-        </div>
-        <div className="relative z-10 flex items-center justify-center min-h-[calc(100vh-8rem)] p-4 pt-20 pb-32">
-          <TopMenu />
+      <ArenaPageShell
+        onNavigate={handleMenuNavigation}
+        overlay={showConfetti ? <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}><CanvasConfetti /></div> : null}
+        shellClassName="flex min-h-[calc(100vh-8rem)] items-center justify-center p-4 pb-32 pt-20"
+      >
           <motion.div
-            className="neon-card rounded-3xl p-8 max-w-md w-full text-center space-y-6"
+            className="w-full max-w-md space-y-6 rounded-[28px] p-8 text-center"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
           >
-            <div className="text-6xl">🎉</div>
-            <h2 className="orbitron text-2xl font-black dark:text-white text-gray-900">Quiz Completo!</h2>
-            <p className="dark:text-gray-400 text-gray-500 text-sm">Quer aparecer no ranking?</p>
-            <input type="text" placeholder="Seu nome (ou deixe em branco)" value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)} maxLength={20}
-              className="w-full px-4 py-3 rounded-xl dark:bg-white/5 bg-gray-50 dark:text-white text-gray-900 dark:border-purple-500/20 border-gray-200 border-2 focus:border-purple-500 focus:outline-none text-center text-sm" />
-            <button onClick={() => saveToLeaderboard(playerName)}
-              className="w-full py-3 rounded-xl text-white font-bold neon-btn">
-              <Trophy className="w-5 h-5 mr-2" />
-              Salvar no Ranking
-            </button>
+            <ArenaSurface variant="reading" className="space-y-6 rounded-[28px] p-8 text-center">
+              <div className="text-6xl">🎉</div>
+              <h2 className="text-2xl font-black text-slate-50">Quiz completo</h2>
+              <p className="text-sm text-slate-300">Quer aparecer no ranking?</p>
+              <input type="text" placeholder="Seu nome (ou deixe em branco)" value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)} maxLength={20}
+                className="w-full rounded-xl border border-white/10 bg-slate-950/70 px-4 py-3 text-center text-sm text-slate-100 outline-none transition-colors focus:border-purple-400/50" />
+              <button onClick={() => saveToLeaderboard(playerName)}
+                className="neon-btn w-full rounded-xl py-3 font-bold text-white">
+                <Trophy className="w-5 h-5 mr-2" />
+                Salvar no Ranking
+              </button>
+            </ArenaSurface>
           </motion.div>
-        </div>
-        <ChatWidget />
-        <RadioPlayer />
-      </div>
+      </ArenaPageShell>
     );
   }
 
   // ==================== RENDER: NOT STARTED ====================
   if (!quizStarted) {
     return (
-      <div className="relative min-h-screen">
-        <div className="fixed inset-0 dark:bg-[#06060e] bg-gradient-to-br from-purple-100 via-pink-50 to-cyan-50" />
-        <div className="relative z-10">
-          <TopMenu />
+      <ArenaPageShell onNavigate={handleMenuNavigation}>
           {!showIntro ? (
             <div className="flex items-center justify-center min-h-[calc(100vh-8rem)] p-4 pb-32">
               <QuizIntro onStart={startQuiz} title={currentQuiz.title} description={currentQuiz.description} quizId={currentQuiz.id} />
             </div>
           ) : (
-            <div className="flex flex-col items-center p-4 pt-20 pb-32">
-              <div className="w-full max-w-2xl">
-                <div className="neon-card rounded-3xl p-8 md:p-10 text-center space-y-6 mb-8">
+            <div className="flex flex-col items-center p-4 pb-32 pt-20">
+              <div className="w-full max-w-3xl">
+                <ArenaSurface variant="reading" className="mb-8 rounded-[30px] p-8 text-center md:p-10">
+                  <div className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Arena selecionada</div>
                   <div className="text-6xl">{currentQuiz.emoji}</div>
-                  <h1 className="orbitron text-3xl md:text-4xl font-black dark:text-white text-gray-900">
+                  <h1 className="mt-4 text-3xl font-black text-slate-50 md:text-4xl">
                     {currentQuiz.title}
                   </h1>
-                  <p className="dark:text-gray-400 text-gray-500 text-lg">{currentQuiz.description}</p>
-                  <button onClick={startQuiz} className="w-full py-4 rounded-xl text-white font-bold text-lg neon-btn">
-                    <Zap className="w-5 h-5 mr-2 inline" />
-                    Começar Quiz
-                  </button>
-                  <button onClick={() => { setAudioEnabled(!audioEnabled); setShowIntro(false); }}
-                    className="w-full py-3 rounded-xl text-sm font-medium dark:bg-white/5 bg-gray-50 dark:text-gray-400 text-gray-500 dark:hover:bg-white/10 hover:bg-gray-100 transition-all flex items-center justify-center gap-2 dark:border border-purple-500/10 border-gray-200">
-                    {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                    Som {audioEnabled ? "Ligado" : "Desligado"}
-                  </button>
-                </div>
-                <Leaderboard leaderboard={leaderboard} maxItems={100} />
+                  <p className="mt-3 text-lg text-slate-300">{currentQuiz.description}</p>
+                  <div className="mt-8 space-y-3">
+                    <button onClick={startQuiz} className="neon-btn w-full rounded-xl py-4 text-lg font-bold text-white">
+                      <Zap className="w-5 h-5 mr-2 inline" />
+                      Começar Quiz
+                    </button>
+                    <button onClick={() => { setAudioEnabled(!audioEnabled); setShowIntro(false); }}
+                      className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-medium text-slate-200 transition-all hover:bg-white/10">
+                      {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                      Som {audioEnabled ? "Ligado" : "Desligado"}
+                    </button>
+                  </div>
+                </ArenaSurface>
+                <ArenaSurface variant="panel" className="rounded-[28px] p-4 sm:p-6">
+                  <Leaderboard leaderboard={leaderboard} maxItems={100} />
+                </ArenaSurface>
               </div>
             </div>
           )}
-        </div>
-        <ChatWidget />
-        <RadioPlayer />
-      </div>
+      </ArenaPageShell>
     );
   }
 
   // ==================== RENDER: LOADING ====================
   if (questions.length === 0) {
     return (
-      <div className="relative min-h-screen">
-        <div className="fixed inset-0 dark:bg-[#06060e] bg-gradient-to-br from-purple-100 via-pink-50 to-cyan-50" />
-        <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
+      <ArenaPageShell shellClassName="flex min-h-screen items-center justify-center p-4" onNavigate={handleMenuNavigation}>
           <WelcomeAnimation />
-          <TopMenu />
           <CardSkeleton />
-        </div>
-        <ChatWidget />
-        <RadioPlayer />
-      </div>
+      </ArenaPageShell>
     );
   }
 
@@ -397,13 +391,11 @@ export default function Home() {
     const time = (Date.now() - startTime) / 1000;
 
     return (
-      <div className="relative min-h-screen">
-        <div className="fixed inset-0 dark:bg-[#06060e] bg-gradient-to-br from-purple-100 via-pink-50 to-cyan-50" />
-        <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 50 }}>
-          {showConfetti && <CanvasConfetti />}
-        </div>
-        <div className="relative z-10 pt-20 pb-32">
-          <TopMenu />
+      <ArenaPageShell
+        onNavigate={handleMenuNavigation}
+        overlay={showConfetti ? <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 50 }}><CanvasConfetti /></div> : null}
+        shellClassName="pb-32 pt-20"
+      >
           <div className="flex flex-col items-center px-4 py-8">
             <QuizResult
               percentage={result.percentage}
@@ -418,7 +410,6 @@ export default function Home() {
               onShare={() => shareResult("whatsapp")}
             />
 
-            {/* Share buttons */}
             <div className="grid grid-cols-4 gap-2 mt-6 w-full max-w-lg">
               {[
                 { platform: "twitter", icon: "𝕏", color: "dark:bg-gray-800 bg-gray-100 dark:text-white text-gray-900" },
@@ -433,39 +424,30 @@ export default function Home() {
               ))}
             </div>
 
-            {/* Leaderboard below result */}
             <div className="w-full max-w-3xl mt-10">
-              <Leaderboard leaderboard={leaderboard} maxItems={100} />
+              <ArenaSurface variant="panel" className="rounded-[28px] p-4 sm:p-6">
+                <Leaderboard leaderboard={leaderboard} maxItems={100} />
+              </ArenaSurface>
             </div>
           </div>
-        </div>
-        <ChatWidget />
-        <RadioPlayer />
-      </div>
+      </ArenaPageShell>
     );
   }
 
   // ==================== RENDER: GAME (question loop) ====================
   const question = questions[currentQuestion];
   const maxPoints = questions.length * 4;
-  const elapsed = Math.floor((Date.now() - startTime) / 1000);
 
   return (
-    <div className="relative min-h-screen">
-      <div className="fixed inset-0 dark:bg-[#06060e] bg-gradient-to-br from-purple-100 via-pink-50 to-cyan-50" />
-      <div className="relative z-10">
-        <TopMenu />
-
-        {/* Top HUD */}
-        <div className="sticky top-0 z-50 dark:bg-[#06060e]/80 bg-white/80 backdrop-blur-xl dark:border-b border-purple-500/10 border-gray-100">
-          <div className="max-w-xl mx-auto px-4 py-3">
+    <ArenaPageShell onNavigate={handleMenuNavigation}>
+        <div className="sticky top-0 z-50 border-b border-white/8 bg-[#070b14]/88 backdrop-blur-xl">
+          <div className="mx-auto max-w-4xl px-4 py-3">
             <QuizProgress current={currentQuestion} total={questions.length} points={totalPoints} maxPoints={maxPoints} />
           </div>
         </div>
 
-        {/* Question Area */}
-        <div className="flex items-start justify-center min-h-[calc(100vh-12rem)] p-4 pt-8 pb-32">
-          <div className="w-full max-w-xl">
+        <div className="flex min-h-[calc(100vh-12rem)] items-start justify-center p-4 pb-32 pt-8">
+          <div className="w-full max-w-4xl">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentQuestion}
@@ -474,58 +456,17 @@ export default function Home() {
                 exit={{ opacity: 0, x: -60 }}
                 transition={{ duration: 0.35, type: "spring", stiffness: 200 }}
               >
-                {/* Question text */}
-                <div className="text-center mb-8">
-                  <h2 className="orbitron text-xl md:text-2xl font-black dark:text-white text-gray-900 leading-relaxed">
-                    {question.text}
-                  </h2>
-                </div>
-
-                {/* Answer options */}
-                <div className="space-y-3">
-                  {question.answers.map((answer, i) => {
-                    const answerLabels = ["A", "B", "C", "D"];
-                    const accentColors = [
-                      "hover:border-purple-500/50 dark:hover:bg-purple-500/10 hover:bg-purple-50",
-                      "hover:border-cyan-500/50 dark:hover:bg-cyan-500/10 hover:bg-cyan-50",
-                      "hover:border-pink-500/50 dark:hover:bg-pink-500/10 hover:bg-pink-50",
-                      "hover:border-amber-500/50 dark:hover:bg-amber-500/10 hover:bg-amber-50",
-                    ];
-
-                    return (
-                      <button
-                        key={i}
-                        onClick={() => handleAnswer(answer.points)}
-                        className={`w-full text-left p-4 md:p-5 rounded-xl transition-all duration-200 dark:bg-white/[0.03] bg-white dark:border border-white/[0.06] border-gray-200 ${accentColors[i]} disabled:cursor-default`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-black flex-shrink-0 dark:bg-white/5 bg-gray-100 dark:text-gray-500 text-gray-400">
-                            {answerLabels[i]}
-                          </span>
-                          <span className="text-sm md:text-base font-medium dark:text-gray-200 text-gray-700 flex-1">
-                            {answer.text}
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Timer + question counter */}
-                <div className="flex items-center justify-between mt-6 text-xs dark:text-gray-600 text-gray-400">
-                  <span className="flex items-center gap-1.5">
-                    <Timer className="w-3.5 h-3.5" />
-                    {elapsed}s
-                  </span>
-                  <span>{currentQuestion + 1} / {questions.length}</span>
-                </div>
+                <QuizQuestion
+                  question={question}
+                  questionIndex={currentQuestion}
+                  totalQuestions={questions.length}
+                  onAnswer={handleAnswer}
+                  selectedAnswer={selectedAnswer}
+                />
               </motion.div>
             </AnimatePresence>
           </div>
         </div>
-      </div>
-      <ChatWidget />
-      <RadioPlayer />
-    </div>
+    </ArenaPageShell>
   );
 }

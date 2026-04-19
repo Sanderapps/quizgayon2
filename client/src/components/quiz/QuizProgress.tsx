@@ -10,18 +10,16 @@ export function QuizProgress({ current, total, points, maxPoints }: QuizProgress
   const pct = Math.round((points / maxPoints) * 100);
 
   return (
-    <div className="w-full max-w-xl mx-auto px-4 mb-6">
-      {/* Top bar: progress + score */}
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-bold dark:text-gray-400 text-gray-500">
-          {current + 1} <span className="dark:text-gray-600 text-gray-400">/ {total}</span>
+    <div className="mx-auto mb-2 w-full max-w-3xl px-4">
+      <div className="mb-3 flex items-center justify-between">
+        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+          {current + 1} <span className="text-slate-600">/ {total}</span>
         </span>
-        <div className="flex items-center gap-2">
-          <div className="orbitron text-sm font-black neon-text">{pct}%</div>
+        <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm font-black text-slate-100">
+          <span className="neon-text">{pct}%</span>
         </div>
       </div>
 
-      {/* Progress bar */}
       <div className="progress-neon">
         <div className="progress-neon-fill" style={{ width: `${progress}%` }} />
       </div>
