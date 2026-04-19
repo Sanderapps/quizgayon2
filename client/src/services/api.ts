@@ -40,7 +40,7 @@ export async function salvarPontuacao(
     
     if (!quizToken) {
       console.error('Token de sessão não encontrado');
-      alert('Sessão expirada. Por favor, recarregue a página e jogue novamente.');
+      alert('Sua sessão expirou. Recarregue a página e faça o quiz de novo.');
       return null;
     }
 

@@ -108,23 +108,38 @@ class RadioStreamSimpleService {
   private async updateCurrentSong() {
     if (this.playlist.length === 0) return;
 
-    const song = this.playlist[this.currentSongIndex];
-    const songPath = path.join(this.publicPath, 'music', song.file);
-    
-    if (!fs.existsSync(songPath)) {
-      console.error(`[RÁDIO SIMPLES] ❌ Arquivo não encontrado: ${songPath}`);
-      this.currentSongIndex = (this.currentSongIndex + 1) % this.playlist.length;
-      return;
+    let elapsedSeconds = Math.floor((Date.now() - this.startTime) / 1000);
+    let songIndex = this.currentSongIndex;
+    let song = this.playlist[songIndex];
+    let songPath = path.join(this.publicPath, 'music', song.file);
+    let duration = 0;
+    let advanced = false;
+
+    for (let guard = 0; guard < this.playlist.length; guard++) {
+      if (!fs.existsSync(songPath)) {
+        console.error(`[RÁDIO SIMPLES] ❌ Arquivo não encontrado: ${songPath}`);
+        songIndex = (songIndex + 1) % this.playlist.length;
+        song = this.playlist[songIndex];
+        songPath = path.join(this.publicPath, 'music', song.file);
+        advanced = true;
+        continue;
+      }
+
+      duration = await this.getMp3Duration(songPath);
+      if (elapsedSeconds < duration) {
+        break;
+      }
+
+      elapsedSeconds -= duration;
+      songIndex = (songIndex + 1) % this.playlist.length;
+      song = this.playlist[songIndex];
+      songPath = path.join(this.publicPath, 'music', song.file);
+      advanced = true;
     }
 
-    const duration = await this.getMp3Duration(songPath);
-    const elapsedSeconds = Math.floor((Date.now() - this.startTime) / 1000);
-    const position = elapsedSeconds % duration;
-
-    // Se a música terminou, avança para a próxima
-    if (position === 0 && elapsedSeconds > 0) {
-      this.currentSongIndex = (this.currentSongIndex + 1) % this.playlist.length;
-      this.startTime = Date.now();
+    if (advanced) {
+      this.currentSongIndex = songIndex;
+      this.startTime = Date.now() - (elapsedSeconds * 1000);
       console.log(`[RÁDIO SIMPLES] 🎵 Próxima música: ${this.playlist[this.currentSongIndex].title}`);
     }
 
@@ -132,7 +147,7 @@ class RadioStreamSimpleService {
       title: song.title,
       artist: song.artist,
       total: this.playlist.length,
-      position,
+      position: Math.min(elapsedSeconds, Math.max(duration - 1, 0)),
       duration
     };
   }
@@ -145,6 +160,14 @@ class RadioStreamSimpleService {
   public skipToNext(): void {
     this.currentSongIndex = (this.currentSongIndex + 1) % this.playlist.length;
     this.startTime = Date.now();
+    const song = this.playlist[this.currentSongIndex];
+    this.currentSongInfo = {
+      title: song.title,
+      artist: song.artist,
+      total: this.playlist.length,
+      position: 0,
+      duration: 0,
+    };
     console.log(`[RÁDIO ADMIN] ⏭️ Pulando para: ${this.playlist[this.currentSongIndex].title}`);
     this.notifyListeners();
   }
@@ -152,6 +175,14 @@ class RadioStreamSimpleService {
   public restart(): void {
     this.currentSongIndex = 0;
     this.startTime = Date.now();
+    const song = this.playlist[this.currentSongIndex];
+    this.currentSongInfo = {
+      title: song.title,
+      artist: song.artist,
+      total: this.playlist.length,
+      position: 0,
+      duration: 0,
+    };
     console.log('[RÁDIO ADMIN] 🔄 Reiniciando playlist');
     this.notifyListeners();
   }
@@ -164,9 +195,29 @@ class RadioStreamSimpleService {
     if (index >= 0 && index < this.playlist.length) {
       this.currentSongIndex = index;
       this.startTime = Date.now();
+      const song = this.playlist[this.currentSongIndex];
+      this.currentSongInfo = {
+        title: song.title,
+        artist: song.artist,
+        total: this.playlist.length,
+        position: 0,
+        duration: 0,
+      };
       console.log(`[RÁDIO ADMIN] ▶️ Tocando: ${this.playlist[index].title}`);
       this.notifyListeners();
     }
+  }
+
+  public getUpcomingSongs(limit: number = 5): Song[] {
+    if (this.playlist.length === 0) return [];
+
+    const queue: Song[] = [];
+    for (let offset = 1; offset <= Math.min(limit, this.playlist.length - 1); offset++) {
+      const index = (this.currentSongIndex + offset) % this.playlist.length;
+      queue.push(this.playlist[index]);
+    }
+
+    return queue;
   }
 
   private notifyListeners(): void {

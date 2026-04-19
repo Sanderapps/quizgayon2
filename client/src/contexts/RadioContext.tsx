@@ -10,12 +10,20 @@ interface Song {
   artist: string;
 }
 
+interface SongQueueEntry {
+  title: string;
+  artist: string;
+}
+
 interface RadioContextType {
   isPlaying: boolean;
   volume: number;
   isLoading: boolean;
   autoplayBlocked: boolean;
   currentSong: Song | null;
+  queue: SongQueueEntry[];
+  currentPosition: number;
+  currentDuration: number;
   totalSongs: number;
   togglePlay: () => void;
   setVolume: (volume: number) => void;
@@ -30,10 +38,59 @@ export function RadioProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [autoplayBlocked, setAutoplayBlocked] = useState(false);
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
+  const [queue, setQueue] = useState<SongQueueEntry[]>([]);
+  const [currentPosition, setCurrentPosition] = useState(0);
+  const [currentDuration, setCurrentDuration] = useState(0);
   const [totalSongs, setTotalSongs] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const shouldResumeRef = useRef(false);
   const resumeOnInteractionRef = useRef(false);
+  const reconnectTimeoutRef = useRef<number | null>(null);
+  const manualStopRef = useRef(false);
+
+  const clearReconnectTimeout = () => {
+    if (reconnectTimeoutRef.current !== null) {
+      window.clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+  };
+
+  const connectToLiveStream = async () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    clearReconnectTimeout();
+    audio.src = `${STREAM_URL}?t=${Date.now()}`;
+    audio.load();
+    setIsLoading(true);
+    await audio.play();
+  };
+
+  const scheduleReconnect = (reason: "ended" | "error" | "songChanged", delay = 700) => {
+    if (!audioRef.current || !shouldResumeRef.current || reconnectTimeoutRef.current !== null) {
+      return;
+    }
+
+    console.log(`[RÁDIO] Tentando reconectar após ${reason} em ${delay}ms`);
+    setIsLoading(true);
+    setIsPlaying(true);
+
+    reconnectTimeoutRef.current = window.setTimeout(() => {
+      reconnectTimeoutRef.current = null;
+      connectToLiveStream().catch((error) => {
+        console.error(`[RÁDIO] Falha ao reconectar após ${reason}:`, error);
+
+        if (error instanceof DOMException && error.name === "NotAllowedError") {
+          resumeOnInteractionRef.current = true;
+          setAutoplayBlocked(true);
+          setIsLoading(false);
+          return;
+        }
+
+        scheduleReconnect(reason, Math.min(delay + 500, 2500));
+      });
+    }, delay);
+  };
 
   // Carregar volume salvo do localStorage
   useEffect(() => {
@@ -56,13 +113,8 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     const resumePlayback = async () => {
       if (!audioRef.current || !shouldResumeRef.current || isPlaying) return;
 
-      const liveStreamUrl = `${STREAM_URL}?t=${Date.now()}`;
-      audioRef.current.src = liveStreamUrl;
-      audioRef.current.load();
-      setIsLoading(true);
-
       try {
-        await audioRef.current.play();
+        await connectToLiveStream();
         resumeOnInteractionRef.current = false;
         setAutoplayBlocked(false);
       } catch (error) {
@@ -95,15 +147,31 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     });
 
     audio.addEventListener("pause", () => {
+      if (!manualStopRef.current && shouldResumeRef.current) {
+        return;
+      }
+
+      manualStopRef.current = false;
       setIsPlaying(false);
       setIsLoading(false);
     });
 
+    audio.addEventListener("ended", () => {
+      if (!shouldResumeRef.current) return;
+      scheduleReconnect("ended");
+    });
+
     audio.addEventListener("error", (e) => {
+      console.error('Erro ao carregar stream de rádio:', e);
+
+      if (shouldResumeRef.current) {
+        scheduleReconnect("error", 1000);
+        return;
+      }
+
       setIsLoading(false);
       setIsPlaying(false);
       setAutoplayBlocked(false);
-      console.error('Erro ao carregar stream de rádio:', e);
     });
 
     window.addEventListener("pointerdown", handleUserInteraction);
@@ -113,6 +181,7 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     return () => {
       window.removeEventListener("pointerdown", handleUserInteraction);
       window.removeEventListener("keydown", handleUserInteraction);
+      clearReconnectTimeout();
 
       if (audioRef.current) {
         audioRef.current.pause();
@@ -131,27 +200,36 @@ export function RadioProvider({ children }: { children: ReactNode }) {
 
   // Buscar informações da música atual periodicamente
   useEffect(() => {
-    const fetchNowPlaying = async () => {
+    const fetchRadioState = async () => {
       try {
-        const response = await fetch('/api/radio/nowplaying');
-        if (response.ok) {
-          const data = await response.json();
+        const [nowPlayingResponse, queueResponse] = await Promise.all([
+          fetch('/api/radio/nowplaying'),
+          fetch('/api/radio/queue'),
+        ]);
+
+        if (nowPlayingResponse.ok) {
+          const data = await nowPlayingResponse.json();
           setCurrentSong({
             title: data.title,
             artist: data.artist
           });
           setTotalSongs(data.total);
+          setCurrentPosition(data.position || 0);
+          setCurrentDuration(data.duration || 0);
+        }
+
+        if (queueResponse.ok) {
+          const data = await queueResponse.json();
+          setQueue(data.upcoming || []);
         }
       } catch (error) {
         console.error('Erro ao buscar informações da música:', error);
       }
     };
 
-    // Busca imediatamente
-    fetchNowPlaying();
+    fetchRadioState();
 
-    // Atualiza a cada 10 segundos
-    const interval = setInterval(fetchNowPlaying, 10000);
+    const interval = setInterval(fetchRadioState, 10000);
 
     return () => clearInterval(interval);
   }, []);
@@ -165,10 +243,7 @@ export function RadioProvider({ children }: { children: ReactNode }) {
       
       // Se está tocando, reconecta ao stream para sincronizar
       if (isPlaying && audioRef.current) {
-        const streamUrl = `/api/radio/stream?t=${Date.now()}`;
-        audioRef.current.src = streamUrl;
-        audioRef.current.load();
-        audioRef.current.play().catch(console.error);
+        scheduleReconnect("songChanged", 150);
       }
 
       // Atualiza informações da música
@@ -176,6 +251,17 @@ export function RadioProvider({ children }: { children: ReactNode }) {
         title: data.song.title,
         artist: data.song.artist
       });
+      setCurrentPosition(data.song.position || 0);
+      setCurrentDuration(data.song.duration || 0);
+
+      fetch('/api/radio/queue')
+        .then((response) => response.ok ? response.json() : null)
+        .then((payload) => {
+          if (payload?.upcoming) {
+            setQueue(payload.upcoming);
+          }
+        })
+        .catch(console.error);
     });
 
     return () => {
@@ -187,20 +273,20 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     if (!audioRef.current) return;
 
     if (isPlaying) {
+      manualStopRef.current = true;
       shouldResumeRef.current = false;
       resumeOnInteractionRef.current = false;
+      clearReconnectTimeout();
       localStorage.setItem(RADIO_SHOULD_RESUME_KEY, "false");
       setAutoplayBlocked(false);
       audioRef.current.pause();
       audioRef.current.src = "";
     } else {
+      manualStopRef.current = false;
       shouldResumeRef.current = true;
       localStorage.setItem(RADIO_SHOULD_RESUME_KEY, "true");
-      audioRef.current.src = `${STREAM_URL}?t=${Date.now()}`;
-      audioRef.current.load();
-      
       setIsLoading(true);
-      audioRef.current.play().catch((error) => {
+      connectToLiveStream().catch((error) => {
         console.error("Erro ao reproduzir:", error);
         setIsLoading(false);
         resumeOnInteractionRef.current = true;
@@ -221,6 +307,9 @@ export function RadioProvider({ children }: { children: ReactNode }) {
         isLoading,
         autoplayBlocked,
         currentSong,
+        queue,
+        currentPosition,
+        currentDuration,
         totalSongs,
         togglePlay,
         setVolume,

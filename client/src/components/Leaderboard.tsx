@@ -1,44 +1,45 @@
 import React from 'react';
+import { Crown, Medal, Shield, Sparkles, Timer, Trophy } from 'lucide-react';
 
 // ==================== TÍTULOS E FRASES ====================
 
 const ALPHA_TITLES = [
-  { min: 95, max: 100, title: "Chad Supremo", emoji: "🗿" },
-  { min: 90, max: 94, title: "Machão Raiz", emoji: "💪" },
-  { min: 85, max: 89, title: "Hetero Top", emoji: "🏋️" },
-  { min: 80, max: 84, title: "Brother Firmeza", emoji: "🍺" },
-  { min: 75, max: 79, title: "Macho Alfa", emoji: "🦁" },
-  { min: 70, max: 74, title: "Carne de Pescoço", emoji: "🥩" },
-  { min: 65, max: 69, title: "Barba de Lenhador", emoji: "🪓" },
-  { min: 60, max: 64, title: "Sertanejo Universitário", emoji: "🤠" },
-  { min: 55, max: 59, title: "Tiozão do Churrasco", emoji: "🔥" },
-  { min: 50, max: 54, title: "Brother Aliado", emoji: "🤝" },
+  { min: 95, max: 100, title: "Modo Blindado", emoji: "🗿" },
+  { min: 90, max: 94, title: "Postura de Pedra", emoji: "💪" },
+  { min: 85, max: 89, title: "Convicção de Camarote", emoji: "🏋️" },
+  { min: 80, max: 84, title: "Brother de Manual", emoji: "🍺" },
+  { min: 75, max: 79, title: "Presença Contida", emoji: "🦁" },
+  { min: 70, max: 74, title: "Carisma Travado", emoji: "🥩" },
+  { min: 65, max: 69, title: "Lenha na Pose", emoji: "🪓" },
+  { min: 60, max: 64, title: "Rotina de Churrasco", emoji: "🤠" },
+  { min: 55, max: 59, title: "Aliado Sem Alarde", emoji: "🔥" },
+  { min: 50, max: 54, title: "Quase Solto", emoji: "🤝" },
 ];
 
 const ALPHA_PHRASES_BY_RANK: Record<number, string> = {
-  1: "Nunca vi uma flor", 2: "Só usa sabonete 3 em 1", 3: "Churrasco todo domingo",
-  4: "Cerveja é vitamina", 5: "Camisa de time é roupa social", 6: "Academia 6x por semana",
-  7: "Futebol é religião", 8: "Carne mal passada sempre", 9: "Brother firmeza", 10: "Respeita as mina",
+  1: "Fechado para balanço afetivo", 2: "Planilha emocional em dia", 3: "Firme na pose",
+  4: "Não entrega fácil", 5: "Camisa de time como traje social", 6: "Controle de danos impecável",
+  7: "Esporte como idioma principal", 8: "Manual de hábitos repetidos", 9: "Postura estável", 10: "Aliado funcional",
 };
 
 const DIVA_PHRASES_BY_RANK: Record<number, string> = {
-  1: "Rainha absoluta, periodt", 2: "Lacrou demais, mana", 3: "Diva certified",
-  4: "Arrasa sempre", 5: "Glamour é o mínimo", 6: "Slay queen energy",
-  7: "Fabulosa por natureza", 8: "Brilha mais que glitter", 9: "Diva em construção", 10: "Quase lá, querida",
+  1: "Presença de palco absoluta", 2: "Carisma calibrado", 3: "Timing de manchete",
+  4: "Entrada forte", 5: "Humor afiado", 6: "Brilho sem esforço",
+  7: "Repertório completo", 8: "Presença que organiza o ambiente", 9: "Subindo de nível", 10: "Quase no topo",
 };
 
-interface Badge { icon: string; title: string; condition: (p: number, t?: number) => boolean; }
+interface Badge { label: string; title: string; condition: (p: number, t?: number) => boolean; }
 
 const ALPHA_BADGES: Badge[] = [
-  { icon: "🏆", title: "Hetero Raiz", condition: (p) => p < 5 },
-  { icon: "💪", title: "Machão Confirmado", condition: (p) => p < 10 },
-  { icon: "⚡", title: "Speedrun Alpha", condition: (p, t) => t !== undefined && t < 30 },
-  { icon: "🤝", title: "Aliado Confiável", condition: (p) => p >= 40 && p < 50 },
+  { label: "Raiz", title: "Perfil mais contido do ranking", condition: (p) => p < 5 },
+  { label: "Firme", title: "Convicção bem amarrada", condition: (p) => p < 10 },
+  { label: "Rápido", title: "Terminou muito rápido", condition: (p, t) => t !== undefined && t < 30 },
+  { label: "Aliado", title: "Resultado mais aberto dentro da faixa", condition: (p) => p >= 40 && p < 50 },
 ];
 
-function getAlphaTitle(p: number) { return ALPHA_TITLES.find(t => p >= t.min && p <= t.max) || { title: "Brother Aliado", emoji: "🤝" }; }
-function getAlphaPhrase(r: number) { return ALPHA_PHRASES_BY_RANK[r] || "Brother gente boa"; }
-function getDivaPhrase(r: number) { return DIVA_PHRASES_BY_RANK[r] || "Diva em ascensão"; }
+function getAlphaTitle(p: number) { return ALPHA_TITLES.find(t => p >= t.min && p <= t.max) || { title: "Quase Solto", emoji: "🤝" }; }
+function getAlphaPhrase(r: number) { return ALPHA_PHRASES_BY_RANK[r] || "Postura constante"; }
+function getDivaPhrase(r: number) { return DIVA_PHRASES_BY_RANK[r] || "Presença em ascensão"; }
 function getAlphaBadges(p: number, t?: number) { return ALPHA_BADGES.filter(b => b.condition(p, t)); }
 
 // ==================== COR POR % ====================
@@ -71,11 +72,38 @@ function getPercentTextColor(p: number): string {
 // ==================== RANK BADGE ====================
 
 const RankBadge = ({ rank, category }: { rank: number; category: 'divas' | 'alfas' }) => {
-  if (rank === 1) return <span className="text-2xl">{category === 'divas' ? '👑' : '🗿'}</span>;
-  if (rank === 2) return <span className="text-xl">{category === 'divas' ? '⭐' : '🍺'}</span>;
-  if (rank === 3) return <span className="text-xl">{category === 'divas' ? '💎' : '🔧'}</span>;
-  if (rank <= 6) return <span className="text-lg">{category === 'divas' ? '✨' : '💪'}</span>;
-  return <span className="text-base">⭐</span>;
+  const iconClass = "h-4 w-4";
+  const wrapperClass = "flex h-7 w-7 items-center justify-center rounded-lg";
+
+  if (rank === 1) {
+    return (
+      <span className={`${wrapperClass} ${category === 'divas' ? 'bg-pink-500/15 text-pink-400' : 'bg-sky-500/15 text-sky-400'}`}>
+        {category === 'divas' ? <Crown className={iconClass} /> : <Shield className={iconClass} />}
+      </span>
+    );
+  }
+
+  if (rank === 2) {
+    return (
+      <span className={`${wrapperClass} bg-amber-500/15 text-amber-400`}>
+        <Medal className={iconClass} />
+      </span>
+    );
+  }
+
+  if (rank === 3) {
+    return (
+      <span className={`${wrapperClass} bg-violet-500/15 text-violet-400`}>
+        <Trophy className={iconClass} />
+      </span>
+    );
+  }
+
+  return (
+    <span className={`${wrapperClass} dark:bg-white/5 bg-slate-100 dark:text-slate-400 text-slate-500`}>
+      {category === 'divas' ? <Sparkles className="h-3.5 w-3.5" /> : <Shield className="h-3.5 w-3.5" />}
+    </span>
+  );
 };
 
 // ==================== MAIN COMPONENT ====================
@@ -88,8 +116,8 @@ export const Leaderboard = ({ leaderboard, maxItems = 50 }: { leaderboard: Leade
   if (leaderboard.length === 0) {
     return (
       <div className="dark:bg-[#0e0e1a]/80 bg-white/80 backdrop-blur-xl rounded-2xl p-8 dark:border border-purple-500/10 border-gray-200">
-        <h2 className="text-2xl font-bold mb-3 text-center dark:text-white text-gray-900">🏆 Placar de Líderes</h2>
-        <p className="text-center dark:text-gray-500 text-gray-400 text-sm">Nenhum resultado ainda. Seja o primeiro!</p>
+        <h2 className="text-2xl font-bold mb-3 text-center dark:text-white text-gray-900">Placar de líderes</h2>
+        <p className="text-center dark:text-gray-500 text-gray-400 text-sm">Ainda não há resultados publicados.</p>
       </div>
     );
   }
@@ -129,7 +157,17 @@ export const Leaderboard = ({ leaderboard, maxItems = 50 }: { leaderboard: Leade
               <p className={`font-bold text-sm truncate ${getPercentTextColor(entry.percentage)} dark:text-gray-200`}>
                 {entry.name}
                 {category === 'alfas' && alphaBadges.length > 0 && (
-                  <span className="ml-1">{alphaBadges.map((b, i) => <span key={i} className="text-xs" title={b.title}>{b.icon}</span>)}</span>
+                  <span className="ml-1 inline-flex flex-wrap gap-1 align-middle">
+                    {alphaBadges.map((b, i) => (
+                      <span
+                        key={i}
+                        className="rounded-full border border-sky-500/20 bg-sky-500/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-sky-500"
+                        title={b.title}
+                      >
+                        {b.label}
+                      </span>
+                    ))}
+                  </span>
                 )}
               </p>
             </div>
@@ -147,7 +185,10 @@ export const Leaderboard = ({ leaderboard, maxItems = 50 }: { leaderboard: Leade
         <div className="flex flex-col items-center gap-0.5 flex-shrink-0 ml-2">
           <span className="orbitron text-lg font-black dark:text-white text-gray-900">{displayPercentage}%</span>
           {entry.tempo_segundos && rank <= 3 && (
-            <span className="text-[9px] dark:text-gray-600 text-gray-400 font-mono">{entry.tempo_segundos.toFixed(1)}s</span>
+            <span className="inline-flex items-center gap-1 text-[9px] dark:text-gray-600 text-gray-400 font-mono">
+              <Timer className="h-2.5 w-2.5" />
+              {entry.tempo_segundos.toFixed(1)}s
+            </span>
           )}
         </div>
       </div>
@@ -156,20 +197,22 @@ export const Leaderboard = ({ leaderboard, maxItems = 50 }: { leaderboard: Leade
 
   return (
     <div className="dark:bg-[#0e0e1a]/80 bg-white/80 backdrop-blur-xl rounded-2xl p-5 md:p-8 dark:border border-purple-500/10 border-gray-200 max-h-[700px] overflow-y-auto">
-      <h2 className="orbitron text-xl md:text-3xl font-black mb-6 text-center">
-        <span className="dark:text-white text-gray-900">🏆 </span>
-        <span className="neon-text">Placar de Líderes</span>
+      <h2 className="orbitron mb-6 flex items-center justify-center gap-3 text-xl font-black text-center md:text-3xl">
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/15 text-amber-500">
+          <Trophy className="h-5 w-5" />
+        </span>
+        <span className="neon-text">Placar de líderes</span>
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         {/* Divas */}
         <div>
           <h3 className="text-sm font-bold mb-3 text-center text-pink-500 flex items-center justify-center gap-2">
-            <span className="text-lg">👑</span> Top Divas
+            <Crown className="h-4 w-4" /> Alta presença
           </h3>
           <div className="space-y-1.5 max-h-[500px] overflow-y-auto pr-1">
             {divas.length > 0 ? divas.map((e, i) => renderEntry(e, i, 'divas')) : (
-              <p className="text-center dark:text-gray-600 text-gray-400 text-xs py-8">Nenhuma diva ainda!</p>
+              <p className="text-center dark:text-gray-600 text-gray-400 text-xs py-8">Ninguém nessa faixa ainda.</p>
             )}
           </div>
         </div>
@@ -177,11 +220,11 @@ export const Leaderboard = ({ leaderboard, maxItems = 50 }: { leaderboard: Leade
         {/* Alfas */}
         <div>
           <h3 className="text-sm font-bold mb-3 text-center text-blue-500 flex items-center justify-center gap-2">
-            <span className="text-lg">💪</span> Top Alpha
+            <Shield className="h-4 w-4" /> Modo contido
           </h3>
           <div className="space-y-1.5 max-h-[500px] overflow-y-auto pr-1">
             {alfas.length > 0 ? alfas.map((e, i) => renderEntry(e, i, 'alfas')) : (
-              <p className="text-center dark:text-gray-600 text-gray-400 text-xs py-8">Nenhum alpha ainda!</p>
+              <p className="text-center dark:text-gray-600 text-gray-400 text-xs py-8">Ninguém nessa faixa ainda.</p>
             )}
           </div>
         </div>

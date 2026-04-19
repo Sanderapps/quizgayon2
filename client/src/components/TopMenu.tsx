@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
+import { useTheme } from "@/contexts/ThemeContext";
 import { changelog } from "@/data/changelog";
 import {
   ChevronRight,
@@ -23,6 +24,7 @@ interface TopMenuProps {
 
 export function TopMenu({ onNavigate }: TopMenuProps) {
   const [, setLocation] = useLocation();
+  const { theme, toggleTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showUpdates, setShowUpdates] = useState(false);
@@ -30,18 +32,15 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
   const [apelido, setApelido] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
-  const [isDark, setIsDark] = useState(() => localStorage.getItem("theme") === "dark");
+  const isDark = theme === "dark";
 
   useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-      return;
-    }
+    window.dispatchEvent(new CustomEvent("quiz:menu-state", { detail: { open: isOpen } }));
 
-    document.documentElement.classList.remove("dark");
-    localStorage.setItem("theme", "light");
-  }, [isDark]);
+    return () => {
+      window.dispatchEvent(new CustomEvent("quiz:menu-state", { detail: { open: false } }));
+    };
+  }, [isOpen]);
 
   const navigationItems = useMemo(
     () => [
@@ -125,7 +124,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
     <>
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="fixed right-4 top-4 z-[70] flex h-12 items-center gap-2 rounded-lg border border-white/10 bg-slate-950/82 px-3 text-slate-100 shadow-lg backdrop-blur-xl transition-all hover:border-purple-400/30"
+        className="fixed right-4 top-4 z-[95] flex h-12 items-center gap-2 rounded-lg border border-slate-200/75 bg-white/86 px-3 text-slate-800 shadow-[0_10px_28px_rgba(15,23,42,0.14)] backdrop-blur-xl transition-all hover:border-fuchsia-300/60 dark:border-white/10 dark:bg-slate-950/82 dark:text-slate-100 dark:hover:border-purple-400/30"
         aria-label="Abrir menu"
       >
         <Menu className="h-4 w-4" />
@@ -134,30 +133,30 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
 
       {isOpen && (
         <div
-          className="fixed inset-0 z-[9998] bg-black/70 backdrop-blur-sm"
+          className="fixed inset-0 z-[109] bg-slate-950/42 backdrop-blur-sm dark:bg-black/70"
           onClick={() => setIsOpen(false)}
         />
       )}
 
       <aside
-        className={`fixed z-[9999] transition-transform duration-300 ease-out ${
+        className={`fixed z-[110] transition-transform duration-300 ease-out ${
           isOpen ? "translate-y-0 md:translate-x-0" : "translate-y-full md:translate-y-0 md:translate-x-full"
         } bottom-0 left-0 right-0 md:bottom-4 md:left-auto md:right-4 md:top-20 md:w-[24rem]`}
         aria-hidden={!isOpen}
       >
-        <div className="arena-panel rounded-t-3xl border-b-0 p-5 md:rounded-2xl md:border-b">
+        <div className="arena-panel rounded-t-3xl border-b-0 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] md:rounded-2xl md:border-b">
           <div className="mb-5 flex items-start justify-between gap-4">
             <div>
-              <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-purple-400/20 bg-purple-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-purple-200">
+              <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-fuchsia-300/35 bg-fuchsia-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-fuchsia-700 dark:border-purple-400/20 dark:bg-purple-500/10 dark:text-purple-200">
                 <Sparkles className="h-3.5 w-3.5" />
                 Navegação
               </div>
-              <h2 className="text-lg font-semibold text-slate-50">QuiZoeira</h2>
-              <p className="mt-1 text-sm text-slate-300">Acesso rápido, ajustes e novidades fora do fluxo do quiz.</p>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">QuiZoeira</h2>
+              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Acesso rápido, ajustes e novidades sem atrapalhar a rodada.</p>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="rounded-lg border border-white/10 bg-white/5 p-2 text-slate-300 transition-colors hover:text-white"
+              className="rounded-lg border border-slate-200/70 bg-white/75 p-2 text-slate-500 transition-colors hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:text-white"
               aria-label="Fechar menu"
             >
               <X className="h-4 w-4" />
@@ -166,20 +165,20 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
 
           <div className="space-y-5">
             <section>
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Navegação</h3>
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Navegação</h3>
               <div className="space-y-2">
                 {navigationItems.map((item) => {
                   const IconComponent = item.icon;
                   return (
                     <button key={item.page} onClick={() => handleItemClick(item.page)} className="menu-item-row">
                       <span className="flex items-center gap-3">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-purple-300">
-                          <IconComponent className="h-4 w-4" />
-                        </span>
-                        <span className="text-left">
-                          <span className="block text-sm font-semibold text-slate-100">{item.label}</span>
-                          <span className="block text-xs text-slate-400">{item.description}</span>
-                        </span>
+                          <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-fuchsia-500/10 text-fuchsia-600 dark:bg-white/5 dark:text-purple-300">
+                            <IconComponent className="h-4 w-4" />
+                          </span>
+                          <span className="text-left">
+                          <span className="block text-sm font-semibold text-slate-900 dark:text-slate-100">{item.label}</span>
+                          <span className="block text-xs text-slate-500 dark:text-slate-400">{item.description}</span>
+                          </span>
                       </span>
                       <ChevronRight className="h-4 w-4 text-slate-500" />
                     </button>
@@ -189,16 +188,16 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
             </section>
 
             <section>
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Preferências</h3>
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Preferências</h3>
               <div className="space-y-2">
-                <button onClick={() => setIsDark((prev) => !prev)} className="menu-item-row">
+                <button onClick={() => toggleTheme?.()} className="menu-item-row">
                   <span className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-cyan-300">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-600 dark:bg-white/5 dark:text-cyan-300">
                       {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                     </span>
                     <span className="text-left">
-                      <span className="block text-sm font-semibold text-slate-100">Tema {isDark ? "claro" : "escuro"}</span>
-                      <span className="block text-xs text-slate-400">Alternar contraste da interface</span>
+                      <span className="block text-sm font-semibold text-slate-900 dark:text-slate-100">Tema {isDark ? "claro" : "escuro"}</span>
+                      <span className="block text-xs text-slate-500 dark:text-slate-400">Alternar atmosfera e contraste</span>
                     </span>
                   </span>
                 </button>
@@ -211,12 +210,12 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
                   className="menu-item-row"
                 >
                   <span className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-amber-300">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:bg-white/5 dark:text-amber-300">
                       <Lightbulb className="h-4 w-4" />
                     </span>
                     <span className="text-left">
-                      <span className="block text-sm font-semibold text-slate-100">Sugestões</span>
-                      <span className="block text-xs text-slate-400">Enviar ideia, feedback ou ajuste</span>
+                      <span className="block text-sm font-semibold text-slate-900 dark:text-slate-100">Sugestões</span>
+                      <span className="block text-xs text-slate-500 dark:text-slate-400">Enviar ideia, feedback ou ajuste</span>
                     </span>
                   </span>
                   <ChevronRight className="h-4 w-4 text-slate-500" />
@@ -230,12 +229,12 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
                   className="menu-item-row"
                 >
                   <span className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-pink-300">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-pink-500/10 text-pink-600 dark:bg-white/5 dark:text-pink-300">
                       <ClipboardList className="h-4 w-4" />
                     </span>
                     <span className="text-left">
-                      <span className="block text-sm font-semibold text-slate-100">Atualizações</span>
-                      <span className="block text-xs text-slate-400">Ver changelog fora do menu principal</span>
+                      <span className="block text-sm font-semibold text-slate-900 dark:text-slate-100">Atualizações</span>
+                      <span className="block text-xs text-slate-500 dark:text-slate-400">Ver changelog fora do menu principal</span>
                     </span>
                   </span>
                   <ChevronRight className="h-4 w-4 text-slate-500" />
@@ -247,16 +246,16 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
       </aside>
 
       {showUpdates && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="arena-panel w-full max-w-xl rounded-2xl p-6">
             <div className="mb-5 flex items-center justify-between gap-4">
               <div>
-                <h2 className="text-lg font-semibold text-slate-50">Atualizações</h2>
-                <p className="mt-1 text-sm text-slate-300">Mudanças recentes sem disputar espaço com a navegação.</p>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Atualizações</h2>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Mudanças recentes sem disputar espaço com a navegação.</p>
               </div>
               <button
                 onClick={() => setShowUpdates(false)}
-                className="rounded-lg border border-white/10 bg-white/5 p-2 text-slate-300 hover:text-white"
+                className="rounded-lg border border-slate-200/70 bg-white/70 p-2 text-slate-500 hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:text-white"
                 aria-label="Fechar atualizações"
               >
                 <X className="h-4 w-4" />
@@ -270,11 +269,11 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
                     <span className="text-lg">{entry.emoji}</span>
                     <div className="min-w-0 flex-1">
                       <div className="mb-1 flex items-center gap-2">
-                        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                           {entry.version}
                         </span>
                       </div>
-                      <p className="text-sm leading-relaxed text-slate-200">{entry.text}</p>
+                      <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-200">{entry.text}</p>
                     </div>
                   </div>
                 </div>
@@ -285,33 +284,33 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
       )}
 
       {showSuggestions && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="arena-panel w-full max-w-md rounded-2xl p-6 space-y-4">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-semibold text-slate-50">Sugestões</h2>
-                <p className="mt-1 text-sm text-slate-300">Manda a ideia com contexto suficiente para virar ajuste de verdade.</p>
+                <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Sugestões</h2>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Manda a ideia com contexto suficiente para virar ajuste de verdade.</p>
               </div>
-              <button onClick={() => setShowSuggestions(false)} className="rounded-lg border border-white/10 bg-white/5 p-2 text-slate-300 hover:text-white">
+              <button onClick={() => setShowSuggestions(false)} className="rounded-lg border border-slate-200/70 bg-white/70 p-2 text-slate-500 hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:text-white">
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-400">Seu nome ou apelido</label>
+                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Seu nome ou apelido</label>
                 <input
                   type="text"
                   value={apelido}
                   onChange={(e) => setApelido(e.target.value)}
                   placeholder="Como quer aparecer?"
                   maxLength={30}
-                  className="w-full rounded-xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm text-slate-100 outline-none transition-colors focus:border-purple-400/50"
+                  className="w-full rounded-xl border border-slate-200/80 bg-white/85 px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-fuchsia-400/60 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100 dark:focus:border-purple-400/50"
                   disabled={isSubmitting}
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-400">Sugestão</label>
+                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Sugestão</label>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -319,10 +318,10 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
                   placeholder="Descreva problema, ideia ou melhoria."
                   rows={4}
                   maxLength={500}
-                  className="w-full resize-none rounded-xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm text-slate-100 outline-none transition-colors focus:border-purple-400/50"
+                  className="w-full resize-none rounded-xl border border-slate-200/80 bg-white/85 px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-fuchsia-400/60 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100 dark:focus:border-purple-400/50"
                   disabled={isSubmitting}
                 />
-                <div className="mt-1 text-right text-[11px] text-slate-500">{message.length}/500</div>
+                <div className="mt-1 text-right text-[11px] text-slate-500 dark:text-slate-500">{message.length}/500</div>
               </div>
             </div>
 
@@ -341,7 +340,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowSuggestions(false)}
-                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-200"
+                className="flex-1 rounded-xl border border-slate-200/80 bg-white/85 px-4 py-3 text-sm font-medium text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
                 disabled={isSubmitting}
               >
                 Cancelar

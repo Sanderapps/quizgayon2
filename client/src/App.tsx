@@ -9,6 +9,7 @@ import { RadioProvider } from "./contexts/RadioContext";
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const Home = lazy(() => import("@/pages/Home"));
 const QuizSelector = lazy(() => import("@/pages/QuizSelector"));
+const ResultSharePage = lazy(() => import("@/pages/ResultSharePage"));
 const AdminDashboard = lazy(() =>
   import("@/components/AdminDashboard").then((module) => ({ default: module.AdminDashboard }))
 );
@@ -28,6 +29,7 @@ function Router() {
     <Switch>
       <Route path={"/"} component={QuizSelector} />
       <Route path="/quiz/:quizId" component={Home} />
+      <Route path="/resultado/:quizId/:percentage" component={ResultSharePage} />
       <Route path={"/admin"} component={AdminDashboard} />
       <Route path={"/admin-radio"} component={AdminRadio} />
       <Route path={"/404"} component={NotFound} />
@@ -47,6 +49,7 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider
         defaultTheme="light"
+        switchable
       >
         <RadioProvider>
           <TooltipProvider>

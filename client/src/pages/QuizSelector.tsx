@@ -3,7 +3,7 @@ import { allQuizzes } from "@/data/quizzes";
 import { ArenaPageShell } from "@/components/layout/ArenaPageShell";
 import { ArenaSurface } from "@/components/layout/ArenaSurface";
 import { motion } from "framer-motion";
-import { Rainbow, Vote, MapPin, Zap, Trophy, Users } from "lucide-react";
+import { Rainbow, Vote, MapPin, Trophy, Radio, Sparkles, ShieldCheck } from "lucide-react";
 
 // Mapeamento de ícones + cores neon para cada quiz
 const quizConfig: Record<string, {
@@ -14,17 +14,17 @@ const quizConfig: Record<string, {
   "gay": {
     icon: Rainbow,
     themeClass: "quiz-theme-gay",
-    tag: "🔥 MAIS POPULAR",
+    tag: "MAIS JOGADO",
   },
   "politico": {
     icon: Vote,
     themeClass: "quiz-theme-politico",
-    tag: "⚡ POLÊMICO",
+    tag: "DEBATE ACESO",
   },
   "regional": {
     icon: MapPin,
     themeClass: "quiz-theme-regional",
-    tag: "🗺️ REGIONAL",
+    tag: "MAPA AFETIVO",
   },
 };
 
@@ -34,59 +34,69 @@ export default function QuizSelector() {
       <div className="flex-1 px-4 pb-24 pt-24 md:pt-28">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-10">
             <motion.div
-              className="mx-auto w-full max-w-3xl text-center"
+              className="mx-auto grid w-full max-w-6xl gap-6 md:grid-cols-[1.1fr,0.9fr] md:items-center"
               initial={{ opacity: 0, y: -30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <motion.div
-                className="mb-6 inline-flex items-center gap-2 rounded-full border border-purple-400/20 bg-purple-500/10 px-4 py-1.5"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                <Zap className="w-4 h-4 text-purple-500" />
-                <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 tracking-wider uppercase">
-                  Neon Arena
-                </span>
-              </motion.div>
+              <div className="text-center md:text-left">
+                <motion.div
+                  className="mb-6 inline-flex items-center gap-2 rounded-full border border-purple-400/20 bg-purple-500/10 px-4 py-1.5"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <Sparkles className="w-4 h-4 text-purple-500" />
+                  <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 tracking-wider uppercase">
+                    Neon Arena
+                  </span>
+                </motion.div>
 
-              <h1 className="orbitron mb-4 text-5xl font-black tracking-tight sm:text-6xl md:text-7xl">
-                <span className="text-slate-50">Qui</span>
-                <span className="neon-text">Zoeira</span>
-              </h1>
+                <h1 className="orbitron mb-4 text-5xl font-black tracking-tight sm:text-6xl md:text-7xl">
+                  <span className="text-slate-900 dark:text-slate-50">Qui</span>
+                  <span className="neon-text">Zoeira</span>
+                </h1>
 
-              <p className="mx-auto max-w-2xl text-base leading-relaxed text-slate-300 md:text-lg">
-                Escolha sua arena. Responda. Domine o ranking.
-              </p>
+                <p className="mx-auto max-w-2xl text-base leading-relaxed text-slate-600 dark:text-slate-300 md:mx-0 md:text-lg">
+                  Escolha sua arena. Responda rápido. Compartilhe o resultado com estilo.
+                </p>
 
-              <motion.div
-                className="mx-auto mt-6 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-300 md:gap-6"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-              >
-                <span className="arena-panel-soft flex items-center gap-1.5 rounded-full px-3 py-2">
-                  <Trophy className="w-3.5 h-3.5 text-amber-500" />
-                  Ranking ao vivo
-                </span>
-                <span className="arena-panel-soft flex items-center gap-1.5 rounded-full px-3 py-2">
-                  <Users className="w-3.5 h-3.5 text-cyan-500" />
-                  Multiplayer
-                </span>
-                <span className="arena-panel-soft flex items-center gap-1.5 rounded-full px-3 py-2">
-                  <Zap className="w-3.5 h-3.5 text-purple-500" />
-                  100% anônimo
-                </span>
-              </motion.div>
+                <motion.div
+                  className="mx-auto mt-6 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-600 dark:text-slate-300 md:mx-0 md:justify-start md:gap-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <span className="arena-panel-soft flex items-center gap-1.5 rounded-full px-3 py-2">
+                    <Trophy className="w-3.5 h-3.5 text-amber-500" />
+                    Ranking ao vivo
+                  </span>
+                  <span className="arena-panel-soft flex items-center gap-1.5 rounded-full px-3 py-2">
+                    <Radio className="w-3.5 h-3.5 text-cyan-500" />
+                    Rádio integrada
+                  </span>
+                  <span className="arena-panel-soft flex items-center gap-1.5 rounded-full px-3 py-2">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                    100% anônimo
+                  </span>
+                </motion.div>
+              </div>
+
+              <div className="arena-poster-frame overflow-hidden rounded-[28px] p-3">
+                <img
+                  src="/share-cover.svg"
+                  alt="Painel neon da QuiZoeira com visual de arena"
+                  className="h-full w-full rounded-[22px] object-cover"
+                />
+              </div>
             </motion.div>
 
             <ArenaSurface variant="panel" className="mx-auto w-full max-w-6xl rounded-3xl p-4 sm:p-6 md:p-8">
               <div className="mb-6 flex flex-col gap-2 border-b border-white/8 pb-5 md:flex-row md:items-end md:justify-between">
                 <div>
-                  <h2 className="text-xl font-semibold text-slate-50 md:text-2xl">Escolha o modo de jogo</h2>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-300">
-                    Cada quiz entra na mesma arena, com menos ruído visual e mais foco na pergunta.
+                  <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50 md:text-2xl">Escolha seu quiz</h2>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                    Três arenas, três humores e a mesma lógica direta: responder, descobrir e compartilhar.
                   </p>
                 </div>
                 <p className="text-xs uppercase tracking-[0.18em] text-slate-500">3 arenas disponíveis</p>
@@ -124,16 +134,16 @@ export default function QuizSelector() {
                               <div className="quiz-card-icon-glow absolute inset-0 rounded-2xl blur-xl" />
                             </motion.div>
 
-                            <h2 className="mb-2 text-center text-lg font-bold text-slate-50 md:text-xl">
+                            <h2 className="mb-2 text-center text-lg font-bold text-slate-900 dark:text-slate-50 md:text-xl">
                               {quiz.title.replace(/[^\w\s]/gi, "").trim()}
                             </h2>
 
-                            <p className="mb-5 text-center text-sm leading-relaxed text-slate-300">
+                            <p className="mb-5 text-center text-sm leading-relaxed text-slate-600 dark:text-slate-300">
                               {quiz.description}
                             </p>
 
                             <div className="quiz-card-cta rounded-lg px-5 py-2 text-sm font-bold text-white transition-all opacity-95 group-hover:opacity-100">
-                              Entrar na Arena →
+                              Jogar agora
                             </div>
                           </div>
                         </div>
@@ -151,7 +161,7 @@ export default function QuizSelector() {
               transition={{ delay: 0.7 }}
             >
               <p className="text-xs text-slate-400">
-                Sem login • Sem cadastro • Só competir
+                Sem login, sem cadastro, direto ao ponto.
               </p>
             </motion.div>
         </div>

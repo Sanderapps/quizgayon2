@@ -1,8 +1,8 @@
 import { Question } from "./types";
 
 /**
- * 50 Perguntas do Quiz Regional: Sulista vs Nordestino
- * Pontuação: 0 = Sulista Raiz | 4 = Nordestino Raiz
+ * 50 perguntas do quiz regional.
+ * Pontuação: 0 = puxa para o Sul | 4 = puxa para o Nordeste
  */
 export const regionalQuestions: Question[] = [
   {
@@ -31,7 +31,7 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 3,
-    pergunta:  "O que é 'bergamota'?",
+    pergunta:  "Quando alguém fala 'bergamota', você entende o quê?",
     emoji: "🍊",
     opcoes: [
       { texto: "Uma fruta, ué (tangerina)", emoji: "🍊", pontos: 0 },
@@ -43,14 +43,14 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 4,
-    pergunta: "Qual o nome disso: Aipim, Mandioca ou Macaxeira?",
+    pergunta: "No seu vocabulário, isso é aipim, mandioca ou macaxeira?",
     emoji: "🥔",
     opcoes: [
       { texto: "Aipim", emoji: "🧉", pontos: 0 },
       { texto: "Mandioca", emoji: "⚪", pontos: 2 },
       { texto: "Macaxeira", emoji: "🌵", pontos: 4 },
       { texto: "É tudo a mesma coisa", emoji: "🤷", pontos: 2 },
-      { texto: "Depende do dia", emoji: "😂", pontos: 2 },
+      { texto: "Troco o nome conforme a conversa", emoji: "😂", pontos: 2 },
     ],
   },
   {
@@ -91,7 +91,7 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 8,
-    pergunta:  "O que é 'cacetinho'?",
+    pergunta:  "Se alguém pede um 'cacetinho', você imagina o quê?",
     emoji: "🥖",
     opcoes: [
       { texto: "Pão francês", emoji: "🥖", pontos: 0 },
@@ -139,7 +139,7 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 12,
-    pergunta:  "O que é 'massa' ou 'massinha'?",
+    pergunta:  "Quando alguém diz que algo está 'massa', isso quer dizer:",
     emoji: "👍",
     opcoes: [
       { texto: "Macarrão", emoji: "🍝", pontos: 0 },
@@ -163,7 +163,7 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 14,
-    pergunta:  "O que significa 'oxe' ou 'oxente'?",
+    pergunta:  "Quando soltam um 'oxe' ou 'oxente', isso soa como:",
     emoji: "😲",
     opcoes: [
       { texto: "Uma marca de água oxigenada", emoji: "🧴", pontos: 0 },
@@ -187,7 +187,7 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 16,
-    pergunta:  "O que é 'arretado'?",
+    pergunta:  "Se algo é 'arretado', para você isso significa:",
     emoji: "😠",
     opcoes: [
       { texto: "Algo que foi preso", emoji: "⛓️", pontos: 0 },
@@ -259,19 +259,19 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 22,
-    pergunta: "Como você chama o semáforo?",
+    pergunta: "No dia a dia, você chama o semáforo de quê?",
     emoji: "🚦",
     opcoes: [
       { texto: "Sinaleira", emoji: "🚦", pontos: 0 },
       { texto: "Farol", emoji: "🚦", pontos: 1 },
       { texto: "Semáforo", emoji: "🚦", pontos: 2 },
       { texto: "Sinal", emoji: "🚦", pontos: 3 },
-      { texto: "O negócio que fecha", emoji: "😂", pontos: 4 },
+      { texto: "Sinal mesmo, sem grandes compromissos", emoji: "😂", pontos: 4 },
     ],
   },
   {
     id: 23,
-    pergunta: "Seu rolê ideal no fim de semana:",
+    pergunta: "Seu fim de semana ideal tem mais cara de quê?",
     emoji: "🎉",
     opcoes: [
       { texto: "Ficar em casa debaixo das cobertas", emoji: "🛌", pontos: 0 },
@@ -283,7 +283,7 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 24,
-    pergunta: "O que você faz quando chove?",
+    pergunta: "Quando começa a chover, sua reação é qual?",
     emoji: "🌧️",
     opcoes: [
       { texto: "Agradeço por não precisar regar as plantas", emoji: "🌱", pontos: 0 },
@@ -295,7 +295,7 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 25,
-    pergunta: "Como você chama a pipa?",
+    pergunta: "Esse brinquedo no céu você chama de quê?",
     emoji: "🪁",
     opcoes: [
       { texto: "Pandorga", emoji: "🪁", pontos: 0 },
@@ -307,14 +307,14 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 26,
-    pergunta:  "O que é uma 'sombra'?",
+    pergunta:  "Quando alguém diz 'vamos para a sombra', isso significa:",
     emoji: "🌳",
     opcoes: [
       { texto: "A ausência de luz", emoji: "🌑", pontos: 0 },
       { texto: "Um lugar pra descansar do sol", emoji: "🌳", pontos: 1 },
       { texto: "Um espírito", emoji: "👻", pontos: 2 },
       { texto: "Uma pessoa que te segue", emoji: "🕵️", pontos: 3 },
-      { texto: "Um lugar fresco e agradável", emoji: "😌", pontos: 4 },
+      { texto: "Um canto fresco e confortável para existir", emoji: "😌", pontos: 4 },
     ],
   },
   {
@@ -331,14 +331,14 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 28,
-    pergunta: "O que você faz no São João?",
+    pergunta: "No São João, você entra em qual clima?",
     emoji: "🔥",
     opcoes: [
       { texto: "Como pinhão e bebo quentão", emoji: "🍷", pontos: 0 },
       { texto: "Fico em casa", emoji: "🏠", pontos: 1 },
       { texto: "Vou a uma quermesse", emoji: "🎪", pontos: 2 },
       { texto: "Danço quadrilha e como canjica", emoji: "🌽", pontos: 3 },
-      { texto: "É a melhor festa do ano! Forró a noite toda!", emoji: "💃", pontos: 4 },
+      { texto: "Melhor época do ano, com forró até tarde", emoji: "💃", pontos: 4 },
     ],
   },
   {
@@ -355,7 +355,7 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 30,
-    pergunta:  "O que é uma 'rede' pra você?",
+    pergunta:  "Quando alguém fala em 'rede', sua cabeça vai para onde?",
     emoji: "🕸️",
     opcoes: [
       { texto: "De pesca ou de vôlei", emoji: "🎣", pontos: 0 },
@@ -379,43 +379,43 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 32,
-    pergunta: "Quem é Gildo de Freitas?",
+    pergunta: "Gildo de Freitas, para você, é quem?",
     emoji: "🤔",
     opcoes: [
       { texto: "Um grande nome da música gaúcha", emoji: "🎶", pontos: 0 },
       { texto: "Um político?", emoji: "🏛️", pontos: 1 },
       { texto: "Um jogador de futebol?", emoji: "⚽", pontos: 2 },
       { texto: "Não sei", emoji: "🤷", pontos: 3 },
-      { texto: "Um amigo seu?", emoji: "😂", pontos: 4 },
+      { texto: "Um nome que claramente não faz parte do meu repertório", emoji: "😂", pontos: 4 },
     ],
   },
   {
     id: 33,
-    pergunta: "Quem é Luiz Gonzaga?",
+    pergunta: "Luiz Gonzaga, para você, é:",
     emoji: "🤔",
     opcoes: [
       { texto: "Um escritor?", emoji: "✍️", pontos: 0 },
       { texto: "Um ator?", emoji: "🎭", pontos: 1 },
       { texto: "O Rei do Baião", emoji: "👑", pontos: 4 },
       { texto: "Não sei", emoji: "🤷", pontos: 2 },
-      { texto: "Um parente do Gonzaguinha?", emoji: "😂", pontos: 3 },
+      { texto: "Um nome que conheço por tabela", emoji: "😂", pontos: 3 },
     ],
   },
   {
     id: 34,
-    pergunta: "O que você acha de CTG (Centro de Tradições Gaúchas)?",
+    pergunta: "Sua leitura sobre CTG é qual?",
     emoji: "🤠",
     opcoes: [
       { texto: "Minha segunda casa", emoji: "❤️", pontos: 0 },
       { texto: "Acho legal a cultura", emoji: "👍", pontos: 1 },
       { texto: "Nunca fui", emoji: "🤷", pontos: 2 },
       { texto: "Acho meio estranho", emoji: "🤔", pontos: 3 },
-      { texto: "É tipo uma seita?", emoji: "😂", pontos: 4 },
+      { texto: "Parece um universo paralelo bem organizado", emoji: "😂", pontos: 4 },
     ],
   },
   {
     id: 35,
-    pergunta: "O que você acha de Carnaval?",
+    pergunta: "Carnaval, para você, é:",
     emoji: "🎉",
     opcoes: [
       { texto: "Prefiro ficar em casa", emoji: "🏠", pontos: 0 },
@@ -439,19 +439,19 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 37,
-    pergunta:  "O que é uma 'tchê'?",
+    pergunta:  "Quando alguém solta um 'tchê', você entende como:",
     emoji: "🤔",
     opcoes: [
       { texto: "Uma forma de chamar qualquer pessoa", emoji: "🗣️", pontos: 0 },
       { texto: "Uma marca de erva-mate", emoji: "🧉", pontos: 1 },
       { texto: "Um tipo de dança", emoji: "💃", pontos: 2 },
       { texto: "Não sei", emoji: "🤷", pontos: 3 },
-      { texto: "Che Guevara?", emoji: "😂", pontos: 4 },
+      { texto: "Uma palavra que claramente não é do meu território", emoji: "😂", pontos: 4 },
     ],
   },
   {
     id: 38,
-    pergunta:  "O que é um 'cabra da peste'?",
+    pergunta:  "Chamar alguém de 'cabra da peste' significa dizer que a pessoa é:",
     emoji: "🐐",
     opcoes: [
       { texto: "Um bode com doença", emoji: "🐐", pontos: 0 },
@@ -463,7 +463,7 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 39,
-    pergunta: "Qual a sua opinião sobre futebol?",
+    pergunta: "No futebol, seu coração tende a ir para:",
     emoji: "⚽",
     opcoes: [
       { texto: "Sou fanático pelo meu time do Sul", emoji: "🔵", pontos: 0 },
@@ -475,7 +475,7 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 40,
-    pergunta: "O que é literatura de cordel?",
+    pergunta: "Literatura de cordel, para você, é:",
     emoji: "📜",
     opcoes: [
       { texto: "Um tipo de artesanato", emoji: "🧶", pontos: 0 },
@@ -499,7 +499,7 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 42,
-    pergunta: "O que é mais importante em uma festa?",
+    pergunta: "Numa festa boa, o item decisivo é:",
     emoji: "🥳",
     opcoes: [
       { texto: "Bebida boa e barata", emoji: "🍻", pontos: 0 },
@@ -511,19 +511,19 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 43,
-    pergunta: "Como você lida com o trânsito?",
+    pergunta: "No trânsito travado, você vira quem?",
     emoji: "🚗",
     opcoes: [
       { texto: "Reclamo o tempo todo", emoji: "🤬", pontos: 0 },
       { texto: "Ouço música e relaxo", emoji: "🎧", pontos: 1 },
       { texto: "Uso como tempo pra pensar na vida", emoji: "🤔", pontos: 2 },
       { texto: "Canto alto pra passar o tempo", emoji: "🎤", pontos: 3 },
-      { texto: "Buzino e xingo todo mundo", emoji: "🚗", pontos: 4 },
+      { texto: "Transformo o carro num pequeno surto coletivo", emoji: "🚗", pontos: 4 },
     ],
   },
   {
     id: 44,
-    pergunta:  "O que é um 'vivente'?",
+    pergunta:  "Se alguém chama outro de 'vivente', isso quer dizer:",
     emoji: "👤",
     opcoes: [
       { texto: "Uma pessoa, um indivíduo", emoji: "👤", pontos: 0 },
@@ -559,7 +559,7 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 47,
-    pergunta:  "O que é 'negrinho'?",
+    pergunta:  "No contexto regional, 'negrinho' costuma ser:",
     emoji: "🤔",
     opcoes: [
       { texto: "Brigadeiro", emoji: "🍫", pontos: 0 },
@@ -571,7 +571,7 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 48,
-    pergunta:  "O que é 'bulir'?",
+    pergunta:  "Quando mandam você 'bulir' com algo, querem dizer:",
     emoji: "👉",
     opcoes: [
       { texto: "Um tipo de panela", emoji: "🍳", pontos: 0 },
@@ -595,7 +595,7 @@ export const regionalQuestions: Question[] = [
   },
   {
     id: 50,
-    pergunta: "O que é melhor?",
+    pergunta: "No fim das contas, seu cenário perfeito é:",
     emoji: "🤔",
     opcoes: [
       { texto: "Frio e fondue", emoji: "🧀", pontos: 0 },

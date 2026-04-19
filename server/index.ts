@@ -10,6 +10,7 @@ import { cleanupOldEvents, cleanupExpiredBans } from "./middleware/antiSpam.js";
 import routes from "./routes/index.js";
 import { setupChatSocket } from "./sockets/chat.socket.js";
 import { cleanupExpiredQuizTokens } from "./services/quizService.js";
+import { renderResultShareHtml, resolveIndexHtmlPath } from "./sharePage.js";
 // Radio stream service removido - usando versão simples
 
 const __filename = fileURLToPath(import.meta.url);
@@ -101,6 +102,13 @@ async function startServer() {
       : path.resolve(__dirname, "..", "dist", "public");
 
   app.use(express.static(staticPath));
+
+  app.get("/resultado/:quizId/:percentage", (req, res) => {
+    const percentage = Number(req.params.percentage || 0);
+    const origin = `${req.protocol}://${req.get("host")}`;
+    const html = renderResultShareHtml(resolveIndexHtmlPath(staticPath), origin, req.params.quizId, percentage);
+    res.send(html);
+  });
 
   // Handle client-side routing - serve index.html for all routes
   app.get("*", (_req, res) => {

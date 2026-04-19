@@ -15,6 +15,22 @@ router.get('/nowplaying', (req: Request, res: Response) => {
   res.json(info);
 });
 
+router.get('/queue', (_req: Request, res: Response) => {
+  const currentSong = radioStreamSimpleService.getCurrentSongInfo();
+  const upcoming = radioStreamSimpleService.getUpcomingSongs(5);
+
+  res.json({
+    currentSong: {
+      title: currentSong.title,
+      artist: currentSong.artist,
+      position: currentSong.position,
+      duration: currentSong.duration,
+    },
+    upcoming,
+    totalSongs: currentSong.total,
+  });
+});
+
 // Endpoint para obter estatísticas da rádio
 router.get('/stats', (req: Request, res: Response) => {
   const info = radioStreamSimpleService.getCurrentSongInfo();

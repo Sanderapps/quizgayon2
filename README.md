@@ -1,148 +1,207 @@
-> **Nota do Desenvolvedor:** Este README foi reescrito a partir de uma análise direta do código-fonte para garantir 100% de precisão técnica e refletir o estado real do projeto.
+# QuiZoeira
 
-# QuizGayon2 🌈 - Análise Técnica e Documentação
+Aplicação full-stack de quiz com ranking global, chat em tempo real, rádio integrada e painel administrativo, deployada na Railway.
 
-Quiz interativo e humorístico evoluído para uma aplicação full-stack completa com placar de líderes global, API REST, chat em tempo real e um robusto sistema de segurança anti-spam, tudo pronto para produção e deploy na Railway.
+## Estado atual
 
----
+- Frontend em `React + Vite + TypeScript`
+- Backend em `Express + Socket.IO`
+- Persistência em `PostgreSQL`
+- Deploy em `Railway`
+- Typecheck e build passando com `pnpm check` e `pnpm build`
 
-## 🌟 Funcionalidades Implementadas
+## O que o projeto faz
 
-| Categoria | Funcionalidade | Status e Detalhes |
-|---|---|---|
-| **Quiz** | Sistema de perguntas e pontuação | ✅ **15 perguntas** aleatórias de um **pool de 50**. Pontuação máxima: **60 pontos**. |
-| **Competição** | Placar de Líderes Global | ✅ Armazenado em **PostgreSQL**, ordenado por pontuação e tempo. |
-| **API** | API REST completa | ✅ Endpoints para pontuações, placar, estatísticas e chat. |
-| **Interatividade** | Chat em Tempo Real | ✅ Implementado com **Socket.IO**, com persistência de mensagens. |
-| **Segurança** | Sistema Anti-Spam e Anti-Fraude | ✅ **Múltiplas camadas** (rate limit, cooldown, banimento de IP, etc.). |
-| **Admin** | Endpoints de Debug e Moderação | ✅ Protegidos por senha para limpar dados e gerenciar o chat. |
-| **Deploy** | Configuração para deploy na Railway | ✅ Automatizado via `railway.json` e Nixpacks. |
+- Seleção de quizzes com temas diferentes
+- Execução de 15 perguntas aleatórias a partir de pools maiores
+- Salvamento de pontuação com ranking por pontuação e tempo
+- Chat em tempo real com persistência
+- Rádio com streaming, painel admin e retomada automática com fallback quando autoplay é bloqueado
+- Painel administrativo protegido por senha
+- Sistema anti-spam para submissão de score
 
----
+## Quizzes
 
-## 🔐 Sistema de Segurança (Anti-Spam)
+Hoje o projeto expõe estes quizzes:
 
-O projeto possui um sistema de defesa sofisticado para proteger a integridade do placar. **Importante: este sistema opera em memória e é resetado a cada reinicialização do servidor.**
+- `gay`
+- `politico`
+- `regional`
 
-| Proteção | Limite | Duração |
-|---|---|---|
-| **Rate Limit de Submissão** | 3 submissões | 1 minuto |
-| **Cooldown entre Submissões** | 1 submissão | 30 segundos |
-| **Variação de Apelido** | 3 submissões com mesmo prefixo | 5 minutos |
-| **Comportamento Idêntico** | 2 submissões (mesma pontuação+tempo) | 10 minutos |
-| **Banimento de IP** | - | 6 horas |
-| **Rate Limit de Chat** | 1 mensagem | 2 segundos |
+Os dados ficam em [client/src/data/quizzes](/root/qz/quizgayon2/client/src/data/quizzes).
 
-### Validação de Dados no Backend
+## Arquitetura
 
-O servidor também impõe as seguintes regras na submissão de pontuação:
-
-- **Pontuação:** Deve ser um número entre 0 e 60.
-- **Tempo:** Deve ser um número entre 45 e 3600 segundos.
-- **Apelido:** Deve ter entre 1 e 20 caracteres.
-
----
-
-## 🛠️ Arquitetura e Tecnologias
-
-| Camada | Tecnologia | Propósito |
-|---|---|---|
-| **Frontend** | React 18.3, TypeScript, Vite, Tailwind CSS | Interface de usuário moderna e reativa. |
-| **Backend** | Node.js, Express, TypeScript, Socket.IO | Servidor web para a API REST e WebSocket. |
-| **Banco de Dados** | PostgreSQL | Armazenamento persistente de pontuações e mensagens. |
-| **DevOps** | Railway, pnpm, esbuild, Nixpacks | Build, gerenciamento de pacotes e deploy. |
-
----
-
-## 📁 Estrutura do Projeto
-
-```
-quizgayon2/
-├── client/              # Aplicação Frontend (React + Vite)
-├── server/              # Aplicação Backend (Node.js + Express)
-│   ├── index.ts         # ⚠️ ARQUIVO MONOLÍTICO (29k linhas) com toda a lógica
-│   └── db.ts            # Configuração e inicialização do PostgreSQL
-├── shared/              # Código compartilhado
-├── .env.example         # Exemplo de variáveis de ambiente
-├── railway.json         # Configuração de deploy para a Railway
-└── package.json         # Dependências e scripts
+```text
+client/   -> app React
+server/   -> API Express, Socket.IO, regras de negócio
+api/      -> entrada alternativa para runtime compatível com função
+patches/  -> patch local de dependência
 ```
 
----
+Pontos principais:
 
-## 🗄️ Estrutura do Banco de Dados
+- bootstrap do servidor: [server/index.ts](/root/qz/quizgayon2/server/index.ts)
+- inicialização do banco: [server/db.ts](/root/qz/quizgayon2/server/db.ts)
+- autenticação admin: [server/auth/adminAuth.ts](/root/qz/quizgayon2/server/auth/adminAuth.ts)
+- contexto da rádio: [client/src/contexts/RadioContext.tsx](/root/qz/quizgayon2/client/src/contexts/RadioContext.tsx)
 
-O banco de dados PostgreSQL contém 3 tabelas principais:
+## Segurança e regras importantes
 
-1.  `scores`: Armazena as pontuações dos jogadores.
-2.  `chat_messages`: Armazena o histórico do chat em tempo real.
-3.  `chat_reports`: Armazena denúncias de mensagens do chat.
+### Admin
 
----
+Rotas administrativas usam `X-Admin-Password` e exigem `ADMIN_PASSWORD`.
 
-## 🔌 Endpoints da API
+O servidor falha na inicialização se `ADMIN_PASSWORD` não estiver configurada.
 
-| Método | Endpoint | Descrição |
-|---|---|---|
-| GET | `/api/quiz/start` | Inicia uma nova sessão de quiz e retorna um token. |
-| POST | `/api/scores` | Salva uma nova pontuação. |
-| GET | `/api/leaderboard` | Retorna o placar de líderes. |
-| GET | `/api/stats` | Retorna estatísticas gerais. |
-| GET | `/api/chat/recent` | Retorna as últimas mensagens do chat. |
-| DELETE | `/api/scores/:id` | (Admin) Deleta uma pontuação. |
-| DELETE | `/api/chat/messages/:id` | (Admin) Deleta uma mensagem do chat. |
-| GET | `/api/chat/reports` | (Admin) Lista as denúncias de mensagens. |
+### Sessão de quiz
 
----
+O token de sessão do quiz:
 
-## 🔴 Pontos de Melhoria Urgentes
+- é gerado em `/api/quiz/start`
+- é persistido em `quiz_tokens` no PostgreSQL
+- expira
+- é consumido de forma transacional junto com o salvamento do score
 
-1.  **Refatorar o Servidor Monolítico:** O arquivo `server/index.ts` com quase 30.000 linhas é uma grande dívida técnica e precisa ser modularizado.
-2.  **Persistir o Estado do Anti-Spam:** O sistema anti-spam em memória é ineficaz contra reinicializações. Migrar para **Redis** ou PostgreSQL é crucial.
-3.  **Implementar Validação de Schema com Zod:** Embora existam validações manuais, usar **Zod** (já nas dependências) para validar os inputs da API tornaria o código mais limpo e seguro.
+Isso evita perda de sessão em restart e corrige problemas de reuso/consumo prematuro.
 
----
+### Anti-spam
 
-## 🚀 Deploy
+O sistema anti-spam usa PostgreSQL, não memória efêmera.
 
-### Railway (Recomendado)
+Camadas principais:
 
-Este projeto está configurado para deploy na **Railway** com suporte completo a WebSockets e PostgreSQL.
+- rate limit por IP
+- cooldown entre submissões
+- detecção de comportamento idêntico
+- detecção de nomes similares
+- banimento temporário de IP
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.com/project/1ce4c5a0-0044-4b31-b2c4-dce9e43ded73)
+Implementação: [server/middleware/antiSpam.ts](/root/qz/quizgayon2/server/middleware/antiSpam.ts)
 
-**URL de Produção:** https://web-production-b5e40.up.railway.app
+## Endpoints principais
 
-**Como deployar:**
+### Quiz e ranking
+
+- `GET /api/quiz/start`
+- `POST /api/scores`
+- `GET /api/leaderboard`
+- `GET /api/stats`
+
+### Chat
+
+- `GET /api/chat/recent`
+- WebSocket via Socket.IO
+
+### Rádio
+
+- `GET /api/radio/stream`
+- `GET /api/radio/nowplaying`
+- `GET /api/radio/stats`
+- `POST /api/radio/admin/next`
+- `POST /api/radio/admin/restart`
+- `GET /api/radio/admin/playlist`
+- `POST /api/radio/admin/play/:index`
+
+### Admin
+
+- `GET /api/admin/stats`
+- `GET /api/admin/bans`
+- `PUT /api/admin/antispam/config`
+- `DELETE /api/scores/:id`
+- `DELETE /api/chat/messages/:id`
+
+As rotas de debug/admin sensíveis estão protegidas.
+
+## Desenvolvimento local
+
+Pré-requisitos:
+
+- Node.js `>=20.19.0`
+- `pnpm`
+- PostgreSQL
+- `ffmpeg`
+
+Instalação:
 
 ```bash
-# Instalar Railway CLI e fazer login
-railway login
+pnpm install
+cp .env.example .env
+```
 
-# Linkar o projeto e fazer deploy
-railway link --project spectacular-intuition
+Desenvolvimento:
+
+```bash
+pnpm dev
+pnpm dev:server
+pnpm dev:full
+```
+
+Verificação:
+
+```bash
+pnpm check
+pnpm build
+```
+
+## Scripts
+
+- `pnpm dev` -> frontend Vite
+- `pnpm dev:server` -> backend Express
+- `pnpm dev:full` -> frontend + backend
+- `pnpm build` -> build de produção
+- `pnpm start` -> inicia servidor em produção
+- `pnpm check` -> TypeScript sem emitir arquivos
+
+## Variáveis de ambiente
+
+Obrigatórias:
+
+- `DATABASE_URL`
+- `ADMIN_PASSWORD`
+- `RADIO_ADMIN_KEY`
+
+O projeto também usa:
+
+- `PORT`
+- `SOCKET_ORIGINS`
+
+Exemplo base: [.env.example](/root/qz/quizgayon2/.env.example)
+
+## Deploy
+
+### Railway
+
+O deploy ativo está na Railway e usa [railway.json](/root/qz/quizgayon2/railway.json) + [Dockerfile](/root/qz/quizgayon2/Dockerfile).
+
+Fluxo típico:
+
+```bash
+railway login
+railway link
 railway up --service web --detach
 ```
 
-**Configuração do PostgreSQL:**
-O Railway provisiona automaticamente o banco de dados PostgreSQL e configura a variável `DATABASE_URL`.
+O serviço atual conhecido:
 
-**Variáveis de Ambiente:**
-- `ADMIN_PASSWORD` - Senha do painel admin
-- `RADIO_ADMIN_KEY` - Chave de acesso à administração da rádio
-- `DATABASE_URL` - Configurada automaticamente pelo Railway
+- projeto: `spectacular-intuition`
+- service: `web`
+- branch: `master`
 
-> ⚠️ **Nota:** A Vercel **NÃO** é recomendada para este projeto pois não suporta WebSockets/Socket.IO necessários para o chat em tempo real e streaming de rádio.
+## Observações práticas
 
----
+- A rádio não preserva o ponto exato em reload; ela reconecta ao stream ao vivo, que é o comportamento esperado.
+- A navegação interna foi ajustada para não forçar reload completo nas rotas principais.
+- O bundle já foi dividido com lazy loading para reduzir o peso inicial.
 
-## 📦 Instalação e Desenvolvimento
+## Arquivos úteis
 
-**Pré-requisitos:** Node.js (>=20), pnpm, e uma instância do PostgreSQL.
+- app shell e rotas: [client/src/App.tsx](/root/qz/quizgayon2/client/src/App.tsx)
+- página principal do quiz: [client/src/pages/Home.tsx](/root/qz/quizgayon2/client/src/pages/Home.tsx)
+- seletor de quizzes: [client/src/pages/QuizSelector.tsx](/root/qz/quizgayon2/client/src/pages/QuizSelector.tsx)
+- painel admin da rádio: [client/src/pages/AdminRadio.tsx](/root/qz/quizgayon2/client/src/pages/AdminRadio.tsx)
+- dashboard admin: [client/src/components/AdminDashboard.tsx](/root/qz/quizgayon2/client/src/components/AdminDashboard.tsx)
 
-1.  **Clonar:** `git clone https://github.com/Sanderapps/quizgayon2.git && cd quizgayon2`
-2.  **Instalar:** `pnpm install`
-3.  **Configurar:** `cp .env.example .env` e edite o arquivo `.env` com sua `DATABASE_URL`.
-4.  **Executar:** `pnpm run dev`
+## Situação do repositório
 
-O frontend estará disponível em `http://localhost:5173` (ou outra porta) e o backend em `http://localhost:3000`.
+Este `README` foi alinhado ao estado atual do código e do deploy, não ao histórico antigo do projeto.

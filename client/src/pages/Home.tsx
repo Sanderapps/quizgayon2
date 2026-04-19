@@ -8,8 +8,13 @@ import { ArenaPageShell } from "@/components/layout/ArenaPageShell";
 import { ArenaSurface } from "@/components/layout/ArenaSurface";
 import { CardSkeleton } from "@/components/LoadingSkeleton";
 import { QuizIntro, QuizProgress, QuizQuestion, QuizResult } from "@/components/quiz";
+import { QuizShareButtons } from "@/components/quiz/QuizShareButtons";
+import { quizAudio } from "@/lib/quizAudio";
+import { buildResultShareUrl, buildShareMessage, getResultDescription } from "@/lib/quizShare";
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap, Volume2, VolumeX, Trophy } from "lucide-react";
+
+const QUIZ_AUDIO_ENABLED_KEY = "quiz_audio_enabled";
 
 interface Question {
   id: number;
@@ -105,9 +110,19 @@ export default function Home() {
   const [startTime, setStartTime] = useState<number>(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showIntro, setShowIntro] = useState(true);
+  const answerLockRef = useRef(false);
 
-  const clickSoundRef = useRef<HTMLAudioElement | null>(null);
-  const successSoundRef = useRef<HTMLAudioElement | null>(null);
+  useEffect(() => {
+    const savedAudioPreference = localStorage.getItem(QUIZ_AUDIO_ENABLED_KEY);
+    const nextEnabled = savedAudioPreference !== "false";
+    setAudioEnabled(nextEnabled);
+    quizAudio.setEnabled(nextEnabled);
+  }, []);
+
+  useEffect(() => {
+    quizAudio.setEnabled(audioEnabled);
+    localStorage.setItem(QUIZ_AUDIO_ENABLED_KEY, String(audioEnabled));
+  }, [audioEnabled]);
 
   useEffect(() => {
     setCurrentQuestion(0);
@@ -121,22 +136,28 @@ export default function Home() {
     setStartTime(0);
     setSelectedAnswer(null);
     setShowIntro(true);
+    answerLockRef.current = false;
   }, [quizId]);
-
-  useEffect(() => {
-    clickSoundRef.current = new Audio('/sounds/guitar-click.mp3');
-    successSoundRef.current = new Audio('/sounds/guitar-success.mp3');
-    clickSoundRef.current.volume = 0.3;
-    successSoundRef.current.volume = 0.5;
-  }, []);
 
   const getResultByPercentage = (percentage: number): Result => {
     const category = percentage < 50 ? currentQuiz.categories.low : currentQuiz.categories.high;
     const titleObj = category.titles.find(t => percentage >= t.min && percentage <= t.max);
     if (titleObj) {
-      return { percentage, title: titleObj.title, description: "", emoji: titleObj.emoji, badge: titleObj.title };
+      return {
+        percentage,
+        title: titleObj.title,
+        description: getResultDescription(currentQuiz.id, percentage),
+        emoji: titleObj.emoji,
+        badge: titleObj.title,
+      };
     }
-    return { percentage, title: category.titles[0].title, description: "", emoji: category.titles[0].emoji, badge: category.titles[0].title };
+    return {
+      percentage,
+      title: category.titles[0].title,
+      description: getResultDescription(currentQuiz.id, percentage),
+      emoji: category.titles[0].emoji,
+      badge: category.titles[0].title,
+    };
   };
 
   // Easter egg
@@ -174,7 +195,7 @@ export default function Home() {
       const quizQuestions = currentQuiz.questions.map(q => ({
         id: q.id, text: q.pergunta,
         answers: q.opcoes.map(o => ({
-          text: `${o.emoji ? `${o.emoji} ` : ""}${o.texto}`,
+          text: o.texto,
           points: o.pontos
         }))
       }));
@@ -184,22 +205,24 @@ export default function Home() {
     }
   }, [quizStarted, quizId]);
 
-  const playSound = () => {
-    if (!audioEnabled || !clickSoundRef.current) return;
-    clickSoundRef.current.currentTime = 0;
-    clickSoundRef.current.play().catch(() => {});
-  };
+  useEffect(() => {
+    if (!quizStarted || questions.length === 0 || currentQuestion === 0 || showResult) return;
+    quizAudio.playTransition();
+  }, [currentQuestion, quizStarted, questions.length, showResult]);
 
-  const playSuccessSound = () => {
-    if (!audioEnabled || !successSoundRef.current) return;
-    successSoundRef.current.currentTime = 0;
-    successSoundRef.current.play().catch(() => {});
-  };
+  const playSound = () => quizAudio.playAnswer();
+  const playSuccessSound = () => quizAudio.playSuccess();
 
-  const handleAnswer = (points: number) => {
-    if (selectedAnswer !== null) return;
+  const handleAnswer = (points: number, answerIndex: number) => {
+    if (answerLockRef.current || selectedAnswer !== null) return;
+    answerLockRef.current = true;
     playSound();
-    setSelectedAnswer(0); // Visual feedback
+    setSelectedAnswer(answerIndex);
+    if (currentQuestion < questions.length - 1) {
+      window.setTimeout(() => {
+        quizAudio.playConfirm();
+      }, 120);
+    }
     setTimeout(() => {
       const newTotal = totalPoints + points;
       setTotalPoints(newTotal);
@@ -211,7 +234,8 @@ export default function Home() {
         setShowConfetti(true);
         setShowNameInput(true);
       }
-    }, 350);
+      answerLockRef.current = false;
+    }, 220);
   };
 
   const startQuiz = async () => {
@@ -220,13 +244,14 @@ export default function Home() {
       const data = await response.json();
       if (data.success && data.token) {
         sessionStorage.setItem('quiz_token', data.token);
+        quizAudio.playStart();
         setQuizStarted(true);
         setStartTime(Date.now());
       } else {
-        alert('Erro ao iniciar quiz. Tente novamente.');
+        alert('Não deu para abrir o quiz agora. Tenta mais uma vez em instantes.');
       }
     } catch {
-      alert('Erro ao conectar com o servidor.');
+      alert('Sem resposta do servidor no momento.');
     }
   };
 
@@ -237,6 +262,7 @@ export default function Home() {
   };
 
   const saveToLeaderboard = async (name: string) => {
+    quizAudio.playConfirm();
     const tempoSegundos = (Date.now() - startTime) / 1000;
     const apelido = name || "Anônimo";
     const saved = await salvarPontuacao(apelido, totalPoints, tempoSegundos, currentQuiz.id);
@@ -272,19 +298,20 @@ export default function Home() {
     setPlayerName(""); setShowNameInput(false); setSelectedAnswer(null); setShowIntro(true);
   };
 
-  const shareResult = (platform: string) => {
-    const result = getResult();
+  const shareResult = (platform: "twitter" | "facebook" | "telegram" | "whatsapp") => {
     const maxPoints = questions.length * 4;
     const percentage = Math.round((totalPoints / maxPoints) * 100);
-    const text = `Fiz o teste "${currentQuiz.title}" e meu resultado foi: ${result.title} (${percentage}%)! Quer tentar também?`;
-    const url = window.location.href;
-    const shareUrls: { [key: string]: string } = {
+    const url = buildResultShareUrl(window.location.origin, currentQuiz.id, percentage, totalPoints, (Date.now() - startTime) / 1000);
+    const text = buildShareMessage(currentQuiz.id, percentage);
+    const shareUrls = {
       twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
       whatsapp: `https://wa.me/?text=${encodeURIComponent(text + " " + url)}`,
-      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
       telegram: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
     };
-    if (shareUrls[platform]) window.open(shareUrls[platform], "_blank");
+
+    quizAudio.playShare();
+    window.open(shareUrls[platform], "_blank", "noopener,noreferrer");
   };
 
   // ==================== RENDER: LEADERBOARD VIEW ====================
@@ -319,15 +346,15 @@ export default function Home() {
           >
             <ArenaSurface variant="reading" className="space-y-6 rounded-[28px] p-8 text-center">
               <div className="text-6xl">🎉</div>
-              <h2 className="text-2xl font-black text-slate-50">Quiz completo</h2>
-              <p className="text-sm text-slate-300">Quer aparecer no ranking?</p>
+              <h2 className="text-2xl font-black text-slate-900 dark:text-slate-50">Fim de rodada</h2>
+              <p className="text-sm text-slate-600 dark:text-slate-300">Quer colocar esse resultado no placar?</p>
               <input type="text" placeholder="Seu nome (ou deixe em branco)" value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)} maxLength={20}
-                className="w-full rounded-xl border border-white/10 bg-slate-950/70 px-4 py-3 text-center text-sm text-slate-100 outline-none transition-colors focus:border-purple-400/50" />
+                className="w-full rounded-xl border border-slate-200/80 bg-white/85 px-4 py-3 text-center text-sm text-slate-900 outline-none transition-colors focus:border-fuchsia-400/60 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100 dark:focus:border-purple-400/50" />
               <button onClick={() => saveToLeaderboard(playerName)}
                 className="neon-btn w-full rounded-xl py-3 font-bold text-white">
                 <Trophy className="w-5 h-5 mr-2" />
-                Salvar no Ranking
+                Salvar no placar
               </button>
             </ArenaSurface>
           </motion.div>
@@ -347,21 +374,21 @@ export default function Home() {
             <div className="flex flex-col items-center p-4 pb-32 pt-20">
               <div className="w-full max-w-3xl">
                 <ArenaSurface variant="reading" className="mb-8 rounded-[30px] p-8 text-center md:p-10">
-                  <div className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Arena selecionada</div>
+                  <div className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Quiz escolhido</div>
                   <div className="text-6xl">{currentQuiz.emoji}</div>
-                  <h1 className="mt-4 text-3xl font-black text-slate-50 md:text-4xl">
+                  <h1 className="mt-4 text-3xl font-black text-slate-900 dark:text-slate-50 md:text-4xl">
                     {currentQuiz.title}
                   </h1>
-                  <p className="mt-3 text-lg text-slate-300">{currentQuiz.description}</p>
+                  <p className="mt-3 text-lg text-slate-600 dark:text-slate-300">{currentQuiz.description}</p>
                   <div className="mt-8 space-y-3">
                     <button onClick={startQuiz} className="neon-btn w-full rounded-xl py-4 text-lg font-bold text-white">
                       <Zap className="w-5 h-5 mr-2 inline" />
-                      Começar Quiz
+                      Começar quiz
                     </button>
                     <button onClick={() => { setAudioEnabled(!audioEnabled); setShowIntro(false); }}
                       className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-medium text-slate-200 transition-all hover:bg-white/10">
                       {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                      Som {audioEnabled ? "Ligado" : "Desligado"}
+                      Efeitos {audioEnabled ? "ligados" : "desligados"}
                     </button>
                   </div>
                 </ArenaSurface>
@@ -410,19 +437,7 @@ export default function Home() {
               onShare={() => shareResult("whatsapp")}
             />
 
-            <div className="grid grid-cols-4 gap-2 mt-6 w-full max-w-lg">
-              {[
-                { platform: "twitter", icon: "𝕏", color: "dark:bg-gray-800 bg-gray-100 dark:text-white text-gray-900" },
-                { platform: "whatsapp", icon: "💬", color: "dark:bg-green-500/10 bg-green-50 dark:text-green-400 text-green-600" },
-                { platform: "facebook", icon: "📘", color: "dark:bg-blue-500/10 bg-blue-50 dark:text-blue-400 text-blue-600" },
-                { platform: "telegram", icon: "✈️", color: "dark:bg-sky-500/10 bg-sky-50 dark:text-sky-400 text-sky-600" },
-              ].map(({ platform, icon, color }) => (
-                <button key={platform} onClick={() => shareResult(platform)}
-                  className={`py-3 rounded-xl font-bold text-sm ${color} dark:border border-purple-500/10 border-gray-200 transition-all hover:scale-105 active:scale-95`}>
-                  {icon}
-                </button>
-              ))}
-            </div>
+            <QuizShareButtons onShare={shareResult} className="mt-6" />
 
             <div className="w-full max-w-3xl mt-10">
               <ArenaSurface variant="panel" className="rounded-[28px] p-4 sm:p-6">

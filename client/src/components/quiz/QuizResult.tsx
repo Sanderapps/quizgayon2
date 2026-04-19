@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArenaSurface } from "@/components/layout/ArenaSurface";
-import { Trophy, Share2, RotateCcw, Zap } from "lucide-react";
+import { Trophy, Share2, RotateCcw, Sparkles, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface QuizResultProps {
@@ -16,7 +16,7 @@ interface QuizResultProps {
   onShare?: () => void;
 }
 
-export function QuizResult({ percentage, title, emoji, time, points, totalQuestions, onRestart, onLeaderboard, onShare }: QuizResultProps) {
+export function QuizResult({ percentage, title, emoji, description, time, points, totalQuestions, onRestart, onLeaderboard, onShare }: QuizResultProps) {
   const grade = percentage >= 80 ? 'S' : percentage >= 60 ? 'A' : percentage >= 40 ? 'B' : percentage >= 20 ? 'C' : 'D';
   const gradeColors: Record<string, string> = {
     S: 'from-amber-400 via-yellow-300 to-amber-500',
@@ -48,12 +48,17 @@ export function QuizResult({ percentage, title, emoji, time, points, totalQuesti
 
         <div>
           <div className="mb-3 text-5xl">{emoji}</div>
-          <h2 className="mb-2 text-xl font-black text-slate-50 md:text-2xl">
+          <h2 className="mb-2 text-xl font-black text-slate-900 dark:text-slate-50 md:text-2xl">
             {title}
           </h2>
-          <p className="text-sm text-slate-300">
+          <p className="text-sm text-slate-600 dark:text-slate-300">
             {points}/{totalQuestions * 4} pontos • {time.toFixed(1)}s
           </p>
+          {description ? (
+            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+              {description}
+            </p>
+          ) : null}
         </div>
 
         <div className="grid grid-cols-3 gap-3">
@@ -66,19 +71,28 @@ export function QuizResult({ percentage, title, emoji, time, points, totalQuesti
         </div>
 
         <div className="space-y-3">
-          <Button onClick={onLeaderboard} size="lg" className="neon-btn w-full rounded-xl py-5 font-bold">
-            <Trophy className="w-5 h-5" />
-            Ver Ranking
+          <Button onClick={onLeaderboard} size="lg" className="neon-btn rank-cta w-full rounded-2xl px-4 py-5 font-bold">
+            <span className="rank-cta__icon">
+              <Trophy className="h-5 w-5" />
+            </span>
+            <span className="flex-1 text-left">
+              <span className="block text-sm uppercase tracking-[0.18em] text-white/70">Ranking</span>
+              <span className="mt-0.5 flex items-center gap-2 text-base text-white">
+                Entrar no placar e guardar resultado
+                <Sparkles className="h-4 w-4 text-amber-200" />
+              </span>
+            </span>
+            <ArrowRight className="h-5 w-5 text-white/85" />
           </Button>
 
           <div className="grid grid-cols-2 gap-3">
             <Button onClick={onRestart} variant="outline" size="lg"
-              className="rounded-xl border-white/10 bg-white/5 py-4 font-bold text-slate-200 transition-all hover:bg-white/10">
+              className="rounded-xl border-slate-200/70 bg-white/75 py-4 font-bold text-slate-700 transition-all hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10">
               <RotateCcw className="w-4 h-4 mr-1.5" />
-              Jogar de Novo
+              Jogar de novo
             </Button>
             <Button onClick={onShare} variant="outline" size="lg"
-              className="rounded-xl border-white/10 bg-white/5 py-4 font-bold text-slate-200 transition-all hover:bg-white/10">
+              className="rounded-xl border-slate-200/70 bg-white/75 py-4 font-bold text-slate-700 transition-all hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10">
               <Share2 className="w-4 h-4 mr-1.5" />
               Compartilhar
             </Button>
