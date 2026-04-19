@@ -47,9 +47,9 @@ const ASSET_CUES: Partial<Record<CueName, AssetCueDefinition>> = {
   },
   success: {
     cooldownMs: 260,
-    src: "/sounds/ui-success.ogg",
-    volume: 0.15,
-    playbackRate: 1,
+    src: "/sounds/ui-confirm.ogg",
+    volume: 0.11,
+    playbackRate: 1.04,
   },
   start: {
     cooldownMs: 180,
@@ -59,9 +59,9 @@ const ASSET_CUES: Partial<Record<CueName, AssetCueDefinition>> = {
   },
   share: {
     cooldownMs: 220,
-    src: "/sounds/ui-share.ogg",
-    volume: 0.15,
-    playbackRate: 1,
+    src: "/sounds/ui-toggle.ogg",
+    volume: 0.1,
+    playbackRate: 1.05,
   },
   tap: {
     cooldownMs: 90,
@@ -89,9 +89,9 @@ const ASSET_CUES: Partial<Record<CueName, AssetCueDefinition>> = {
   },
   submit: {
     cooldownMs: 220,
-    src: "/sounds/ui-success.ogg",
-    volume: 0.12,
-    playbackRate: 1.04,
+    src: "/sounds/ui-toggle.ogg",
+    volume: 0.09,
+    playbackRate: 1,
   },
 };
 
