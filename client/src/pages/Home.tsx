@@ -216,6 +216,18 @@ export default function Home() {
   const playSound = () => quizAudio.playAnswer();
   const playSuccessSound = () => quizAudio.playSuccess();
 
+  const handleAudioToggle = () => {
+    const nextEnabled = !audioEnabled;
+    setAudioEnabled(nextEnabled);
+    quizAudio.setEnabled(nextEnabled);
+
+    if (nextEnabled) {
+      window.setTimeout(() => {
+        quizAudio.playAnswer();
+      }, 0);
+    }
+  };
+
   const handleAnswer = (points: number, answerIndex: number) => {
     if (answerLockRef.current || selectedAnswer !== null) return;
     answerLockRef.current = true;
@@ -389,7 +401,7 @@ export default function Home() {
                       <Zap className="w-5 h-5 mr-2 inline" />
                       Começar quiz
                     </button>
-                    <button onClick={() => { setAudioEnabled(!audioEnabled); setShowIntro(false); }}
+                    <button onClick={handleAudioToggle}
                       className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200/80 bg-white/85 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-white dark:border-white/10 dark:bg-white/8 dark:text-slate-100 dark:hover:bg-white/12">
                       {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
                       Efeitos {audioEnabled ? "ligados" : "desligados"}

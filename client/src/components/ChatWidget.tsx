@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import { GifPicker } from "./GifPicker";
+import { quizAudio } from "@/lib/quizAudio";
 import { Flag, MessageSquare, Palette, Send, SmilePlus, Sticker, Trash2, UserRound, X } from "lucide-react";
 
 interface ChatMessage {
@@ -52,7 +53,14 @@ export function ChatWidget() {
     if (savedColor) setSelectedColor(savedColor);
     if (savedEmoji) setSelectedEmoji(savedEmoji);
 
-    const handleToggleChat = () => setIsOpen(prev => !prev);
+    const handleToggleChat = () => {
+      setIsOpen((prev) => {
+        const nextOpen = !prev;
+        if (nextOpen) quizAudio.playPanelOpen();
+        else quizAudio.playPanelClose();
+        return nextOpen;
+      });
+    };
     window.addEventListener('toggleChat', handleToggleChat);
     return () => window.removeEventListener('toggleChat', handleToggleChat);
   }, []);
@@ -119,6 +127,7 @@ export function ChatWidget() {
 
   const handleSetApelido = () => {
     if (apelido.trim().length >= 2) {
+      quizAudio.playConfirm();
       localStorage.setItem("chat_apelido", apelido.trim());
       localStorage.setItem("chat_color", selectedColor);
       localStorage.setItem("chat_emoji", selectedEmoji);
@@ -128,6 +137,7 @@ export function ChatWidget() {
 
   const handleSendMessage = () => {
     if (!inputMessage.trim() || !socketRef.current) return;
+    quizAudio.playSubmit();
     socketRef.current.emit("chat_message", {
       apelido, mensagem: inputMessage.trim(), cor: selectedColor,
       emoji_avatar: selectedEmoji, tipo: 'text',
@@ -143,6 +153,7 @@ export function ChatWidget() {
       setTimeout(() => setError(""), 2000);
       return;
     }
+    quizAudio.playSubmit();
     socketRef.current.emit("chat_message", {
       apelido, mensagem: "[GIF]", cor: selectedColor,
       emoji_avatar: selectedEmoji, tipo: 'gif', gif_url: gifUrl,
@@ -222,7 +233,10 @@ export function ChatWidget() {
               )}
             </div>
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                quizAudio.playPanelClose();
+                setIsOpen(false);
+              }}
               className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-500 transition-colors hover:bg-white/40 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200"
               aria-label="Fechar chat"
             >
@@ -242,7 +256,10 @@ export function ChatWidget() {
 
               {/* Avatar */}
               <button
-                onClick={() => setShowAvatarPicker(!showAvatarPicker)}
+                onClick={() => {
+                  quizAudio.playSoftToggle();
+                  setShowAvatarPicker(!showAvatarPicker);
+                }}
                 className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 text-4xl transition-transform hover:scale-105 dark:border-purple-500/20 dark:bg-white/5"
                 aria-label="Escolher avatar"
               >
@@ -278,7 +295,12 @@ export function ChatWidget() {
                   {COLOR_PALETTE.map((color) => (
                     <button
                       key={color}
-                      onClick={() => setSelectedColor(color)}
+                      onClick={() => {
+                        if (selectedColor !== color) {
+                          quizAudio.playSoftToggle();
+                        }
+                        setSelectedColor(color);
+                      }}
                       className={`h-8 w-8 rounded-full transition-all ${selectedColor === color ? "scale-125 ring-2 ring-white dark:ring-purple-400" : "hover:scale-110"}`}
                       style={{ backgroundColor: color }}
                       aria-label={`Escolher cor ${color}`}
@@ -368,14 +390,20 @@ export function ChatWidget() {
               {/* Input */}
               <div className="flex items-end gap-2 border-t border-gray-100 p-2.5 dark:border-purple-500/10">
                 <button
-                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  onClick={() => {
+                    quizAudio.playSoftToggle();
+                    setShowEmojiPicker(!showEmojiPicker);
+                  }}
                   className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
                   aria-label="Abrir emojis"
                 >
                   <SmilePlus className="h-4 w-4" />
                 </button>
                 <button
-                  onClick={() => setShowGifPicker(true)}
+                  onClick={() => {
+                    quizAudio.playPanelOpen();
+                    setShowGifPicker(true);
+                  }}
                   disabled={gifCooldown > 0}
                   className="relative flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-40 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
                   title={gifCooldown > 0 ? `Aguarde ${gifCooldown}s` : "Enviar GIF"}

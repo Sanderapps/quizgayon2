@@ -1,5 +1,6 @@
 import { ChevronUp, ListMusic, MessageCircle, Music, Radio, Volume2, X } from "lucide-react";
 import { useRadio } from "@/contexts/RadioContext";
+import { quizAudio } from "@/lib/quizAudio";
 import { useEffect, useState } from "react";
 
 export function RadioPlayer() {
@@ -33,8 +34,16 @@ export function RadioPlayer() {
     return () => window.removeEventListener("quiz:menu-state", handleMenuState as EventListener);
   }, []);
 
+  const togglePanel = (nextState?: boolean) => {
+    const willOpen = typeof nextState === "boolean" ? nextState : !isExpanded;
+    setIsExpanded(willOpen);
+    if (willOpen) quizAudio.playPanelOpen();
+    else quizAudio.playPanelClose();
+  };
+
   const handleRequestSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    quizAudio.playTap();
     setIsSubmitting(true);
     try {
       const response = await fetch('/api/music-requests', {
@@ -43,6 +52,7 @@ export function RadioPlayer() {
         body: JSON.stringify({ name: requestName || 'Anônimo', song: requestSong })
       });
       if (response.ok) {
+        quizAudio.playSubmit();
         alert('Pedido enviado. Se entrar na fila, ele aparece aqui.');
         setRequestName('');
         setRequestSong('');
@@ -74,7 +84,7 @@ export function RadioPlayer() {
               </div>
               <button
                 type="button"
-                onClick={() => setIsExpanded(false)}
+                onClick={() => togglePanel(false)}
                 className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200/80 bg-white text-slate-600 shadow-sm transition-colors hover:bg-slate-50 dark:border-white/10 dark:bg-white/6 dark:text-slate-300 dark:hover:bg-white/10"
                 aria-label="Fechar painel da rádio"
               >
@@ -172,7 +182,10 @@ export function RadioPlayer() {
         <div className="relative max-w-7xl mx-auto px-4 py-2.5 md:py-3 flex items-center gap-3">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <button
-              onClick={togglePlay}
+              onClick={() => {
+                quizAudio.playSoftToggle();
+                togglePlay();
+              }}
               disabled={isLoading}
               className="w-11 h-11 md:w-12 md:h-12 rounded-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 dark:bg-white/10 bg-gray-100 dark:hover:bg-white/15 hover:bg-gray-200 dark:border border-purple-500/20 border-gray-200"
               title={isPlaying ? "Pausar" : "Reproduzir"}
@@ -187,7 +200,7 @@ export function RadioPlayer() {
             </button>
 
             <button
-              onClick={() => setIsExpanded((prev) => !prev)}
+              onClick={() => togglePanel()}
               aria-expanded={isExpanded}
               aria-controls="radio-player-panel"
               aria-label={isExpanded ? "Fechar painel da rádio" : "Abrir painel da rádio"}
@@ -217,7 +230,7 @@ export function RadioPlayer() {
 
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
-              onClick={() => setIsExpanded((prev) => !prev)}
+              onClick={() => togglePanel()}
               aria-expanded={isExpanded}
               aria-controls="radio-player-panel"
               aria-label={isExpanded ? "Fechar painel da rádio" : "Abrir painel da rádio"}
@@ -228,7 +241,9 @@ export function RadioPlayer() {
             </button>
 
             <button
-              onClick={() => window.dispatchEvent(new CustomEvent('toggleChat'))}
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('toggleChat'));
+              }}
               className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-500 px-3 py-2 text-xs font-bold text-white transition-all hover:scale-105 active:scale-95"
             >
               <MessageCircle className="w-3.5 h-3.5" />

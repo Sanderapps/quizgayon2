@@ -1,4 +1,15 @@
-type CueName = "answerClick" | "confirm" | "transition" | "success" | "start" | "share";
+type CueName =
+  | "answerClick"
+  | "confirm"
+  | "transition"
+  | "success"
+  | "start"
+  | "share"
+  | "tap"
+  | "softToggle"
+  | "panelOpen"
+  | "panelClose"
+  | "submit";
 
 interface AssetCueDefinition {
   cooldownMs: number;
@@ -25,7 +36,7 @@ const ASSET_CUES: Partial<Record<CueName, AssetCueDefinition>> = {
   answerClick: {
     cooldownMs: 45,
     src: "/sounds/guitar-click.mp3",
-    volume: 0.18,
+    volume: 0.16,
     playbackRate: 1.04,
   },
   confirm: {
@@ -37,7 +48,7 @@ const ASSET_CUES: Partial<Record<CueName, AssetCueDefinition>> = {
   success: {
     cooldownMs: 260,
     src: "/sounds/guitar-success.mp3",
-    volume: 0.22,
+    volume: 0.19,
     playbackRate: 1,
   },
   start: {
@@ -47,10 +58,40 @@ const ASSET_CUES: Partial<Record<CueName, AssetCueDefinition>> = {
     playbackRate: 0.86,
   },
   share: {
-    cooldownMs: 180,
+    cooldownMs: 220,
     src: "/sounds/guitar-success.mp3",
-    volume: 0.18,
+    volume: 0.15,
     playbackRate: 1.06,
+  },
+  tap: {
+    cooldownMs: 90,
+    src: "/sounds/guitar-click.mp3",
+    volume: 0.08,
+    playbackRate: 1.12,
+  },
+  softToggle: {
+    cooldownMs: 110,
+    src: "/sounds/guitar-click.mp3",
+    volume: 0.075,
+    playbackRate: 0.98,
+  },
+  panelOpen: {
+    cooldownMs: 150,
+    src: "/sounds/guitar-click.mp3",
+    volume: 0.1,
+    playbackRate: 0.88,
+  },
+  panelClose: {
+    cooldownMs: 150,
+    src: "/sounds/guitar-click.mp3",
+    volume: 0.07,
+    playbackRate: 1.18,
+  },
+  submit: {
+    cooldownMs: 220,
+    src: "/sounds/guitar-success.mp3",
+    volume: 0.13,
+    playbackRate: 1.1,
   },
 };
 
@@ -141,11 +182,17 @@ class QuizAudioEngine {
     return nextAudio;
   }
 
+  private getVolumeScale() {
+    if (typeof window === "undefined") return 1;
+    const isCoarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches;
+    return isCoarsePointer ? 0.78 : 1;
+  }
+
   private playAsset(cueName: CueName, cue: AssetCueDefinition) {
     if (typeof window === "undefined") return;
 
     const audio = this.getAssetInstance(cue.src);
-    audio.volume = cue.volume;
+    audio.volume = cue.volume * this.getVolumeScale();
     audio.playbackRate = cue.playbackRate || 1;
     audio.currentTime = 0;
     audio.play().catch(() => {
@@ -196,6 +243,26 @@ class QuizAudioEngine {
 
   playShare() {
     this.play("share");
+  }
+
+  playTap() {
+    this.play("tap");
+  }
+
+  playSoftToggle() {
+    this.play("softToggle");
+  }
+
+  playPanelOpen() {
+    this.play("panelOpen");
+  }
+
+  playPanelClose() {
+    this.play("panelClose");
+  }
+
+  playSubmit() {
+    this.play("submit");
   }
 }
 

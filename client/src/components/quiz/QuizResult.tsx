@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArenaSurface } from "@/components/layout/ArenaSurface";
+import { quizAudio } from "@/lib/quizAudio";
 import { Trophy, Share2, RotateCcw, Sparkles, ArrowRight, BadgeCheck, TimerReset } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -80,7 +81,7 @@ export function QuizResult({ percentage, title, emoji, description, time, points
         </div>
 
         <div className="space-y-3 rounded-2xl border border-slate-200/70 bg-white/70 p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.03]">
-          <Button onClick={onLeaderboard} size="lg" className="neon-btn neon-btn-strong rank-cta w-full rounded-2xl px-4 py-5 font-bold">
+          <Button onClick={() => { quizAudio.playConfirm(); onLeaderboard(); }} size="lg" className="neon-btn neon-btn-strong rank-cta w-full rounded-2xl px-4 py-5 font-bold">
             <span className="rank-cta__icon">
               <Trophy className="h-5 w-5" />
             </span>
@@ -95,12 +96,12 @@ export function QuizResult({ percentage, title, emoji, description, time, points
           </Button>
 
           <div className="grid grid-cols-2 gap-3">
-            <Button onClick={onRestart} variant="outline" size="lg"
+            <Button onClick={() => { quizAudio.playTap(); onRestart(); }} variant="outline" size="lg"
               className="rounded-xl border-slate-300/90 bg-white py-4 font-bold text-slate-800 shadow-sm transition-all hover:bg-white dark:border-white/12 dark:bg-white/8 dark:text-slate-100 dark:hover:bg-white/12">
               <RotateCcw className="w-4 h-4 mr-1.5" />
               Jogar de novo
             </Button>
-            <Button onClick={onShare} variant="outline" size="lg"
+            <Button onClick={() => onShare?.()} variant="outline" size="lg"
               className="rounded-xl border-cyan-300/70 bg-cyan-50 py-4 font-bold text-cyan-900 shadow-sm transition-all hover:bg-cyan-100 dark:border-cyan-400/20 dark:bg-cyan-500/10 dark:text-cyan-100 dark:hover:bg-cyan-500/14">
               <Share2 className="w-4 h-4 mr-1.5" />
               Compartilhar

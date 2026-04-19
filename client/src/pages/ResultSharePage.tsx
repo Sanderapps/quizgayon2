@@ -3,6 +3,7 @@ import { Link, useLocation, useParams } from "wouter";
 import { ArenaPageShell } from "@/components/layout/ArenaPageShell";
 import { ArenaSurface } from "@/components/layout/ArenaSurface";
 import { QuizShareButtons } from "@/components/quiz/QuizShareButtons";
+import { quizAudio } from "@/lib/quizAudio";
 import { buildResultShareMeta, buildResultShareUrl, buildSavedScoreShareMeta, buildSavedScoreShareUrl, buildShareMessage } from "@/lib/quizShare";
 import { getQuizById, getDefaultQuiz } from "@/data/quizzes";
 import { buscarResultadoCompartilhavel, pontuacaoParaPercentual } from "@/services/api";
@@ -89,6 +90,7 @@ export default function ResultSharePage() {
   }, [meta, percentage, quiz.id]);
 
   const handleShare = (platform: "twitter" | "facebook" | "telegram" | "whatsapp") => {
+    quizAudio.playShare();
     const url = canonicalUrl;
     const text = buildShareMessage(quiz.id, percentage);
     const shareUrls = {
@@ -103,6 +105,7 @@ export default function ResultSharePage() {
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(canonicalUrl);
+      quizAudio.playSubmit();
       toast.success("Link copiado");
     } catch (error) {
       console.error("Falha ao copiar link:", error);
@@ -117,6 +120,7 @@ export default function ResultSharePage() {
       setLoadError("Digite um código para abrir um resultado.");
       return;
     }
+    quizAudio.playConfirm();
     navigate(`/resultado/codigo/${encodeURIComponent(numericCode)}`);
   };
 
@@ -216,11 +220,11 @@ export default function ResultSharePage() {
               </button>
 
               <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Link href={`/quiz/${quiz.slug}`} className="neon-btn neon-btn-strong rounded-xl px-5 py-4 text-center font-semibold text-white">
+                <Link href={`/quiz/${quiz.slug}`} onClick={() => quizAudio.playConfirm()} className="neon-btn neon-btn-strong rounded-xl px-5 py-4 text-center font-semibold text-white">
                   <RotateCcw className="mr-2 inline h-4 w-4" />
                   Jogar este quiz
                 </Link>
-                <Link href="/" className="rounded-xl border border-slate-200/85 bg-white px-5 py-4 text-center font-semibold text-slate-800 shadow-sm transition-colors hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10">
+                <Link href="/" onClick={() => quizAudio.playTap()} className="rounded-xl border border-slate-200/85 bg-white px-5 py-4 text-center font-semibold text-slate-800 shadow-sm transition-colors hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10">
                   <Trophy className="mr-2 inline h-4 w-4" />
                   Explorar outras arenas
                 </Link>

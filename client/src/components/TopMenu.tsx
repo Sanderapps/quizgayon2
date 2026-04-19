@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { useTheme } from "@/contexts/ThemeContext";
 import { changelog } from "@/data/changelog";
+import { quizAudio } from "@/lib/quizAudio";
 import {
   ChevronRight,
   ClipboardList,
@@ -34,6 +35,12 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const isDark = theme === "dark";
 
+  const setMenuOpen = (nextOpen: boolean) => {
+    setIsOpen(nextOpen);
+    if (nextOpen) quizAudio.playPanelOpen();
+    else quizAudio.playPanelClose();
+  };
+
   useEffect(() => {
     window.dispatchEvent(new CustomEvent("quiz:menu-state", { detail: { open: isOpen } }));
 
@@ -54,21 +61,25 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
   );
 
   const handleItemClick = (page: string) => {
+    if (page !== "chat") {
+      quizAudio.playTap();
+    }
+
     if (page === "chat") {
       window.dispatchEvent(new CustomEvent("toggleChat"));
-      setIsOpen(false);
+      setMenuOpen(false);
       return;
     }
 
     if (page === "admin") {
       setLocation("/admin");
-      setIsOpen(false);
+      setMenuOpen(false);
       return;
     }
 
     if (page === "home" || page === "quiz") {
       setLocation("/");
-      setIsOpen(false);
+      setMenuOpen(false);
       if (page === "quiz" && onNavigate) onNavigate(page);
       return;
     }
@@ -77,7 +88,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
       onNavigate(page);
     }
 
-    setIsOpen(false);
+    setMenuOpen(false);
   };
 
   const handleSubmitSuggestion = async () => {
@@ -97,6 +108,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
       });
 
       if (response.ok) {
+        quizAudio.playSubmit();
         setFeedback({ type: "success", text: "Sugestão enviada." });
         setMessage("");
         setApelido("");
@@ -123,7 +135,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
   return (
     <>
       <button
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={() => setMenuOpen(!isOpen)}
         className="fixed right-4 top-4 z-[95] flex h-12 items-center gap-2 rounded-lg border border-slate-200/75 bg-white/86 px-3 text-slate-800 shadow-[0_10px_28px_rgba(15,23,42,0.14)] backdrop-blur-xl transition-all hover:border-fuchsia-300/60 dark:border-white/10 dark:bg-slate-950/82 dark:text-slate-100 dark:hover:border-purple-400/30"
         aria-label="Abrir menu"
       >
@@ -134,7 +146,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
       {isOpen && (
         <div
           className="fixed inset-0 z-[109] bg-slate-950/42 backdrop-blur-sm dark:bg-black/70"
-          onClick={() => setIsOpen(false)}
+          onClick={() => setMenuOpen(false)}
         />
       )}
 
@@ -155,7 +167,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
               <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Acesso rápido, ajustes e novidades sem atrapalhar a rodada.</p>
             </div>
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={() => setMenuOpen(false)}
               className="rounded-lg border border-slate-200/70 bg-white/75 p-2 text-slate-500 transition-colors hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:text-white"
               aria-label="Fechar menu"
             >
@@ -190,7 +202,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
             <section>
               <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Preferências</h3>
               <div className="space-y-2">
-                <button onClick={() => toggleTheme?.()} className="menu-item-row">
+                <button onClick={() => { quizAudio.playSoftToggle(); toggleTheme?.(); }} className="menu-item-row">
                   <span className="flex items-center gap-3">
                     <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-600 dark:bg-white/5 dark:text-cyan-300">
                       {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
@@ -204,6 +216,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
 
                 <button
                   onClick={() => {
+                    quizAudio.playPanelOpen();
                     setShowSuggestions(true);
                     setIsOpen(false);
                   }}
@@ -223,6 +236,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
 
                 <button
                   onClick={() => {
+                    quizAudio.playPanelOpen();
                     setShowUpdates(true);
                     setIsOpen(false);
                   }}
@@ -254,7 +268,10 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
                 <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Mudanças recentes sem disputar espaço com a navegação.</p>
               </div>
               <button
-                onClick={() => setShowUpdates(false)}
+                onClick={() => {
+                  quizAudio.playPanelClose();
+                  setShowUpdates(false);
+                }}
                 className="rounded-lg border border-slate-200/70 bg-white/70 p-2 text-slate-500 hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:text-white"
                 aria-label="Fechar atualizações"
               >
@@ -291,7 +308,7 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
                 <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Sugestões</h2>
                 <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Manda a ideia com contexto suficiente para virar ajuste de verdade.</p>
               </div>
-              <button onClick={() => setShowSuggestions(false)} className="rounded-lg border border-slate-200/70 bg-white/70 p-2 text-slate-500 hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:text-white">
+              <button onClick={() => { quizAudio.playPanelClose(); setShowSuggestions(false); }} className="rounded-lg border border-slate-200/70 bg-white/70 p-2 text-slate-500 hover:text-slate-900 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:text-white">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -339,13 +356,13 @@ export function TopMenu({ onNavigate }: TopMenuProps) {
 
             <div className="flex gap-3">
               <button
-                onClick={() => setShowSuggestions(false)}
+                onClick={() => { quizAudio.playPanelClose(); setShowSuggestions(false); }}
                 className="flex-1 rounded-xl border border-slate-200/80 bg-white/85 px-4 py-3 text-sm font-medium text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
                 disabled={isSubmitting}
               >
                 Cancelar
               </button>
-              <button onClick={handleSubmitSuggestion} className="neon-btn flex-1 rounded-xl px-4 py-3 text-sm font-semibold" disabled={isSubmitting}>
+              <button onClick={() => { quizAudio.playTap(); handleSubmitSuggestion(); }} className="neon-btn flex-1 rounded-xl px-4 py-3 text-sm font-semibold" disabled={isSubmitting}>
                 {isSubmitting ? "Enviando..." : "Enviar"}
               </button>
             </div>
