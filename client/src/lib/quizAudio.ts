@@ -32,75 +32,76 @@ interface ToneCueDefinition {
   steps: ToneStep[];
 }
 
-const ASSET_CUES: Partial<Record<CueName, AssetCueDefinition>> = {
+const ASSET_CUES: Partial<Record<CueName, AssetCueDefinition>> = {};
+
+const TONE_CUES: Partial<Record<CueName, ToneCueDefinition>> = {
   answerClick: {
-    cooldownMs: 45,
-    src: "/sounds/ui-tap.ogg",
-    volume: 0.14,
-    playbackRate: 1,
+    cooldownMs: 55,
+    steps: [{ duration: 0.032, from: 840, to: 760, gain: 0.011, type: "square" }],
+  },
+  tap: {
+    cooldownMs: 95,
+    steps: [{ duration: 0.026, from: 780, to: 700, gain: 0.007, type: "square" }],
   },
   confirm: {
-    cooldownMs: 70,
-    src: "/sounds/ui-confirm.ogg",
-    volume: 0.14,
-    playbackRate: 1,
-  },
-  success: {
-    cooldownMs: 260,
-    src: "/sounds/ui-confirm.ogg",
-    volume: 0.11,
-    playbackRate: 1.04,
+    cooldownMs: 90,
+    steps: [
+      { duration: 0.028, from: 620, to: 720, gain: 0.009, type: "square" },
+      { delay: 0.018, duration: 0.03, from: 760, to: 880, gain: 0.007, type: "square" },
+    ],
   },
   start: {
     cooldownMs: 180,
-    src: "/sounds/ui-confirm.ogg",
-    volume: 0.14,
-    playbackRate: 0.96,
+    steps: [
+      { duration: 0.03, from: 540, to: 680, gain: 0.008, type: "square" },
+      { delay: 0.024, duration: 0.034, from: 720, to: 960, gain: 0.01, type: "square" },
+    ],
   },
-  share: {
-    cooldownMs: 220,
-    src: "/sounds/ui-toggle.ogg",
-    volume: 0.1,
-    playbackRate: 1.05,
-  },
-  tap: {
-    cooldownMs: 90,
-    src: "/sounds/ui-tap.ogg",
-    volume: 0.08,
-    playbackRate: 1,
-  },
-  softToggle: {
-    cooldownMs: 110,
-    src: "/sounds/ui-toggle.ogg",
-    volume: 0.08,
-    playbackRate: 1,
-  },
-  panelOpen: {
-    cooldownMs: 150,
-    src: "/sounds/ui-panel-open.ogg",
-    volume: 0.09,
-    playbackRate: 1,
-  },
-  panelClose: {
-    cooldownMs: 150,
-    src: "/sounds/ui-panel-close.ogg",
-    volume: 0.07,
-    playbackRate: 1,
-  },
-  submit: {
-    cooldownMs: 220,
-    src: "/sounds/ui-toggle.ogg",
-    volume: 0.09,
-    playbackRate: 1,
-  },
-};
-
-const TONE_CUES: Partial<Record<CueName, ToneCueDefinition>> = {
   transition: {
     cooldownMs: 90,
     steps: [
-      { duration: 0.03, from: 420, to: 500, gain: 0.006, type: "triangle" },
-      { delay: 0.016, duration: 0.035, from: 590, to: 700, gain: 0.004, type: "sine" },
+      { duration: 0.024, from: 460, to: 540, gain: 0.004, type: "triangle" },
+      { delay: 0.016, duration: 0.026, from: 600, to: 700, gain: 0.003, type: "square" },
+    ],
+  },
+  success: {
+    cooldownMs: 260,
+    steps: [
+      { duration: 0.04, from: 620, to: 740, gain: 0.007, type: "square" },
+      { delay: 0.03, duration: 0.045, from: 820, to: 980, gain: 0.008, type: "square" },
+      { delay: 0.062, duration: 0.05, from: 1040, to: 1240, gain: 0.009, type: "square" },
+    ],
+  },
+  submit: {
+    cooldownMs: 220,
+    steps: [
+      { duration: 0.032, from: 600, to: 700, gain: 0.006, type: "square" },
+      { delay: 0.022, duration: 0.03, from: 760, to: 860, gain: 0.006, type: "square" },
+    ],
+  },
+  share: {
+    cooldownMs: 220,
+    steps: [
+      { duration: 0.025, from: 700, to: 820, gain: 0.006, type: "square" },
+      { delay: 0.018, duration: 0.028, from: 900, to: 1080, gain: 0.007, type: "square" },
+    ],
+  },
+  softToggle: {
+    cooldownMs: 110,
+    steps: [{ duration: 0.03, from: 520, to: 620, gain: 0.005, type: "square" }],
+  },
+  panelOpen: {
+    cooldownMs: 150,
+    steps: [
+      { duration: 0.028, from: 380, to: 460, gain: 0.0045, type: "square" },
+      { delay: 0.02, duration: 0.03, from: 520, to: 660, gain: 0.0055, type: "square" },
+    ],
+  },
+  panelClose: {
+    cooldownMs: 150,
+    steps: [
+      { duration: 0.026, from: 620, to: 520, gain: 0.0045, type: "square" },
+      { delay: 0.014, duration: 0.022, from: 480, to: 380, gain: 0.0035, type: "square" },
     ],
   },
 };

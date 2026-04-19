@@ -244,10 +244,21 @@ export function RadioPlayer() {
               onClick={() => {
                 window.dispatchEvent(new CustomEvent('toggleChat'));
               }}
-              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-500 px-3 py-2 text-xs font-bold text-white transition-all hover:scale-105 active:scale-95"
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-500 px-3 py-2 text-left text-white shadow-[0_10px_24px_rgba(168,85,247,0.26)] transition-all hover:scale-[1.02] active:scale-95"
+              aria-label="Entrar no chat ao vivo"
             >
-              <MessageCircle className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Chat</span>
+              <span className="relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-white/14">
+                <MessageCircle className="h-4 w-4" />
+                <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_10px_rgba(110,231,183,0.9)]" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-white/70">
+                  Ao vivo
+                </span>
+                <span className="block whitespace-nowrap text-sm font-bold">
+                  Entrar no chat
+                </span>
+              </span>
             </button>
           </div>
         </div>
